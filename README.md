@@ -1,8 +1,20 @@
 # Qwik City + Next Auth ⚡️
 
-## TODO
+## TODO List
 
-- [ ] - fix saving cookies when new qwik release cookies api
+- [ ] fix saving cookies when new qwik release cookies api
+- [ ] random albums grid
+- [ ] album card
+- [ ] albums search
+- [ ] album details page
+- [ ] review album
+- [ ] review list
+- [ ] remove album
+- [ ] remove review
+- [ ] edit album
+- [ ] edit review
+- [ ] setup vanilla-extract
+- [ ] setup trpc
 
 ## Tools
 
