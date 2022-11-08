@@ -4,7 +4,7 @@ import { withSession } from "~/server/auth/withSession";
 import type { inferPromise } from "~/utils/types";
 import { useSessionContextProvider } from "./SessionContext";
 
-export const onGet = withSession(async (event) => {
+export const onGet = withSession((event) => {
   return event.session;
 });
 

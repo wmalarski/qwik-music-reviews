@@ -3,7 +3,6 @@ import Auth0Provider from "next-auth/providers/auth0";
 import { env } from "../env";
 
 export const authOptions: NextAuthOptions = {
-  secret: env.VITE_NEXTAUTH_SECRET,
   providers: [
     Auth0Provider({
       clientId: env.VITE_AUTH0_CLIENT_ID,
@@ -11,4 +10,5 @@ export const authOptions: NextAuthOptions = {
       issuer: env.VITE_AUTH0_ISSUER,
     }),
   ],
+  secret: env.VITE_NEXTAUTH_SECRET,
 };

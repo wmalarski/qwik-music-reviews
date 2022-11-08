@@ -22,7 +22,7 @@ export const withProtectedSession = <T>(
   handler: (event: RequestEvent & { session: Session }) => T | Promise<T>,
   options: WithProtectedSessionOptions = {}
 ) => {
-  return withSession(async (event) => {
+  return withSession((event) => {
     if (!event.session) {
       throw event.response.redirect(options.redirectTo || "/api/auth/signin");
     }

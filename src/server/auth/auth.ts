@@ -16,14 +16,17 @@ import type {
 } from "next-auth/core/types";
 import { env } from "../env";
 
-const getBody = (formData: FormData | null): Record<string, any> => {
+const getBody = (formData: FormData | null): Record<string, unknown> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {};
   (formData || []).forEach((value, key) => {
-    if (key in data)
+    if (key in data) {
       data[key] = Array.isArray(data[key])
         ? [...data[key], value]
         : [data[key], value];
-    else data[key] = value;
+    } else {
+      data[key] = value;
+    }
   }, {});
   return data;
 };
@@ -31,7 +34,9 @@ const getBody = (formData: FormData | null): Record<string, any> => {
 const tempCookieName = "next-auth.temp";
 
 const setCookies = (response: ResponseContext, cookies?: Cookie[]) => {
-  if (!cookies || cookies.length < 1) return;
+  if (!cookies || cookies.length < 1) {
+    return;
+  }
 
   // TODO: change to new api when available
   // this is temporary fix for not able to save multiple cookies
@@ -60,7 +65,7 @@ const QWikNextAuthHandler = async (
   options: NextAuthOptions
 ) => {
   const { request, params, url, response } = event;
-  const [action, providerId] = params.nextauth!.split("/");
+  const [action, providerId] = params.nextauth.split("/");
 
   let body = undefined;
   try {
@@ -72,18 +77,18 @@ const QWikNextAuthHandler = async (
   const query = Object.fromEntries(url.searchParams);
 
   const res = await NextAuthHandler({
-    req: {
-      host: env.VITE_NEXTAUTH_URL,
-      body,
-      query,
-      headers: request.headers,
-      method: request.method,
-      cookies: getCookie(request.headers),
-      action: action as NextAuthAction,
-      providerId,
-      error: (query.error as string | undefined) ?? providerId,
-    },
     options,
+    req: {
+      action: action as NextAuthAction,
+      body,
+      cookies: getCookie(request.headers),
+      error: (query.error as string | undefined) ?? providerId,
+      headers: request.headers,
+      host: env.VITE_NEXTAUTH_URL,
+      method: request.method,
+      providerId,
+      query,
+    },
   });
 
   const { cookies, redirect, headers, status } = res;
@@ -113,14 +118,14 @@ export const getServerSession = async (
 ): Promise<Session | null> => {
   const { request, response } = event;
   const res = await NextAuthHandler({
-    req: {
-      host: env.VITE_NEXTAUTH_URL,
-      headers: request.headers,
-      method: "GET",
-      cookies: getCookie(request.headers),
-      action: "session",
-    },
     options,
+    req: {
+      action: "session",
+      cookies: getCookie(request.headers),
+      headers: request.headers,
+      host: env.VITE_NEXTAUTH_URL,
+      method: "GET",
+    },
   });
   const { body, cookies } = res;
 
@@ -137,14 +142,14 @@ export const getServerCsrfToken = async (
   options: NextAuthOptions
 ) => {
   const { body } = await NextAuthHandler({
-    req: {
-      host: env.VITE_NEXTAUTH_URL,
-      headers: request.headers,
-      method: "GET",
-      cookies: getCookie(request.headers),
-      action: "csrf",
-    },
     options,
+    req: {
+      action: "csrf",
+      cookies: getCookie(request.headers),
+      headers: request.headers,
+      host: env.VITE_NEXTAUTH_URL,
+      method: "GET",
+    },
   });
   return (body as { csrfToken: string }).csrfToken;
 };
@@ -162,14 +167,14 @@ export const getServerProviders = async (
   options: NextAuthOptions
 ) => {
   const { body } = await NextAuthHandler({
-    req: {
-      host: env.VITE_NEXTAUTH_URL,
-      headers: request.headers,
-      method: "GET",
-      cookies: getCookie(request.headers),
-      action: "providers",
-    },
     options,
+    req: {
+      action: "providers",
+      cookies: getCookie(request.headers),
+      headers: request.headers,
+      host: env.VITE_NEXTAUTH_URL,
+      method: "GET",
+    },
   });
   if (body && typeof body !== "string") {
     return body as Record<string, PublicProvider>;
