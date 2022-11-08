@@ -8,7 +8,7 @@ export default component$(() => {
   return (
     <div>
       <h1>
-        Welcome to Qwik <span class="lightning">⚡️</span>
+        Welcome to Qwik <span class="bg-red-500">⚡️</span>
       </h1>
       <a href="/protected">Protected</a>
       <Resource
