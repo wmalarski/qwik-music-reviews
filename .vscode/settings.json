@@ -1,3 +1,9 @@
 {
-  "cSpell.words": ["NEXTAUTH", "qwik"]
+  "cSpell.words": [
+    "NEXTAUTH",
+    "qwik",
+    "superjson",
+    "tailwindcss",
+    "trpc"
+  ]
 }
