@@ -1,6 +1,13 @@
 import { component$, Resource } from "@builder.io/qwik";
-import { DocumentHead } from "@builder.io/qwik-city";
+import { DocumentHead, RequestEvent } from "@builder.io/qwik-city";
 import { useSessionContext } from "./SessionContext";
+
+export const onGet = async (event: RequestEvent) => {
+  const { trpcServerCaller } = await import("~/server/trpc/router");
+  const { caller } = await trpcServerCaller(event);
+
+  return caller.album.findRandom();
+};
 
 export default component$(() => {
   const resource = useSessionContext();
@@ -10,7 +17,7 @@ export default component$(() => {
       <h1>
         Welcome to Qwik <span class="bg-red-500">⚡️</span>
       </h1>
-      <a href="/protected">Protected</a>
+      <a href="/app">Protected</a>
       <Resource
         value={resource}
         onPending={() => <span>Pending</span>}
@@ -18,11 +25,6 @@ export default component$(() => {
         onResolved={(data) => (
           <div>
             <pre>{JSON.stringify(data, null, 2)}</pre>
-            {data ? (
-              <a href="/api/auth/signout">Sing Out</a>
-            ) : (
-              <a href="/api/auth/signin">Sign In</a>
-            )}
           </div>
         )}
       />

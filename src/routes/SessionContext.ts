@@ -6,7 +6,7 @@ import {
 } from "@builder.io/qwik";
 import type { Session } from "next-auth/core/types";
 
-type SessionContextState = ResourceReturn<Session | null>;
+type SessionContextState = ResourceReturn<Session>;
 
 const SessionContext = createContext<SessionContextState>("session-context");
 
