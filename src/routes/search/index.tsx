@@ -5,7 +5,10 @@ export const onGet = async (event: RequestEvent) => {
   const { trpcServerCaller } = await import("~/server/trpc/router");
   const { caller } = await trpcServerCaller(event);
 
-  return caller.album.findRandom();
+  const params = event.url.searchParams;
+  const query = params.get("query") || "";
+  const page = +(params.get("page") || 0);
+  return caller.album.findAlbums({ query, skip: page * 10, take: 10 });
 };
 
 export default component$(() => {
@@ -14,7 +17,7 @@ export default component$(() => {
   return (
     <div>
       <h1>
-        Random Albums <span class="bg-red-500">⚡️</span>
+        Search <span class="bg-red-500">⚡️</span>
       </h1>
       <Resource
         value={resource}
@@ -27,5 +30,5 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Welcome to Qwik",
+  title: "Search - Qwik Album Review",
 };
