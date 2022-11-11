@@ -1,9 +1,14 @@
 import { RequestEvent } from "@builder.io/qwik-city";
+import { Session } from "next-auth";
 
-export const withTrpc = <R extends RequestEvent = RequestEvent>() => {
+type RequestEventWithSession = RequestEvent & { session: Session | null };
+
+export const withTrpc = <
+  R extends RequestEventWithSession = RequestEventWithSession
+>() => {
   return async (event: R) => {
-    const { trpcServerCaller } = await import("~/server/trpc/router");
-    const { caller } = await trpcServerCaller(event);
-    return { ...event, trpc: caller };
+    const { appRouter } = await import("~/server/trpc/router");
+    const trpc = appRouter.createCaller({ session: event.session });
+    return { ...event, trpc };
   };
 };

@@ -1,9 +1,11 @@
 import { component$, Resource } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 
 export const onGet = endpointBuilder()
+  .use(withProtectedSession())
   .use(withTrpc())
   .query(({ trpc }) => {
     return trpc.album.findRandom();

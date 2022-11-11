@@ -1,6 +1,7 @@
 import { component$, Resource } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
 import { z } from "zod";
+import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { withTypedQuery } from "~/utils/withTypes";
@@ -14,6 +15,7 @@ export const onGet = endpointBuilder()
       })
     )
   )
+  .use(withProtectedSession())
   .use(withTrpc())
   .query(({ query, trpc }) => {
     return trpc.album.findAlbums({
