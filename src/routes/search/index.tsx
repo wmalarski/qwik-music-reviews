@@ -1,15 +1,27 @@
 import { component$, Resource } from "@builder.io/qwik";
-import { DocumentHead, RequestEvent, useEndpoint } from "@builder.io/qwik-city";
+import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { z } from "zod";
+import { withTrpc } from "~/server/trpc/withTrpc";
+import { endpointBuilder } from "~/utils/endpointBuilder";
+import { withTypedQuery } from "~/utils/withTypes";
 
-export const onGet = async (event: RequestEvent) => {
-  const { trpcServerCaller } = await import("~/server/trpc/router");
-  const { caller } = await trpcServerCaller(event);
-
-  const params = event.url.searchParams;
-  const query = params.get("query") || "";
-  const page = +(params.get("page") || 0);
-  return caller.album.findAlbums({ query, skip: page * 10, take: 10 });
-};
+export const onGet = endpointBuilder()
+  .use(
+    withTypedQuery(
+      z.object({
+        page: z.string().regex(/\d+/).optional(),
+        query: z.string().optional(),
+      })
+    )
+  )
+  .use(withTrpc())
+  .query(({ query, trpc }) => {
+    return trpc.album.findAlbums({
+      query: query.query || "",
+      skip: +(query.page || "0") * 10,
+      take: 10,
+    });
+  });
 
 export default component$(() => {
   const resource = useEndpoint<typeof onGet>();

@@ -1,12 +1,13 @@
 import { component$, Resource } from "@builder.io/qwik";
-import { DocumentHead, RequestEvent, useEndpoint } from "@builder.io/qwik-city";
+import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { withTrpc } from "~/server/trpc/withTrpc";
+import { endpointBuilder } from "~/utils/endpointBuilder";
 
-export const onGet = async (event: RequestEvent) => {
-  const { trpcServerCaller } = await import("~/server/trpc/router");
-  const { caller } = await trpcServerCaller(event);
-
-  return caller.album.findRandom();
-};
+export const onGet = endpointBuilder()
+  .use(withTrpc())
+  .query(({ trpc }) => {
+    return trpc.album.findRandom();
+  });
 
 export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
@@ -16,6 +17,7 @@ export default component$(() => {
       <h1>
         Random Albums <span class="bg-red-500">⚡️</span>
       </h1>
+      <a href="/album/yolo">Album 1</a>
       <Resource
         value={resource}
         onPending={() => <span>Pending</span>}

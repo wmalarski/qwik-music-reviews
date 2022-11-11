@@ -1,15 +1,18 @@
 import { component$, Resource, Slot } from "@builder.io/qwik";
-import { DocumentHead, RequestEvent, useEndpoint } from "@builder.io/qwik-city";
+import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { z } from "zod";
+import { withTrpc } from "~/server/trpc/withTrpc";
+import { endpointBuilder } from "~/utils/endpointBuilder";
+import { withTypedParams } from "~/utils/withTypes";
 import { useAlbumContextProvider } from "./context";
 
-export const onGet = async (event: RequestEvent) => {
-  const { trpcServerCaller } = await import("~/server/trpc/router");
-  const { caller } = await trpcServerCaller(event);
-
-  const album = await caller.album.findAlbum({ id: event.params.id });
-
-  return { album };
-};
+export const onGet = endpointBuilder()
+  .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
+  .use(withTrpc())
+  .query(async ({ trpc, params }) => {
+    const album = await trpc.album.findAlbum({ id: params.albumId });
+    return { album };
+  });
 
 export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
