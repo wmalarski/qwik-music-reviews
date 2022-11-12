@@ -1,9 +1,10 @@
 import { component$, Resource } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint, useLocation } from "@builder.io/qwik-city";
+import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
+import { paths } from "~/utils/paths";
 import { withTypedQuery } from "~/utils/withTypes";
 
 export const onGet = endpointBuilder()
@@ -23,7 +24,6 @@ export const onGet = endpointBuilder()
   });
 
 export default component$(() => {
-  const location = useLocation();
   const resource = useEndpoint<typeof onGet>();
 
   return (
@@ -37,13 +37,7 @@ export default component$(() => {
         onRejected={() => <span>Rejected</span>}
         onResolved={(data) => (
           <div>
-            <a
-              href={`${location.pathname}?${new URLSearchParams({
-                page: "1",
-              })}`}
-            >
-              Next page
-            </a>
+            <a href={paths.search(1, "")}>Next page</a>
             <pre>{JSON.stringify(data, null, 2)}</pre>
           </div>
         )}

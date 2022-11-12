@@ -1,11 +1,12 @@
 import { component$ } from "@builder.io/qwik";
 import { DocumentHead } from "@builder.io/qwik-city";
+import { paths } from "~/utils/paths";
 
 export default component$(() => {
   return (
     <div>
       <h1>SignIn</h1>
-      <a href="/api/auth/signin">SignIn</a>
+      <a href={paths.nextSignIn}>SignIn</a>
     </div>
   );
 });
