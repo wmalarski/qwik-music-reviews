@@ -1,4 +1,4 @@
-import { component$, Resource, Slot } from "@builder.io/qwik";
+import { component$, Slot } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -19,17 +19,7 @@ export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
   useAlbumContextProvider(resource);
 
-  return (
-    <div>
-      <Resource
-        value={resource}
-        onPending={() => <span>Pending</span>}
-        onRejected={() => <span>Rejected</span>}
-        onResolved={(data) => <pre>{JSON.stringify(data, null, 2)}</pre>}
-      />
-      <Slot />
-    </div>
-  );
+  return <Slot />;
 });
 
 export const head: DocumentHead = {

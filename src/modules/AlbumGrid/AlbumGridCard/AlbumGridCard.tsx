@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import type { Album, Artist } from "@prisma/client";
-import { Stars } from "~/components/RouterHead/Stars/Stars";
+import { Stars } from "~/components/Stars/Stars";
 import { formatAlbum } from "~/utils/format";
 import { Covers, getCoversAttributes } from "~/utils/images";
 import { paths } from "~/utils/paths";
