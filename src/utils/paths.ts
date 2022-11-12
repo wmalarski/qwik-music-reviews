@@ -3,7 +3,7 @@ export const paths = {
   home: "/",
   nextSignIn: "/api/auth/signin",
   nextSignOut: "/api/auth/signout",
-  search: (page: number, query: string) =>
-    `/search?${new URLSearchParams({ page: `${page || 0}`, query })}`,
+  reviews: "/reviews",
+  search: "/search",
   signIn: "/signIn",
 };

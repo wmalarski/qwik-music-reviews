@@ -33,7 +33,12 @@ export default component$(() => {
         </ul>
         <ul>
           <li>
-            <a href={paths.search(0, "")}>Search</a>
+            <a href={paths.search}>Search</a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a href={paths.reviews}>Reviews</a>
           </li>
         </ul>
         <li>

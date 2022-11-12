@@ -15,12 +15,13 @@ import { endpointBuilder } from "~/utils/endpointBuilder";
 import { withTypedQuery } from "~/utils/withTypes";
 import { ContainerContext } from "../context";
 
-const pageSize = 10;
-
 export const onGet = endpointBuilder()
   .use(
     withTypedQuery(
-      z.object({ page: z.number().optional(), query: z.string().optional() })
+      z.object({
+        page: z.number().min(0).step(1).optional(),
+        query: z.string().optional(),
+      })
     )
   )
   .use(withProtectedSession())
@@ -28,8 +29,8 @@ export const onGet = endpointBuilder()
   .resolver(({ query, trpc }) => {
     return trpc.album.findAlbums({
       query: query.query || "",
-      skip: (query.page || 0) * pageSize,
-      take: pageSize,
+      skip: (query.page || 0) * 10,
+      take: 10,
     });
   });
 
