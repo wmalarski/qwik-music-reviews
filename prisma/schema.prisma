@@ -33,7 +33,7 @@ model Album {
   reviews   Review[]
   visits    Visit[]
   release   String?
-  covers    Json?
+  covers    String?
 
   @@index([userId])
 }

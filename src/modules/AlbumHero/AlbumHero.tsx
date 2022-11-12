@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import type { Album, Artist } from "@prisma/client";
 import { formatAlbum } from "~/utils/format";
-import { Covers, getCoversAttributes } from "~/utils/images";
+import { getCoversAttributes } from "~/utils/images";
 
 type Props = {
   album: Album & { artist: Artist };
@@ -23,7 +23,7 @@ export const AlbumHero = component$((props: Props) => {
                 <img
                   alt={`${heading} cover`}
                   class="w-80"
-                  {...getCoversAttributes(props.album.covers as Covers)}
+                  {...getCoversAttributes(JSON.parse(props.album.covers))}
                 />
               </picture>
             </div>

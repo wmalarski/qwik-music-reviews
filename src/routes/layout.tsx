@@ -1,9 +1,14 @@
-import { component$, Slot } from "@builder.io/qwik";
+import {
+  component$,
+  Slot,
+  useContextProvider,
+  useSignal,
+} from "@builder.io/qwik";
 import { useEndpoint } from "@builder.io/qwik-city";
 import { withSession } from "~/server/auth/withSession";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
-import { useSessionContextProvider } from "./context";
+import { ContainerContext, useSessionContextProvider } from "./context";
 
 export const onGet = endpointBuilder()
   .use(withSession())
@@ -15,35 +20,41 @@ export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
   useSessionContextProvider(resource);
 
+  const containerRef = useSignal<Element | null>(null);
+  useContextProvider(ContainerContext, containerRef);
+
   return (
-    <>
-      <main>
-        <nav>
-          <ul>
-            <li>
-              <a href={paths.home}>Home</a>
-            </li>
-          </ul>
-          <ul>
-            <li>
-              <a href={paths.search(0, "")}>Search</a>
-            </li>
-          </ul>
+    <div class="flex h-screen w-screen flex-col-reverse md:flex-row">
+      <nav>
+        <ul>
           <li>
-            <ul>
-              <a href={paths.nextSignOut}>Sing Out</a>
-            </ul>
+            <a href={paths.home}>Home</a>
           </li>
-        </nav>
-        <section>
+        </ul>
+        <ul>
+          <li>
+            <a href={paths.search(0, "")}>Search</a>
+          </li>
+        </ul>
+        <li>
+          <ul>
+            <a href={paths.nextSignOut}>Sing Out</a>
+          </ul>
+        </li>
+      </nav>
+      <div
+        ref={(e) => (containerRef.value = e)}
+        class="w-full overflow-y-scroll"
+      >
+        <main>
           <Slot />
-        </section>
-      </main>
-      <footer>
-        <a href="https://www.builder.io/" target="_blank">
-          Made with ♡ by Builder.io
-        </a>
-      </footer>
-    </>
+        </main>
+        <footer>
+          <a href="https://www.builder.io/" target="_blank">
+            Made with ♡ by Builder.io
+          </a>
+        </footer>
+      </div>
+    </div>
   );
 });
