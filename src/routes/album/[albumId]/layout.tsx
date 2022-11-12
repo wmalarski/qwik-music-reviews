@@ -11,7 +11,7 @@ export const onGet = endpointBuilder()
   .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
   .use(withProtectedSession())
   .use(withTrpc())
-  .query(async ({ trpc, params }) => {
+  .resolver(async ({ trpc, params }) => {
     const album = await trpc.album.findAlbum({ id: params.albumId });
     return { album };
   });

@@ -1,5 +1,5 @@
 import { component$, Resource } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { DocumentHead, useEndpoint, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
@@ -9,23 +9,21 @@ import { withTypedQuery } from "~/utils/withTypes";
 export const onGet = endpointBuilder()
   .use(
     withTypedQuery(
-      z.object({
-        page: z.string().regex(/\d+/).optional(),
-        query: z.string().optional(),
-      })
+      z.object({ page: z.number().optional(), query: z.string().optional() })
     )
   )
   .use(withProtectedSession())
   .use(withTrpc())
-  .query(({ query, trpc }) => {
+  .resolver(({ query, trpc }) => {
     return trpc.album.findAlbums({
       query: query.query || "",
-      skip: +(query.page || "0") * 10,
+      skip: (query.page || 0) * 10,
       take: 10,
     });
   });
 
 export default component$(() => {
+  const location = useLocation();
   const resource = useEndpoint<typeof onGet>();
 
   return (
@@ -37,7 +35,18 @@ export default component$(() => {
         value={resource}
         onPending={() => <span>Pending</span>}
         onRejected={() => <span>Rejected</span>}
-        onResolved={(data) => <pre>{JSON.stringify(data, null, 2)}</pre>}
+        onResolved={(data) => (
+          <div>
+            <a
+              href={`${location.pathname}?${new URLSearchParams({
+                page: "1",
+              })}`}
+            >
+              Next page
+            </a>
+            <pre>{JSON.stringify(data, null, 2)}</pre>
+          </div>
+        )}
       />
     </div>
   );

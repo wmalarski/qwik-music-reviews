@@ -22,10 +22,25 @@ export const withTypedQuery = <
   Q extends z.ZodRawShape = z.ZodRawShape,
   R extends RequestEvent = RequestEvent
 >(
-  schema: z.ZodObject<Q>
+  schema: z.ZodObject<Q>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  parser: (v: string) => any = JSON.parse
 ) => {
   return (event: R) => {
     const rawQuery = Object.fromEntries(event.url.searchParams.entries());
+
+    // Try to parse any query params that might be json
+    for (const key in rawQuery) {
+      const value = rawQuery[key];
+      if (typeof value === "string") {
+        try {
+          rawQuery[key] = parser(value);
+        } catch (err) {
+          //
+        }
+      }
+    }
+
     const query = schema?.safeParse(rawQuery);
 
     if (!query.success) {

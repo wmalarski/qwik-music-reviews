@@ -7,7 +7,7 @@ import { endpointBuilder } from "~/utils/endpointBuilder";
 export const onGet = endpointBuilder()
   .use(withProtectedSession())
   .use(withTrpc())
-  .query(({ trpc }) => {
+  .resolver(({ trpc }) => {
     return trpc.album.findRandom();
   });
 

@@ -6,7 +6,7 @@ import { useSessionContextProvider } from "./context";
 
 export const onGet = endpointBuilder()
   .use(withProtectedSession())
-  .query((event) => {
+  .resolver((event) => {
     return event.session;
   });
 
@@ -21,6 +21,11 @@ export default component$(() => {
           <ul>
             <li>
               <a href="/">Home</a>
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <a href="/search">Search</a>
             </li>
           </ul>
           <li>
