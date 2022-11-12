@@ -18,7 +18,8 @@
     "preview": "qwik build preview && vite preview --open",
     "serve": "echo 'Run \"npm run qwik add\" to install a server adaptor'",
     "start": "vite --open --mode ssr",
-    "qwik": "qwik"
+    "qwik": "qwik",
+    "postinstall": "prisma generate"
   },
   "devDependencies": {
     "@builder.io/qwik": "0.12.1",
@@ -42,12 +43,14 @@
     "node-fetch": "3.2.10",
     "postcss": "^8.4.18",
     "prettier": "2.7.1",
+    "prisma": "^4.6.1",
     "tailwindcss": "^3.2.2",
     "typescript": "4.8.4",
     "vite": "3.2.2",
     "vite-tsconfig-paths": "3.5.2"
   },
   "dependencies": {
+    "@prisma/client": "^4.6.1",
     "@trpc/client": "^10.0.0-rc.6",
     "@trpc/server": "^10.0.0-rc.6",
     "cookie": "^0.5.0",
