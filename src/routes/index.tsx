@@ -8,7 +8,7 @@ export const onGet = endpointBuilder()
   .use(withProtectedSession())
   .use(withTrpc())
   .resolver(({ trpc }) => {
-    return trpc.album.findRandom();
+    return trpc.album.findRandom({ take: 10 });
   });
 
 export default component$(() => {

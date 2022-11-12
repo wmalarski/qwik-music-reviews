@@ -25,7 +25,7 @@ export const withProtectedSession = <R extends RequestEvent = RequestEvent>(
     const session = await getServerSession(event, authOptions);
 
     if (!session) {
-      throw event.response.redirect(options.redirectTo || "/api/auth/signin");
+      throw event.response.redirect(options.redirectTo || "/signIn");
     }
     return { ...event, session };
   };

@@ -3,6 +3,14 @@ import Auth0Provider from "next-auth/providers/auth0";
 import { env } from "../env";
 
 export const authOptions: NextAuthOptions = {
+  callbacks: {
+    session: ({ session, user }) => {
+      if (session.user) {
+        session.user.id = user?.id;
+      }
+      return session;
+    },
+  },
   providers: [
     Auth0Provider({
       clientId: env.VITE_AUTH0_CLIENT_ID,

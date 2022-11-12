@@ -1,4 +1,5 @@
 import { createTRPCProxyClient, httpLink, loggerLink } from "@trpc/client";
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 import superjson from "superjson";
 import type { AppRouter } from "~/server/trpc/router";
 
@@ -15,3 +16,6 @@ export const trpc = createTRPCProxyClient<AppRouter>({
   ],
   transformer: superjson,
 });
+
+export type RouterInput = inferRouterInputs<AppRouter>;
+export type RouterOutput = inferRouterOutputs<AppRouter>;

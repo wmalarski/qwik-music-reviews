@@ -4,8 +4,9 @@ import {
   useContext,
   useContextProvider,
 } from "@builder.io/qwik";
+import type { RouterOutput } from "~/utils/trpc";
 
-type AlbumContextState = ResourceReturn<{ album: string }>;
+type AlbumContextState = ResourceReturn<RouterOutput["album"]["findAlbum"]>;
 
 const AlbumContext = createContext<AlbumContextState>("album-context");
 

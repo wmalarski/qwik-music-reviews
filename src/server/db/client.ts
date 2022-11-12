@@ -14,6 +14,8 @@ export const prisma =
         : ["error"],
   });
 
+export type DbPrismaClient = typeof prisma;
+
 if (process.env.NODE_ENV !== "production") {
   global.prisma = prisma;
 }

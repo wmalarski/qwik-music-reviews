@@ -1,11 +1,11 @@
 import { component$, Slot } from "@builder.io/qwik";
 import { useEndpoint } from "@builder.io/qwik-city";
-import { withProtectedSession } from "~/server/auth/withSession";
+import { withSession } from "~/server/auth/withSession";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { useSessionContextProvider } from "./context";
 
 export const onGet = endpointBuilder()
-  .use(withProtectedSession())
+  .use(withSession())
   .resolver((event) => {
     return event.session;
   });
