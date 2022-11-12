@@ -1,6 +1,7 @@
 import { component$, Resource, useContext, useStore } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
 import { z } from "zod";
+import { ReviewActivity } from "~/modules/ReviewActivity/ReviewActivity";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -14,11 +15,15 @@ export const onGet = endpointBuilder()
   .use(withTypedQuery(z.object({ page: z.number().min(0).step(1).optional() })))
   .use(withProtectedSession())
   .use(withTrpc())
-  .resolver(({ query, trpc }) => {
-    return trpc.review.findReviews({
-      skip: (query.page || 0) * 20,
-      take: 20,
-    });
+  .resolver(async ({ query, trpc }) => {
+    const [collection, counts] = await Promise.all([
+      trpc.review.findReviews({
+        skip: (query.page || 0) * 20,
+        take: 20,
+      }),
+      trpc.review.countReviewsByDate(),
+    ]);
+    return { collection, counts };
   });
 
 export default component$(() => {
@@ -41,21 +46,24 @@ export default component$(() => {
         onPending={() => <span>Pending</span>}
         onRejected={() => <span>Rejected</span>}
         onResolved={(data) => (
-          <ReviewList
-            collection={[...data.reviews, ...store.results]}
-            currentPage={store.currentPage}
-            pageCount={Math.floor(data.count / 20)}
-            parentContainer={container.value}
-            onMore$={async () => {
-              const newResult = await trpc.review.findReviews.query({
-                skip: (store.currentPage + 1) * 20,
-                take: 20,
-              });
-              const newAlbums = newResult?.reviews || [];
-              store.currentPage = store.currentPage + 1;
-              store.results = [...store.results, ...newAlbums];
-            }}
-          />
+          <>
+            <ReviewActivity counts={data.counts} />
+            <ReviewList
+              collection={[...data.collection.reviews, ...store.results]}
+              currentPage={store.currentPage}
+              pageCount={Math.floor(data.collection.count / 20)}
+              parentContainer={container.value}
+              onMore$={async () => {
+                const newResult = await trpc.review.findReviews.query({
+                  skip: (store.currentPage + 1) * 20,
+                  take: 20,
+                });
+                const newAlbums = newResult?.reviews || [];
+                store.currentPage = store.currentPage + 1;
+                store.results = [...store.results, ...newAlbums];
+              }}
+            />
+          </>
         )}
       />
     </div>
