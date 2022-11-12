@@ -1,10 +1,4 @@
-import {
-  $,
-  component$,
-  Resource,
-  useContext,
-  useStore,
-} from "@builder.io/qwik";
+import { component$, Resource, useContext, useStore } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
@@ -12,6 +6,7 @@ import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
+import { trpc } from "~/utils/trpc";
 import { withTypedQuery } from "~/utils/withTypes";
 import { ContainerContext } from "../context";
 
@@ -29,8 +24,8 @@ export const onGet = endpointBuilder()
   .resolver(({ query, trpc }) => {
     return trpc.album.findAlbums({
       query: query.query || "",
-      skip: (query.page || 0) * 10,
-      take: 10,
+      skip: (query.page || 0) * 20,
+      take: 20,
     });
   });
 
@@ -39,17 +34,6 @@ export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
 
   const container = useContext(ContainerContext);
-
-  const fetcher$ = $(async (page: number) => {
-    const currentUrl = new URL(location.href);
-    const params = new URLSearchParams({
-      page: String(page),
-      query: currentUrl.searchParams.get("query") || "",
-    });
-    const url = `${currentUrl.origin}${currentUrl.pathname}/api?${params}`;
-    const response = await fetch(url);
-    return await response.json();
-  });
 
   const store = useStore({
     currentPage: 0,
@@ -87,10 +71,14 @@ export default component$(() => {
           <AlbumGrid
             collection={[...data.albums, ...store.results]}
             currentPage={store.currentPage}
-            pageCount={Math.floor(data.count / 10)}
+            pageCount={Math.floor(data.count / 20)}
             parentContainer={container.value}
             onMore$={async () => {
-              const newResult = await fetcher$(store.currentPage + 1);
+              const newResult = await trpc.album.findAlbums.query({
+                query: location.query["query"] || "",
+                skip: (store.currentPage || 0) * 20,
+                take: 20,
+              });
               const newAlbums = newResult?.albums || [];
               store.currentPage = store.currentPage + 1;
               store.results = [...store.results, ...newAlbums];

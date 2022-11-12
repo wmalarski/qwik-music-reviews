@@ -5,8 +5,6 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-console.log("=====HELLO=====", typeof global);
-
 export const prisma =
   global.prisma ||
   new PrismaClient({

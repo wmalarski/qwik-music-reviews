@@ -16,8 +16,8 @@ export const onGet = endpointBuilder()
   .use(withTrpc())
   .resolver(({ query, trpc }) => {
     return trpc.review.findReviews({
-      skip: (query.page || 0) * 10,
-      take: 10,
+      skip: (query.page || 0) * 20,
+      take: 20,
     });
   });
 
@@ -44,12 +44,12 @@ export default component$(() => {
           <ReviewList
             collection={[...data.reviews, ...store.results]}
             currentPage={store.currentPage}
-            pageCount={Math.floor(data.count / 10)}
+            pageCount={Math.floor(data.count / 20)}
             parentContainer={container.value}
             onMore$={async () => {
               const newResult = await trpc.review.findReviews.query({
-                skip: (store.currentPage + 1) * 10,
-                take: 10,
+                skip: (store.currentPage + 1) * 20,
+                take: 20,
               });
               const newAlbums = newResult?.reviews || [];
               store.currentPage = store.currentPage + 1;
