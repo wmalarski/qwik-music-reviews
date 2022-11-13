@@ -1,5 +1,6 @@
 {
   "cSpell.words": [
+    "daisyui",
     "NEXTAUTH",
     "qwik",
     "signin",
@@ -7,5 +8,11 @@
     "superjson",
     "tailwindcss",
     "trpc"
+  ],
+  "tailwindCSS.experimental.classRegex": [
+    [
+      "cva\\(([^)]*)\\)",
+      "[\"'`]([^\"'`]*).*?[\"'`]"
+    ]
   ]
 }
