@@ -1,11 +1,13 @@
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import type { NextAuthOptions } from "next-auth/core/types";
 import Auth0Provider from "next-auth/providers/auth0";
+import { prisma } from "../db/client";
 import { env } from "../env";
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   callbacks: {
     session: ({ session, user }) => {
-      console.log({ session, user });
       if (session.user) {
         session.user.id = user?.id;
       }
