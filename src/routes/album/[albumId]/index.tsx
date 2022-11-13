@@ -1,7 +1,6 @@
 import { component$, Resource } from "@builder.io/qwik";
 import { DocumentHead } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
-import { AlbumHero } from "~/modules/AlbumHero/AlbumHero";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { useAlbumContext } from "./context";
 
@@ -17,8 +16,7 @@ export default component$(() => {
         <div>
           {data.album ? (
             <>
-              <AlbumHero album={data.album} />
-              <h2>Other albums</h2>
+              <h2 class="py-4 px-8 text-2xl">Other albums</h2>
               <AlbumGrid
                 collection={data.albums.map((album) => ({
                   ...album,
@@ -27,7 +25,7 @@ export default component$(() => {
                 currentPage={0}
                 pageCount={1}
               />
-              <h2>Reviews</h2>
+              <h2 class="py-4 px-8 text-2xl">Reviews</h2>
               <ReviewList
                 collection={data.reviews.flatMap((review) => {
                   const album = data.albums.find(

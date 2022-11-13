@@ -14,7 +14,7 @@ export const AlbumHero = component$((props: Props) => {
   });
 
   return (
-    <section class="flex justify-center p-6">
+    <section class="flex justify-center p-8">
       <div class="flex max-w-5xl flex-row items-center gap-8">
         <div class="hidden flex-grow md:flex">
           {props.album.covers ? (
