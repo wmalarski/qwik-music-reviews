@@ -50,3 +50,42 @@ export const withTypedQuery = <
     return { ...event, query: query.data };
   };
 };
+
+// export const withTypedFormData = <
+//   Q extends z.ZodRawShape = z.ZodRawShape,
+//   R extends RequestEvent = RequestEvent
+// >(
+//   schema: z.ZodObject<Q>,
+//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   parser: (v: string) => any = JSON.parse
+// ) => {
+//   return async (event: R) => {
+//     const formData = await event.request.formData();
+
+//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//     const rawData = Array.from(formData.entries()).reduce<Record<string, any>>(
+//       (prev, [key, value]) => {
+//         schema.
+//         if (typeof value === "string") {
+//           try {
+//             prev[key] = parser(value);
+//           } catch (err) {
+//             //
+//           }
+//         }
+//         return prev;
+//       },
+//       {}
+//     );
+
+//     const query = schema?.safeParse(rawData);
+
+//     console.log(query);
+
+//     // if (!query.success) {
+//     //   throw event.response.redirect("/404");
+//     // }
+
+//     return { ...event, formData: query };
+//   };
+// };
