@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 export const button = cva("btn uppercase", {
   defaultVariants: {
-    isLoading: true,
+    isLoading: false,
   },
   variants: {
     isLoading: {

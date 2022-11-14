@@ -2,6 +2,7 @@ import { component$, Resource, Slot } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { AlbumHero } from "~/modules/AlbumHero/AlbumHero";
+import { useSessionContext } from "~/routes/context";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
@@ -20,6 +21,7 @@ export const onGet = endpointBuilder()
 export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
   useAlbumContextProvider(resource);
+  const sessionResource = useSessionContext();
 
   return (
     <div>
@@ -37,11 +39,23 @@ export default component$(() => {
                         Details
                       </a>
                     </li>
-                    <li>
-                      <a class="text-xl" href={paths.albumEdit(data.album.id)}>
-                        Edit
-                      </a>
-                    </li>
+                    <Resource
+                      value={sessionResource}
+                      onResolved={(session) => (
+                        <>
+                          {data.album.userId === session.user?.id ? (
+                            <li>
+                              <a
+                                class="text-xl"
+                                href={paths.albumEdit(data.album.id)}
+                              >
+                                Edit
+                              </a>
+                            </li>
+                          ) : null}
+                        </>
+                      )}
+                    />
                     <li>
                       <a
                         class="text-xl"

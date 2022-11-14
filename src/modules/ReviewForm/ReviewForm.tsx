@@ -44,10 +44,7 @@ export const ReviewForm = component$(({ initialValue, action }: Props) => {
           value={initialValue?.rate}
         />
       </div>
-
-      <Button isLoading={false} type="submit">
-        Save
-      </Button>
+      <Button type="submit">Save</Button>
     </form>
   );
 });
