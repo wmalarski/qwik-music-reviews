@@ -6,7 +6,6 @@ import { useSessionContext } from "~/routes/context";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
-import { paths } from "~/utils/paths";
 import { withTypedParams } from "~/utils/withTypes";
 import { useAlbumContextProvider } from "./context";
 
@@ -24,51 +23,20 @@ export default component$(() => {
   const sessionResource = useSessionContext();
 
   return (
-    <div>
+    <div class="flex flex-col">
       <Resource
         value={resource}
         onResolved={(data) => (
-          <>
-            {data.album ? (
-              <div class="flex flex-col">
-                <AlbumHero album={data.album} />
-                <nav>
-                  <ul class="w-full flex flex-row justify-center gap-8">
-                    <li>
-                      <a class="text-xl" href={paths.album(data.album.id)}>
-                        Details
-                      </a>
-                    </li>
-                    <Resource
-                      value={sessionResource}
-                      onResolved={(session) => (
-                        <>
-                          {data.album.userId === session.user?.id ? (
-                            <li>
-                              <a
-                                class="text-xl"
-                                href={paths.albumEdit(data.album.id)}
-                              >
-                                Edit
-                              </a>
-                            </li>
-                          ) : null}
-                        </>
-                      )}
-                    />
-                    <li>
-                      <a
-                        class="text-xl"
-                        href={paths.albumReview(data.album.id)}
-                      >
-                        Review
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-            ) : null}
-          </>
+          <Resource
+            value={sessionResource}
+            onResolved={(session) => (
+              <>
+                {data.album ? (
+                  <AlbumHero album={data.album} session={session} />
+                ) : null}
+              </>
+            )}
+          />
         )}
       />
       <Slot />
