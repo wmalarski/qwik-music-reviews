@@ -1,7 +1,7 @@
 import { component$, Resource, Slot } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
 import { z } from "zod";
-import { useSessionContext } from "~/routes/context";
+import { ReviewHero } from "~/modules/ReviewHero/ReviewHero";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
@@ -26,24 +26,12 @@ export const onGet = endpointBuilder()
 export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
   useReviewContextProvider(resource);
-  const sessionResource = useSessionContext();
 
   return (
     <div class="flex flex-col">
       <Resource
         value={resource}
-        onResolved={(data) => (
-          <Resource
-            value={sessionResource}
-            onResolved={(session) => (
-              <>
-                {data ? (
-                  <pre>{JSON.stringify({ data, session }, null, 2)}</pre>
-                ) : null}
-              </>
-            )}
-          />
-        )}
+        onResolved={(data) => <ReviewHero review={data} />}
       />
       <Slot />
     </div>
