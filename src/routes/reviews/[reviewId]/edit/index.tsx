@@ -1,5 +1,5 @@
 import { component$, Resource } from "@builder.io/qwik";
-import { DocumentHead } from "@builder.io/qwik-city";
+import { DocumentHead, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -28,6 +28,7 @@ export const onPost = endpointBuilder()
   });
 
 export default component$(() => {
+  const location = useLocation();
   const albumResource = useReviewContext();
 
   return (

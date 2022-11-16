@@ -41,6 +41,9 @@ export const ReviewListCard = component$((props: Props) => {
           {heading}
         </a>
         <Stars rating={props.review.rate} />
+        <a class="link" href={paths.reviewEdit(props.review.id)}>
+          Edit
+        </a>
       </div>
     </div>
   );

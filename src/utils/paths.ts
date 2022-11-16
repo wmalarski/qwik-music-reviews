@@ -5,6 +5,7 @@ export const paths = {
   home: "/",
   nextSignIn: "/api/auth/signin",
   nextSignOut: "/api/auth/signout",
+  reviewEdit: (id: string) => `/reviews/${id}/edit`,
   reviews: "/reviews",
   search: "/search",
   signIn: "/signIn",
