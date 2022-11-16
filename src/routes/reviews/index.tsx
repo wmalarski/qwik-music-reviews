@@ -1,7 +1,6 @@
 import { component$, Resource, useContext, useStore } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
 import { z } from "zod";
-import { ReviewActivity } from "~/modules/ReviewActivity/ReviewActivity";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -10,6 +9,7 @@ import { endpointBuilder } from "~/utils/endpointBuilder";
 import { trpc } from "~/utils/trpc";
 import { withTypedQuery } from "~/utils/withTypes";
 import { ContainerContext } from "../context";
+import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
 export const onGet = endpointBuilder()
   .use(withTypedQuery(z.object({ page: z.number().min(0).step(1).optional() })))

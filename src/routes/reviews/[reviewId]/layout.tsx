@@ -1,13 +1,13 @@
 import { component$, Resource, Slot } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
 import { z } from "zod";
-import { ReviewHero } from "~/modules/ReviewHero/ReviewHero";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
 import { withTypedParams } from "~/utils/withTypes";
 import { useReviewContextProvider } from "./context";
+import { ReviewHero } from "./ReviewHero/ReviewHero";
 
 export const onGet = endpointBuilder()
   .use(withTypedParams(z.object({ reviewId: z.string().min(1) })))

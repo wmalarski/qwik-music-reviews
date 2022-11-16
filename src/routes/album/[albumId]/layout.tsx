@@ -1,12 +1,12 @@
 import { component$, Resource, Slot } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
 import { z } from "zod";
-import { AlbumHero } from "~/modules/AlbumHero/AlbumHero";
 import { useSessionContext } from "~/routes/context";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { withTypedParams } from "~/utils/withTypes";
+import { AlbumHero } from "./AlbumHero/AlbumHero";
 import { useAlbumContextProvider } from "./context";
 
 export const onGet = endpointBuilder()

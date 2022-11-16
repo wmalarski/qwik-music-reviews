@@ -1,13 +1,13 @@
 import { component$, Resource } from "@builder.io/qwik";
 import { DocumentHead, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
-import { AlbumForm } from "~/modules/AlbumForm/AlbumForm";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
 import { withTypedParams } from "~/utils/withTypes";
 import { useAlbumContext } from "../context";
+import { AlbumForm } from "./AlbumForm/AlbumForm";
 
 export const onPost = endpointBuilder()
   .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
