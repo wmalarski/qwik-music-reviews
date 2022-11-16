@@ -23,6 +23,7 @@ export const onGet = endpointBuilder()
       }),
       trpc.review.countReviewsByDate(),
     ]);
+
     return { collection, counts };
   });
 

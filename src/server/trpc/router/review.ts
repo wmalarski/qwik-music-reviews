@@ -2,14 +2,19 @@ import { z } from "zod";
 import { protectedProcedure, t } from "../trpc";
 
 export const reviewRouter = t.router({
-  countReviewsByDate: protectedProcedure.query(({ ctx }) => {
-    return ctx.prisma.$queryRaw<{ count: number; date: Date }[]>`
+  countReviewsByDate: protectedProcedure.query(async ({ ctx }) => {
+    const result = await ctx.prisma.$queryRaw<{ count: number; date: Date }[]>`
       SELECT DATE_TRUNC('day', "createdAt") as date, count(id) 
       FROM "public"."Review" 
       WHERE "createdAt" > CURRENT_DATE - INTERVAL '1 year' AND "userId" = ${ctx.userId} 
       GROUP BY DATE_TRUNC('day', "createdAt") 
       ORDER BY DATE_TRUNC('day', "createdAt") DESC
   `;
+
+    return result.map((entry) => ({
+      count: Number(entry.count),
+      date: entry.date.toISOString(),
+    }));
   }),
   createReview: protectedProcedure
     .input(

@@ -4,7 +4,7 @@ export const getCountItems = (
   groups: RouterOutput["review"]["countReviewsByDate"]
 ) => {
   const groupsMap = groups.reduce<Record<string, number>>((prev, curr) => {
-    prev[curr.date.toDateString()] = curr.count;
+    prev[new Date(curr.date).toDateString()] = curr.count;
     return prev;
   }, {});
 
