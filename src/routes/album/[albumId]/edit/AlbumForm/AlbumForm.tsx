@@ -11,9 +11,9 @@ type Props = {
   action: string;
 };
 
-export const AlbumForm = component$(({ initialValue, action }: Props) => {
+export const AlbumForm = component$<Props>((props) => {
   return (
-    <form class="flex flex-col gap-2" method="post" action={action}>
+    <form class="flex flex-col gap-2" method="post" action={props.action}>
       <div class="form-control w-full">
         <label for="title" class="label">
           <span class="label-text">Title</span>
@@ -24,7 +24,7 @@ export const AlbumForm = component$(({ initialValue, action }: Props) => {
           id="title"
           placeholder="Title"
           type="text"
-          value={initialValue?.title}
+          value={props.initialValue?.title}
         />
       </div>
 
@@ -41,7 +41,7 @@ export const AlbumForm = component$(({ initialValue, action }: Props) => {
           min={1900}
           max={2100}
           step={1}
-          value={initialValue?.year}
+          value={props.initialValue?.year}
         />
       </div>
       <Button type="submit">Save</Button>

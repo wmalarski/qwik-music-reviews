@@ -11,9 +11,9 @@ type Props = {
   action: string;
 };
 
-export const ReviewForm = component$(({ initialValue, action }: Props) => {
+export const ReviewForm = component$<Props>((props) => {
   return (
-    <form class="flex flex-col gap-2" method="post" action={action}>
+    <form class="flex flex-col gap-2" method="post" action={props.action}>
       <div class="form-control w-full">
         <label for="text" class="label">
           <span class="label-text">Text</span>
@@ -24,7 +24,7 @@ export const ReviewForm = component$(({ initialValue, action }: Props) => {
           id="text"
           placeholder="Type here"
           type="text"
-          value={initialValue?.text}
+          value={props.initialValue?.text}
         />
       </div>
 
@@ -41,7 +41,7 @@ export const ReviewForm = component$(({ initialValue, action }: Props) => {
           min={0}
           max={10}
           step={0.1}
-          value={initialValue?.rate}
+          value={props.initialValue?.rate}
         />
       </div>
       <Button type="submit">Save</Button>

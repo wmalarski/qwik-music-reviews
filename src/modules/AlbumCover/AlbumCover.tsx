@@ -7,7 +7,7 @@ type Props = {
   album: Album & { artist: Artist };
 };
 
-export const AlbumCover = component$((props: Props) => {
+export const AlbumCover = component$<Props>((props) => {
   const heading = formatAlbum({
     album: props.album,
     artist: props.album.artist,

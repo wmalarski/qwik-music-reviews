@@ -10,7 +10,7 @@ type Props = {
   review: Review & { album: Album & { artist: Artist } };
 };
 
-export const ReviewHero = component$((props: Props) => {
+export const ReviewHero = component$<Props>((props) => {
   const heading = formatAlbum({
     album: props.review.album,
     artist: props.review.album.artist,

@@ -16,7 +16,7 @@ type Props = {
   album: AlbumGridItem;
 };
 
-export const AlbumGridCard = component$((props: Props) => {
+export const AlbumGridCard = component$<Props>((props) => {
   const heading = formatAlbum({
     album: props.album,
     artist: props.album.artist,

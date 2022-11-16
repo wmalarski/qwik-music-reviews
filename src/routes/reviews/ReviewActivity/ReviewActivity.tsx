@@ -6,7 +6,7 @@ type Props = {
   counts: RouterOutput["review"]["countReviewsByDate"];
 };
 
-export const ReviewActivity = component$((props: Props) => {
+export const ReviewActivity = component$<Props>((props) => {
   const { items, months } = getCountItems(props.counts);
 
   return (

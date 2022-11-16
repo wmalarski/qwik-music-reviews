@@ -6,7 +6,7 @@ type Props = {
   album: Album & { artist: Artist };
 };
 
-export const AlbumLinks = component$((props: Props) => {
+export const AlbumLinks = component$<Props>((props) => {
   return (
     <div class="flex gap-2">
       <a

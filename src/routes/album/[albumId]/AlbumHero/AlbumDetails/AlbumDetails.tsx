@@ -7,7 +7,7 @@ type Props = {
   album: Album & { artist: Artist };
 };
 
-export const AlbumDetails = component$((props: Props) => {
+export const AlbumDetails = component$<Props>((props) => {
   return (
     <section class="flex justify-center p-8">
       <div class="flex max-w-5xl flex-row items-center gap-8">

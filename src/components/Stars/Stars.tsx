@@ -4,7 +4,7 @@ type Props = {
   rating?: number;
 };
 
-export const Stars = component$((props: Props) => {
+export const Stars = component$<Props>((props) => {
   const value = Math.round((props.rating || 0) * 10) / 10;
 
   return (

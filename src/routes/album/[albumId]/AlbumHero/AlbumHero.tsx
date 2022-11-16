@@ -9,7 +9,7 @@ type Props = {
   session: Session;
 };
 
-export const AlbumHero = component$((props: Props) => {
+export const AlbumHero = component$<Props>((props) => {
   return (
     <div class="flex flex-col justify-center">
       <AlbumDetails album={props.album} />

@@ -16,7 +16,7 @@ type Props = {
   review: ReviewListItem;
 };
 
-export const ReviewListCard = component$((props: Props) => {
+export const ReviewListCard = component$<Props>((props) => {
   const heading = formatAlbum({
     album: props.review.album,
     artist: props.review.album.artist,
