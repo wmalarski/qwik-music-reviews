@@ -35,6 +35,18 @@ export const reviewRouter = t.router({
         where: { id: input.id, userId: ctx.userId },
       });
     }),
+  findReview: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(({ ctx, input }) => {
+      return ctx.prisma.review.findFirst({
+        include: { album: { include: { artist: true } } },
+        where: { id: input.id, userId: ctx.userId },
+      });
+    }),
   findReviews: protectedProcedure
     .input(
       z.object({
