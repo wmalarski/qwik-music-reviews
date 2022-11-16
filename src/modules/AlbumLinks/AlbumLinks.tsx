@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import type { Album, Artist } from "@prisma/client";
-import { pathToGoogle, pathToYt } from "./AlbumLinks.utils";
+import { pathToBrainz, pathToGoogle, pathToYt } from "./AlbumLinks.utils";
 
 type Props = {
   album: Album & { artist: Artist };
@@ -23,6 +23,11 @@ export const AlbumLinks = component$<Props>((props) => {
       >
         Youtube
       </a>
+      {props.album.sid ? (
+        <a href={pathToBrainz(props.album.sid)} class="link" target="_none">
+          MusicBrainz
+        </a>
+      ) : null}
     </div>
   );
 });

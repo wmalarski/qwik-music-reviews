@@ -9,3 +9,7 @@ export const pathToGoogle = (title: string, name: string): string => {
   const params = new URLSearchParams({ q: value });
   return `https://www.google.com/search?${params}`;
 };
+
+export const pathToBrainz = (uid: string): string => {
+  return `https://musicbrainz.org/release/${uid}`;
+};
