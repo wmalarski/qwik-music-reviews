@@ -2,6 +2,7 @@ import { component$ } from "@builder.io/qwik";
 import type { Album, Artist, Review } from "@prisma/client";
 import { Stars } from "~/components/Stars/Stars";
 import { AlbumCover } from "~/modules/AlbumCover/AlbumCover";
+import { AlbumLinks } from "~/modules/AlbumLinks/AlbumLinks";
 import { formatAlbum } from "~/utils/format";
 import { paths } from "~/utils/paths";
 
@@ -36,6 +37,10 @@ export const ReviewListCard = component$((props: Props) => {
         <a class="link" href={paths.reviewEdit(props.review.id)}>
           Edit
         </a>
+        <a class="link" href={paths.albumReview(props.review.albumId)}>
+          Review
+        </a>
+        <AlbumLinks album={props.review.album} />
       </div>
     </div>
   );

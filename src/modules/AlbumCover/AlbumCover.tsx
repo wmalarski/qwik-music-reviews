@@ -27,29 +27,3 @@ export const AlbumCover = component$((props: Props) => {
     </>
   );
 });
-/*
-
-          <picture>
-            <img
-              alt={heading}
-              class="max-w-full border-4 border-base-300 object-cover aspect-square"
-
-            <picture>
-              <img
-                alt={heading}
-                class="max-w-full border-4 border-base-300 object-cover aspect-square"
-
-            <div class="min-w-max">
-              <picture>
-                <img
-                  alt={`${heading} cover`}
-                  class="w-80"
-
-            <div class="min-w-max">
-              <picture>
-                <img
-                  alt={`${heading} cover`}
-                  class="w-80"
-
-
-*/

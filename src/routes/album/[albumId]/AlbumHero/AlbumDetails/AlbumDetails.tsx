@@ -1,6 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import type { Album, Artist } from "@prisma/client";
 import { AlbumCover } from "~/modules/AlbumCover/AlbumCover";
+import { AlbumLinks } from "~/modules/AlbumLinks/AlbumLinks";
 
 type Props = {
   album: Album & { artist: Artist };
@@ -27,6 +28,7 @@ export const AlbumDetails = component$((props: Props) => {
               </>
             ) : null}
           </div>
+          <AlbumLinks album={props.album} />
         </div>
       </div>
     </section>
