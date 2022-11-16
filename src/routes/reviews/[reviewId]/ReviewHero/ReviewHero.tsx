@@ -1,8 +1,8 @@
 import { component$ } from "@builder.io/qwik";
 import type { Album, Artist, Review } from "@prisma/client";
 import { Stars } from "~/components/Stars/Stars";
+import { AlbumCover } from "~/modules/AlbumCover/AlbumCover";
 import { formatAlbum } from "~/utils/format";
-import { getCoversAttributes } from "~/utils/images";
 import { paths } from "~/utils/paths";
 
 type Props = {
@@ -19,19 +19,7 @@ export const ReviewHero = component$((props: Props) => {
     <section class="flex justify-center p-8">
       <div class="flex max-w-5xl flex-row items-center gap-8">
         <div class="hidden flex-grow md:flex">
-          {props.review.album.covers ? (
-            <div class="min-w-max">
-              <picture>
-                <img
-                  alt={`${heading} cover`}
-                  class="w-80"
-                  {...getCoversAttributes(
-                    JSON.parse(props.review.album.covers)
-                  )}
-                />
-              </picture>
-            </div>
-          ) : null}
+          <AlbumCover album={props.review.album} />
         </div>
         <div class="flex flex-col gap-6">
           <a href={paths.album(props.review.albumId)}>

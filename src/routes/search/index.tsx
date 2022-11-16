@@ -42,27 +42,27 @@ export default component$(() => {
 
   return (
     <div>
-      <h1>
-        Search <span class="bg-red-500">⚡️</span>
-      </h1>
-      <form class="flex flex-row justify-start gap-4 bg-base-300 p-4">
-        <img
-          src="/images/magnifier.svg"
-          width={24}
-          height={24}
-          alt="search"
-          aria-label="Search"
-        />
-        <input
-          name="query"
-          id="query"
-          aria-label="query"
-          value={location.query.query}
-        />
-        <button class="btn" type="submit">
-          Search
-        </button>
-      </form>
+      <div class="flex flex-row bg-base-300">
+        <h1 class="text-2xl hidden">Search</h1>
+        <form class="flex flex-row justify-start gap-4 p-4">
+          <img
+            src="/images/magnifier.svg"
+            width={24}
+            height={24}
+            alt="search"
+            aria-label="Search"
+          />
+          <input
+            name="query"
+            id="query"
+            aria-label="query"
+            value={location.query.query}
+          />
+          <button class="btn" type="submit">
+            Search
+          </button>
+        </form>
+      </div>
       <Resource
         value={resource}
         onPending={() => <span>Pending</span>}

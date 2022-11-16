@@ -1,33 +1,17 @@
 import { component$ } from "@builder.io/qwik";
 import type { Album, Artist } from "@prisma/client";
-import { formatAlbum } from "~/utils/format";
-import { getCoversAttributes } from "~/utils/images";
+import { AlbumCover } from "~/modules/AlbumCover/AlbumCover";
 
 type Props = {
   album: Album & { artist: Artist };
 };
 
 export const AlbumDetails = component$((props: Props) => {
-  const heading = formatAlbum({
-    album: props.album,
-    artist: props.album.artist,
-  });
-
   return (
     <section class="flex justify-center p-8">
       <div class="flex max-w-5xl flex-row items-center gap-8">
         <div class="hidden flex-grow md:flex">
-          {props.album.covers ? (
-            <div class="min-w-max">
-              <picture>
-                <img
-                  alt={`${heading} cover`}
-                  class="w-80"
-                  {...getCoversAttributes(JSON.parse(props.album.covers))}
-                />
-              </picture>
-            </div>
-          ) : null}
+          <AlbumCover album={props.album} />
         </div>
         <div class="flex flex-col gap-6">
           <div>
