@@ -1,32 +1,12 @@
-# Qwik City + Next Auth ⚡️
-
-## TODO List
-
-- [ ] fix saving cookies when new qwik release cookies api
-- [ ] random albums grid
-- [ ] album card
-- [ ] albums search
-- [ ] album details page
-- [ ] review album
-- [ ] review list
-- [ ] remove album
-- [ ] remove review
-- [ ] edit album
-- [ ] edit review
-- [ ] setup vanilla-extract
-- [ ] setup trpc
+# Qwik City + NextAuth.js +tRPC + TailwindCSS + Prisma ⚡️
 
 ## Tools
 
 - [Qwik Docs](https://qwik.builder.io/)
 - [Next-Auth.js](https://next-auth.js.org/)
-- [Discord](https://qwik.builder.io/chat)
-- [Qwik GitHub](https://github.com/BuilderIO/qwik)
-- [@QwikDev](https://twitter.com/QwikDev)
-- [Vite](https://vitejs.dev/)
-- [Partytown](https://partytown.builder.io/)
-- [Mitosis](https://github.com/BuilderIO/mitosis)
-- [Builder.io](https://www.builder.io/)
+- [tRPC](https://trpc.io/)
+- [TailwindCSS](https://tailwindcss.com/)
+- [Prisma](https://www.prisma.io/)
 
 ---
 
