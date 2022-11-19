@@ -102,8 +102,12 @@ export const albumRouter = t.router({
           take: input.take,
           where: {
             OR: [
-              { title: { contains: input.query } },
-              { artist: { name: { contains: input.query } } },
+              { title: { contains: input.query, mode: "insensitive" } },
+              {
+                artist: {
+                  name: { contains: input.query, mode: "insensitive" },
+                },
+              },
             ],
           },
         }),
