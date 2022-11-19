@@ -1,10 +1,12 @@
 import { component$ } from "@builder.io/qwik";
 import type { Album, Artist, Review } from "@prisma/client";
+import type { Session } from "next-auth";
 import { Stars } from "~/components/Stars/Stars";
 import { AlbumCover } from "~/modules/AlbumCover/AlbumCover";
 import { AlbumLinks } from "~/modules/AlbumLinks/AlbumLinks";
 import { formatAlbum } from "~/utils/format";
 import { paths } from "~/utils/paths";
+import { ReviewRemoveForm } from "./ReviewRemoveForm/ReviewRemoveForm";
 
 export type ReviewListItem = Review & {
   album: Album & {
@@ -14,6 +16,7 @@ export type ReviewListItem = Review & {
 
 type Props = {
   review: ReviewListItem;
+  session: Session;
 };
 
 export const ReviewListCard = component$<Props>((props) => {
@@ -37,9 +40,16 @@ export const ReviewListCard = component$<Props>((props) => {
         <a class="link" href={paths.reviewEdit(props.review.id)}>
           Edit
         </a>
-        <a class="link" href={paths.albumReview(props.review.albumId)}>
-          Review
-        </a>
+        <pre>
+          {JSON.stringify(
+            { user: props.session.user?.id, review: props.review.userId },
+            null,
+            2
+          )}
+        </pre>
+        {props.session.user?.id === props.review.userId && (
+          <ReviewRemoveForm review={props.review} />
+        )}
         <AlbumLinks album={props.review.album} />
       </div>
     </div>

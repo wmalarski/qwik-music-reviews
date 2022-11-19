@@ -7,6 +7,7 @@ export const paths = {
   nextSignIn: "/api/auth/signin",
   nextSignOut: "/api/auth/signout",
   reviewEdit: (id: string) => `/reviews/${id}/edit`,
+  reviewRemove: (id: string) => `/reviews/${id}/remove`,
   reviews: "/reviews",
   search: "/search",
   signIn: "/signIn",
