@@ -5,7 +5,7 @@ import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCa
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
-import { trpc } from "~/utils/trpc";
+import { useTrpcContext } from "../context";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
 export const onGet = endpointBuilder()
@@ -23,6 +23,7 @@ export const onGet = endpointBuilder()
 export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
 
+  const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
@@ -52,7 +53,8 @@ export default component$(() => {
               pageCount={Math.floor(data.collection.count / 20)}
               parentContainer={containerRef.value}
               onMore$={async () => {
-                const newResult = await trpc.review.findReviews.query({
+                const trpc = await trpcContext();
+                const newResult = await trpc?.review.findReviews.query({
                   skip: (store.currentPage + 1) * 20,
                   take: 20,
                 });

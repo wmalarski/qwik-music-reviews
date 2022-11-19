@@ -5,7 +5,7 @@ import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
-import { trpc } from "~/utils/trpc";
+import { useTrpcContext } from "./context";
 
 export const onGet = endpointBuilder()
   .use(withProtectedSession())
@@ -17,6 +17,7 @@ export const onGet = endpointBuilder()
 export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
 
+  const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
@@ -40,7 +41,10 @@ export default component$(() => {
             pageCount={1}
             parentContainer={containerRef.value}
             onMore$={async () => {
-              const newResult = await trpc.album.findRandom.query({ take: 20 });
+              const trpc = await trpcContext();
+              const newResult = await trpc?.album.findRandom.query({
+                take: 20,
+              });
               const newAlbums = newResult?.albums || [];
               store.results = [...store.results, ...newAlbums];
             }}

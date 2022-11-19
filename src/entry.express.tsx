@@ -1,20 +1,20 @@
-import { createQwikCity } from '@builder.io/qwik-city/middleware/node';
-import qwikCityPlan from '@qwik-city-plan';
-import render from './entry.ssr';
-import express from 'express';
-import { fileURLToPath } from 'node:url';
-import { join } from 'node:path';
-import compression from 'compression';
+import { createQwikCity } from "@builder.io/qwik-city/middleware/node";
+import qwikCityPlan from "@qwik-city-plan";
+import compression from "compression";
+import express from "express";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import render from "./entry.ssr";
 
 // Directories where the static assets are located
-const distDir = join(fileURLToPath(import.meta.url), '..', '..', 'dist');
-const buildDir = join(distDir, 'build');
+const distDir = join(fileURLToPath(import.meta.url), "..", "..", "dist");
+const buildDir = join(distDir, "build");
 
 // Allow for dynamic port
 const PORT = process.env.PORT ?? 3000;
 
 // Create the Qwik City express middleware
-const { router, notFound } = createQwikCity({ render, qwikCityPlan });
+const { router, notFound } = createQwikCity({ qwikCityPlan, render });
 
 // Create the express server
 // https://expressjs.com/
@@ -25,7 +25,7 @@ app.use(compression());
 
 // Static asset handlers
 // https://expressjs.com/en/starter/static-files.html
-app.use(`/build`, express.static(buildDir, { immutable: true, maxAge: '1y' }));
+app.use(`/build`, express.static(buildDir, { immutable: true, maxAge: "1y" }));
 app.use(express.static(distDir, { redirect: false }));
 
 // Use Qwik City's page and endpoint request handler
