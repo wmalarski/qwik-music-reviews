@@ -40,13 +40,6 @@ export const ReviewListCard = component$<Props>((props) => {
         <a class="link" href={paths.reviewEdit(props.review.id)}>
           Edit
         </a>
-        <pre>
-          {JSON.stringify(
-            { user: props.session.user?.id, review: props.review.userId },
-            null,
-            2
-          )}
-        </pre>
         {props.session.user?.id === props.review.userId && (
           <ReviewRemoveForm review={props.review} />
         )}

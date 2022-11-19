@@ -18,5 +18,5 @@ export const onPost = endpointBuilder()
       return;
     }
 
-    throw response.redirect(paths.home);
+    throw response.redirect(paths.reviews);
   });

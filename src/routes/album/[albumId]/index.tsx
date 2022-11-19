@@ -1,13 +1,11 @@
 import { component$, Resource } from "@builder.io/qwik";
 import { DocumentHead } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
-import { useSessionContext } from "~/routes/context";
 import { ArtistReviews } from "./ArtistReviews/ArtistReviews";
 import { useAlbumContext } from "./context";
 
 export default component$(() => {
   const albumResource = useAlbumContext();
-  const sessionResource = useSessionContext();
 
   return (
     <Resource
@@ -27,12 +25,7 @@ export default component$(() => {
               pageCount={1}
             />
           ) : null}
-          <Resource
-            value={sessionResource}
-            onResolved={(session) => (
-              <ArtistReviews data={data} session={session} />
-            )}
-          />
+          <ArtistReviews data={data} session={data.session} />
         </div>
       )}
     />
