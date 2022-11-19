@@ -22,7 +22,7 @@ export default component$(() => {
   useAlbumContextProvider(resource);
 
   return (
-    <div class="flex flex-col">
+    <div class="flex flex-col max-h-screen overflow-y-scroll">
       <Resource
         value={resource}
         onResolved={(data) => (

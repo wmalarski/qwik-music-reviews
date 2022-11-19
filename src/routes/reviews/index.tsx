@@ -35,14 +35,16 @@ export default component$(() => {
       ref={(e) => (containerRef.value = e)}
       class="max-h-screen overflow-y-scroll"
     >
-      <h1 class="text-2xl">Reviews</h1>
+      <h1 class="px-8 py-8 text-2xl">Reviews</h1>
       <Resource
         value={resource}
         onPending={() => <span>Pending</span>}
         onRejected={() => <span>Rejected</span>}
         onResolved={(data) => (
           <>
-            <ReviewActivity counts={data.counts} />
+            <div class="px-8">
+              <ReviewActivity counts={data.counts} />
+            </div>
             <ReviewList
               session={data.session}
               collection={[...data.collection.reviews, ...store.results]}

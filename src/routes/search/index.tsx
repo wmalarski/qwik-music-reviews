@@ -59,8 +59,9 @@ export default component$(() => {
             id="query"
             aria-label="query"
             value={location.query.query}
+            class="input input-bordered"
           />
-          <button class="btn" type="submit">
+          <button class="btn uppercase" type="submit">
             Search
           </button>
         </form>

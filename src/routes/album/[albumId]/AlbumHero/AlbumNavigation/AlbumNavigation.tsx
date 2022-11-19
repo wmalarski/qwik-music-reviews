@@ -1,6 +1,7 @@
 import { component$ } from "@builder.io/qwik";
-import { DocumentHead } from "@builder.io/qwik-city";
+import { useLocation } from "@builder.io/qwik-city";
 import type { Album, Artist } from "@prisma/client";
+import { cva } from "class-variance-authority";
 import type { Session } from "next-auth";
 import { paths } from "~/utils/paths";
 
@@ -9,25 +10,57 @@ type Props = {
   session: Session;
 };
 
+export const link = cva(
+  "link no-underline hover:border-b-2 hover:border-gray-400 text-xl",
+  {
+    defaultVariants: {
+      isActive: false,
+    },
+    variants: {
+      isActive: {
+        false: "",
+        true: "border-b-2 border-white",
+      },
+    },
+  }
+);
+
 export const AlbumNavigation = component$<Props>(({ album, session }) => {
+  const location = useLocation();
+
   return (
-    <nav>
+    <nav class="border-b-2 pb-4 border-base-300">
       <ul class="w-full flex flex-row justify-center gap-8">
         <li>
-          <a class="text-xl" href={paths.album(album.id)}>
+          <a
+            class={link({
+              isActive: paths.album(album.id) === location.pathname,
+            })}
+            href={paths.album(album.id)}
+          >
             Details
           </a>
         </li>
         {album.userId === session.user?.id ? (
           <li>
-            <a class="text-xl" href={paths.albumEdit(album.id)}>
+            <a
+              class={link({
+                isActive: paths.albumEdit(album.id) === location.pathname,
+              })}
+              href={paths.albumEdit(album.id)}
+            >
               Edit
             </a>
           </li>
         ) : null}
 
         <li>
-          <a class="text-xl" href={paths.albumReview(album.id)}>
+          <a
+            class={link({
+              isActive: paths.albumReview(album.id) === location.pathname,
+            })}
+            href={paths.albumReview(album.id)}
+          >
             Review
           </a>
         </li>
@@ -35,7 +68,3 @@ export const AlbumNavigation = component$<Props>(({ album, session }) => {
     </nav>
   );
 });
-
-export const head: DocumentHead = {
-  title: "Album - Qwik Album Review",
-};

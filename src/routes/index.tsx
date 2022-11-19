@@ -28,7 +28,7 @@ export default component$(() => {
       ref={(e) => (containerRef.value = e)}
       class="max-h-screen overflow-y-scroll"
     >
-      <h1 class="text-2xl">Random Albums</h1>
+      <h1 class="px-8 pt-8 text-2xl">Random Albums</h1>
       <Resource
         value={resource}
         onPending={() => <span>Pending</span>}
