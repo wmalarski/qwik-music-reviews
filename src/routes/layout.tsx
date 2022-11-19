@@ -1,14 +1,9 @@
-import {
-  component$,
-  Slot,
-  useContextProvider,
-  useSignal,
-} from "@builder.io/qwik";
+import { component$, Slot } from "@builder.io/qwik";
 import { useEndpoint } from "@builder.io/qwik-city";
 import { withSession } from "~/server/auth/withSession";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
-import { ContainerContext, useSessionContextProvider } from "./context";
+import { useSessionContextProvider } from "./context";
 
 export const onGet = endpointBuilder()
   .use(withSession())
@@ -20,11 +15,8 @@ export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
   useSessionContextProvider(resource);
 
-  const containerRef = useSignal<Element | null>(null);
-  useContextProvider(ContainerContext, containerRef);
-
   return (
-    <div class="flex h-screen w-screen flex-col-reverse md:flex-row">
+    <div class="flex h-screen w-screen flex-col-reverse md:flex-row overflow-y-hidden">
       <nav>
         <ul>
           <li>
@@ -47,10 +39,7 @@ export default component$(() => {
           </ul>
         </li>
       </nav>
-      <div
-        ref={(e) => (containerRef.value = e)}
-        class="w-full overflow-y-scroll"
-      >
+      <div class="w-full">
         <main>
           <Slot />
         </main>

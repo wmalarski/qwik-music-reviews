@@ -1,4 +1,4 @@
-import { component$, Resource, useContext, useStore } from "@builder.io/qwik";
+import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
@@ -8,7 +8,6 @@ import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { trpc } from "~/utils/trpc";
 import { withTypedQuery } from "~/utils/withTypes";
-import { ContainerContext } from "../context";
 
 export const onGet = endpointBuilder()
   .use(
@@ -33,7 +32,7 @@ export default component$(() => {
   const location = useLocation();
   const resource = useEndpoint<typeof onGet>();
 
-  const container = useContext(ContainerContext);
+  const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
     currentPage: 0,
@@ -41,7 +40,10 @@ export default component$(() => {
   });
 
   return (
-    <div>
+    <div
+      ref={(e) => (containerRef.value = e)}
+      class="max-h-screen overflow-y-scroll"
+    >
       <div class="flex flex-row bg-base-300">
         <h1 class="text-2xl hidden">Search</h1>
         <form class="flex flex-row justify-start gap-4 p-4">
@@ -72,7 +74,7 @@ export default component$(() => {
             collection={[...data.albums, ...store.results]}
             currentPage={store.currentPage}
             pageCount={Math.floor(data.count / 20)}
-            parentContainer={container.value}
+            parentContainer={containerRef.value}
             onMore$={async () => {
               const newResult = await trpc.album.findAlbums.query({
                 query: location.query["query"] || "",

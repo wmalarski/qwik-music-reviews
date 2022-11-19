@@ -1,4 +1,4 @@
-import { component$, Resource, useContext, useStore } from "@builder.io/qwik";
+import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
@@ -8,7 +8,6 @@ import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { trpc } from "~/utils/trpc";
 import { withTypedQuery } from "~/utils/withTypes";
-import { ContainerContext } from "../context";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
 export const onGet = endpointBuilder()
@@ -30,7 +29,7 @@ export const onGet = endpointBuilder()
 export default component$(() => {
   const resource = useEndpoint<typeof onGet>();
 
-  const container = useContext(ContainerContext);
+  const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
     currentPage: 0,
@@ -38,7 +37,10 @@ export default component$(() => {
   });
 
   return (
-    <div>
+    <div
+      ref={(e) => (containerRef.value = e)}
+      class="max-h-screen overflow-y-scroll"
+    >
       <h1 class="text-2xl">Reviews</h1>
       <Resource
         value={resource}
@@ -52,7 +54,7 @@ export default component$(() => {
               collection={[...data.collection.reviews, ...store.results]}
               currentPage={store.currentPage}
               pageCount={Math.floor(data.collection.count / 20)}
-              parentContainer={container.value}
+              parentContainer={containerRef.value}
               onMore$={async () => {
                 const newResult = await trpc.review.findReviews.query({
                   skip: (store.currentPage + 1) * 20,

@@ -17,7 +17,3 @@ export const useSessionContextProvider = (state: SessionContextState) => {
 export const useSessionContext = () => {
   return useContext(SessionContext);
 };
-
-export const ContainerContext = createContext<{ value: Element | null }>(
-  "container-context"
-);

@@ -37,24 +37,22 @@ export const AlbumGrid = component$<Props>((props) => {
   });
 
   return (
-    <section>
-      <div
-        document:onScroll$={() => {
-          if (throttleTimer.value || !scrollEnabled.value) {
-            return;
-          }
-          throttleTimer.value = true;
-          setTimeout(() => {
-            handleScroll$();
-            throttleTimer.value = false;
-          }, 1000);
-        }}
-        class="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-4 p-8"
-      >
-        {props.collection?.map((media) => (
-          <AlbumGridCard album={media} />
-        ))}
-      </div>
-    </section>
+    <div
+      class="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-4 p-8"
+      document:onScroll$={() => {
+        if (throttleTimer.value || !scrollEnabled.value) {
+          return;
+        }
+        throttleTimer.value = true;
+        setTimeout(() => {
+          handleScroll$();
+          throttleTimer.value = false;
+        }, 1000);
+      }}
+    >
+      {props.collection?.map((media) => (
+        <AlbumGridCard album={media} />
+      ))}
+    </div>
   );
 });
