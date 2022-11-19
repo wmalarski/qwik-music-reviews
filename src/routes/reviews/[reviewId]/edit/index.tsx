@@ -1,5 +1,5 @@
 import { component$, Resource } from "@builder.io/qwik";
-import { DocumentHead, useLocation } from "@builder.io/qwik-city";
+import { DocumentHead } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -10,42 +10,46 @@ import { withTypedParams } from "~/utils/withTypes";
 import { useReviewContext } from "../context";
 
 export const onPost = endpointBuilder()
-  .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
+  .use(withTypedParams(z.object({ reviewId: z.string().min(1) })))
   .use(withProtectedSession())
   .use(withTrpc())
   .resolver(async ({ request, trpc, params, response }) => {
     const formData = await request.formData();
-    const year = formData.get("year");
-    const title = formData.get("title");
+    const rate = formData.get("rate");
+    const text = formData.get("text");
 
-    await trpc.album.updateAlbum({
-      id: params.albumId,
-      title: title ? (title as string) : undefined,
-      year: year ? +year : undefined,
+    await trpc.review.updateReview({
+      id: params.reviewId,
+      rate: rate ? +rate : undefined,
+      text: text ? (text as string) : undefined,
     });
 
-    throw response.redirect(paths.album(params.albumId));
+    throw response.redirect(paths.reviews);
   });
 
 export default component$(() => {
-  const location = useLocation();
-  const albumResource = useReviewContext();
+  const reviewResource = useReviewContext();
 
   return (
-    <Resource
-      value={albumResource}
-      onResolved={(data) => (
-        <div class="p-8 flex flex-col gap-4">
-          <h2 class="text-xl">Edit album</h2>
-          {data ? (
-            <ReviewForm action={location.pathname} initialValue={data} />
-          ) : null}
-        </div>
-      )}
-    />
+    <div class="p-8 flex flex-col gap-4">
+      <h2 class="text-xl">Edit review</h2>
+      <Resource
+        value={reviewResource}
+        onResolved={(data) => (
+          <>
+            {data ? (
+              <ReviewForm
+                action={paths.reviewEdit(data.id)}
+                initialValue={data}
+              />
+            ) : null}
+          </>
+        )}
+      />
+    </div>
   );
 });
 
 export const head: DocumentHead = {
-  title: "Edit Album - Qwik Album Review",
+  title: "Edit Review - Qwik Album Review",
 };

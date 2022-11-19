@@ -39,9 +39,7 @@ export default component$(() => {
 
   return (
     <div>
-      <h1>
-        Reviews <span class="bg-red-500">⚡️</span>
-      </h1>
+      <h1 class="text-2xl">Reviews</h1>
       <Resource
         value={resource}
         onPending={() => <span>Pending</span>}

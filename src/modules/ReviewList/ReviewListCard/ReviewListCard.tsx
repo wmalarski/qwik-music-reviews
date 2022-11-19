@@ -37,11 +37,13 @@ export const ReviewListCard = component$<Props>((props) => {
           {heading}
         </a>
         <Stars rating={props.review.rate} />
-        <a class="link" href={paths.reviewEdit(props.review.id)}>
-          Edit
-        </a>
         {props.session.user?.id === props.review.userId && (
-          <ReviewRemoveForm review={props.review} />
+          <>
+            <a class="link" href={paths.reviewEdit(props.review.id)}>
+              Edit
+            </a>
+            <ReviewRemoveForm review={props.review} />
+          </>
         )}
         <AlbumLinks album={props.review.album} />
       </div>
