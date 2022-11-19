@@ -1,25 +1,19 @@
 import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
 import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
-import { z } from "zod";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { trpc } from "~/utils/trpc";
-import { withTypedQuery } from "~/utils/withTypes";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
 export const onGet = endpointBuilder()
-  .use(withTypedQuery(z.object({ page: z.number().min(0).step(1).optional() })))
   .use(withProtectedSession())
   .use(withTrpc())
-  .resolver(async ({ query, trpc, session }) => {
+  .resolver(async ({ trpc, session }) => {
     const [collection, counts] = await Promise.all([
-      trpc.review.findReviews({
-        skip: (query.page || 0) * 20,
-        take: 20,
-      }),
+      trpc.review.findReviews({ skip: 0, take: 20 }),
       trpc.review.countReviewsByDate(),
     ]);
 
@@ -32,7 +26,7 @@ export default component$(() => {
   const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
-    currentPage: 0,
+    currentPage: 1,
     results: [] as ReviewListItem[],
   });
 

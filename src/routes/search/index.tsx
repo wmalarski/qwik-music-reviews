@@ -35,7 +35,7 @@ export default component$(() => {
   const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
-    currentPage: 0,
+    currentPage: 1,
     results: [] as AlbumGridItem[],
   });
 
