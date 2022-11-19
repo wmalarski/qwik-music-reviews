@@ -4,7 +4,6 @@ import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
-import { paths } from "~/utils/paths";
 
 export const onGet = endpointBuilder()
   .use(withProtectedSession())
@@ -18,10 +17,7 @@ export default component$(() => {
 
   return (
     <div>
-      <h1>
-        Random Albums <span class="bg-red-500">⚡️</span>
-      </h1>
-      <a href={paths.album("yolo")}>Album 1</a>
+      <h1 class="text-2xl">Random Albums</h1>
       <Resource
         value={resource}
         onPending={() => <span>Pending</span>}

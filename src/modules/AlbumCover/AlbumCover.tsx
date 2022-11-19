@@ -19,11 +19,13 @@ export const AlbumCover = component$<Props>((props) => {
         <picture>
           <img
             alt={heading}
-            class="w-80 max-w-full border-4 border-base-300 object-cover aspect-square"
+            class="w-64 max-w-full bg-base-200 border-4 border-base-300 object-cover aspect-square"
             {...getCoversAttributes(JSON.parse(props.album.covers))}
           />
         </picture>
-      ) : null}
+      ) : (
+        <div class="w-64 h-64 border-4 border-base-300 bg-base-200" />
+      )}
     </>
   );
 });

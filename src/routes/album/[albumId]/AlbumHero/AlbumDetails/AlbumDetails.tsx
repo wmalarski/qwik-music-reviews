@@ -1,10 +1,13 @@
 import { component$ } from "@builder.io/qwik";
 import type { Album, Artist } from "@prisma/client";
+import type { Session } from "next-auth";
 import { AlbumCover } from "~/modules/AlbumCover/AlbumCover";
 import { AlbumLinks } from "~/modules/AlbumLinks/AlbumLinks";
+import { AlbumRemoveForm } from "./AlbumRemoveForm/AlbumRemoveForm";
 
 type Props = {
   album: Album & { artist: Artist };
+  session: Session;
 };
 
 export const AlbumDetails = component$<Props>((props) => {
@@ -29,6 +32,9 @@ export const AlbumDetails = component$<Props>((props) => {
             ) : null}
           </div>
           <AlbumLinks album={props.album} />
+          {props.session.user?.id === props.album.userId && (
+            <AlbumRemoveForm album={props.album} />
+          )}
         </div>
       </div>
     </section>

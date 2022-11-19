@@ -12,7 +12,7 @@ type Props = {
 export const AlbumHero = component$<Props>((props) => {
   return (
     <div class="flex flex-col justify-center">
-      <AlbumDetails album={props.album} />
+      <AlbumDetails album={props.album} session={props.session} />
       <AlbumNavigation album={props.album} session={props.session} />
     </div>
   );
