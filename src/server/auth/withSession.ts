@@ -1,4 +1,5 @@
 import { RequestEvent } from "@builder.io/qwik-city";
+import { paths } from "~/utils/paths";
 
 export const withSession = <R extends RequestEvent = RequestEvent>() => {
   return async (event: R) => {
@@ -25,7 +26,7 @@ export const withProtectedSession = <R extends RequestEvent = RequestEvent>(
     const session = await getServerSession(event, authOptions);
 
     if (!session) {
-      throw event.response.redirect(options.redirectTo || "/signIn");
+      throw event.response.redirect(options.redirectTo || paths.signIn);
     }
     return { ...event, session };
   };

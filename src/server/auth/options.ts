@@ -22,10 +22,10 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     Auth0({
-      clientId: env.VITE_AUTH0_CLIENT_ID,
-      clientSecret: env.VITE_AUTH0_CLIENT_SECRET,
-      issuer: env.VITE_AUTH0_ISSUER,
+      clientId: env.AUTH0_CLIENT_ID,
+      clientSecret: env.AUTH0_CLIENT_SECRET,
+      issuer: env.AUTH0_ISSUER,
     }),
   ],
-  secret: env.VITE_NEXTAUTH_SECRET,
+  secret: env.NEXTAUTH_SECRET,
 };

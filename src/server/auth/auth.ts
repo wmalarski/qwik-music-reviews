@@ -84,7 +84,7 @@ const QWikNextAuthHandler = async (
       cookies: getCookie(request.headers),
       error: (query.error as string | undefined) ?? providerId,
       headers: request.headers,
-      host: env.VITE_NEXTAUTH_URL,
+      host: env.NEXTAUTH_URL,
       method: request.method,
       providerId,
       query,
@@ -123,7 +123,7 @@ export const getServerSession = async (
       action: "session",
       cookies: getCookie(request.headers),
       headers: request.headers,
-      host: env.VITE_NEXTAUTH_URL,
+      host: env.NEXTAUTH_URL,
       method: "GET",
     },
   });
@@ -147,7 +147,7 @@ export const getServerCsrfToken = async (
       action: "csrf",
       cookies: getCookie(request.headers),
       headers: request.headers,
-      host: env.VITE_NEXTAUTH_URL,
+      host: env.NEXTAUTH_URL,
       method: "GET",
     },
   });
@@ -172,7 +172,7 @@ export const getServerProviders = async (
       action: "providers",
       cookies: getCookie(request.headers),
       headers: request.headers,
-      host: env.VITE_NEXTAUTH_URL,
+      host: env.NEXTAUTH_URL,
       method: "GET",
     },
   });
