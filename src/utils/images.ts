@@ -12,7 +12,7 @@ export const getCoversAttributes = (covers: Covers) => {
     if (!size || size in prev) {
       return prev;
     }
-    prev[size] = curr;
+    prev[size] = curr.replace(/^http:/, "https:");
     return prev;
   }, {});
 
