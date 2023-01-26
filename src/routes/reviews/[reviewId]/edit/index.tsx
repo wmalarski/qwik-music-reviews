@@ -1,5 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead } from "@builder.io/qwik-city";
+import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
 import { protectedReviewProcedure } from "~/server/procedures";
 import { updateReview } from "~/server/review";
@@ -7,19 +8,22 @@ import { paths } from "~/utils/paths";
 import { reviewLoader } from "../layout";
 
 export const updateReviewAction = action$(
-  protectedReviewProcedure.action(async (form, event) => {
-    const rate = form.get("rate");
-    const text = form.get("text");
+  protectedReviewProcedure.typedAction(
+    z.object({
+      rate: z.coerce.number().min(0).max(10).optional(),
+      text: z.string().optional(),
+    }),
+    async (form, event) => {
+      await updateReview({
+        ctx: event.ctx,
+        id: event.typedParams.reviewId,
+        rate: form.rate,
+        text: form.text,
+      });
 
-    await updateReview({
-      ctx: event.ctx,
-      id: event.typedParams.reviewId,
-      rate: rate ? +rate : undefined,
-      text: text ? (text as string) : undefined,
-    });
-
-    throw event.redirect(302, paths.reviews);
-  })
+      throw event.redirect(302, paths.reviews);
+    }
+  )
 );
 
 export default component$(() => {

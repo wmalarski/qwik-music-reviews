@@ -1,5 +1,6 @@
 import { component$, Slot } from "@builder.io/qwik";
 import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { z } from "zod";
 import { protectedSessionLoader } from "~/routes/layout";
 import { deleteAlbum, findAlbum } from "~/server/album";
 import {
@@ -34,20 +35,21 @@ export const deleteAlbumAction = action$(
 );
 
 export const deleteReviewAction = action$(
-  protectedProcedure.action(async (form, event) => {
-    const reviewId = form.get("reviewId") as string;
+  protectedProcedure.typedAction(
+    z.object({ reviewId: z.string() }),
+    async (form, event) => {
+      const result = await deleteReview({
+        ctx: event.ctx,
+        id: form.reviewId,
+      });
 
-    const result = await deleteReview({
-      ctx: event.ctx,
-      id: reviewId,
-    });
+      if (result.count <= 0) {
+        return;
+      }
 
-    if (result.count <= 0) {
-      return;
+      throw event.redirect(302, paths.reviews);
     }
-
-    throw event.redirect(302, paths.reviews);
-  })
+  )
 );
 
 export default component$(() => {

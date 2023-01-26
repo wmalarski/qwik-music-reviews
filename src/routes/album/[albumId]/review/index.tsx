@@ -1,5 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead } from "@builder.io/qwik-city";
+import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
 import { protectedAlbumProcedure } from "~/server/procedures";
 import { createReview } from "~/server/review";
@@ -7,20 +8,24 @@ import { paths } from "~/utils/paths";
 import { albumLoader } from "../layout";
 
 export const createReviewAction = action$(
-  protectedAlbumProcedure.action(async (form, event) => {
-    const albumId = event.typedParams.albumId;
-    const rate = form.get("rate");
-    const text = form.get("text");
+  protectedAlbumProcedure.typedAction(
+    z.object({
+      rate: z.coerce.number().min(0).max(10),
+      text: z.string().optional().default(""),
+    }),
+    async (form, event) => {
+      const albumId = event.typedParams.albumId;
 
-    await createReview({
-      albumId,
-      ctx: event.ctx,
-      rate: rate ? +rate : 0,
-      text: text ? (text as string) : "",
-    });
+      await createReview({
+        albumId,
+        ctx: event.ctx,
+        rate: form.rate,
+        text: form.text,
+      });
 
-    throw event.redirect(302, paths.album(albumId));
-  })
+      throw event.redirect(302, paths.album(albumId));
+    }
+  )
 );
 
 export default component$(() => {

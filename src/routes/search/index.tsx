@@ -14,11 +14,11 @@ import { withTypedQuery } from "~/server/withTypes";
 
 export const albumsLoader = loader$(
   protectedProcedure
-    .use(withTypedQuery(z.object({ query: z.string().optional() })))
+    .use(withTypedQuery(z.object({ query: z.string().default("") })))
     .loader((event) => {
       return findAlbums({
         ctx: event.ctx,
-        query: event.query.query || "",
+        query: event.query.query,
         skip: 0,
         take: 20,
       });
@@ -26,16 +26,20 @@ export const albumsLoader = loader$(
 );
 
 export const findAlbumsAction = action$(
-  protectedProcedure.action((form, event) => {
-    const query = (form.get("query") || "") as string;
-    const page = +(form.get("page") || 0);
-    return findAlbums({
-      ctx: event.ctx,
-      query: query,
-      skip: page * 20,
-      take: 20,
-    });
-  })
+  protectedProcedure.typedAction(
+    z.object({
+      page: z.coerce.number().min(0).int().default(0),
+      query: z.string().default(""),
+    }),
+    (form, event) => {
+      return findAlbums({
+        ctx: event.ctx,
+        query: form.query,
+        skip: form.page * 20,
+        take: 20,
+      });
+    }
+  )
 );
 
 export default component$(() => {

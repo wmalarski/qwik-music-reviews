@@ -1,5 +1,6 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
 import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { z } from "zod";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
 import { protectedProcedure } from "~/server/procedures";
@@ -21,28 +22,37 @@ export const countsLoader = loader$(
 );
 
 export const deleteReviewAction = action$(
-  protectedProcedure.action(async (form, event) => {
-    const reviewId = form.get("reviewId") as string;
+  protectedProcedure.typedAction(
+    z.object({ reviewId: z.string() }),
+    async (form, event) => {
+      const result = await deleteReview({
+        ctx: event.ctx,
+        id: form.reviewId,
+      });
 
-    const result = await deleteReview({
-      ctx: event.ctx,
-      id: reviewId,
-    });
+      if (result.count <= 0) {
+        return;
+      }
 
-    if (result.count <= 0) {
-      return;
+      throw event.redirect(302, paths.reviews);
     }
-
-    throw event.redirect(302, paths.reviews);
-  })
+  )
 );
 
 export const findReviewsAction = action$(
-  protectedProcedure.action((form, event) => {
-    const skip = +(form.get("skip") || 0);
-    const take = +(form.get("take") || 20);
-    return findReviews({ ctx: event.ctx, skip, take });
-  })
+  protectedProcedure.typedAction(
+    z.object({
+      skip: z.coerce.number().int().min(0).default(0),
+      take: z.coerce.number().int().min(0).max(100).default(20),
+    }),
+    (form, event) => {
+      return findReviews({
+        ctx: event.ctx,
+        skip: form.skip,
+        take: form.take,
+      });
+    }
+  )
 );
 
 export default component$(() => {

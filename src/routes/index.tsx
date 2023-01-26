@@ -1,5 +1,6 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
 import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { findRandom } from "~/server/album";
@@ -12,10 +13,12 @@ export const randomAlbumsLoader = loader$(
 );
 
 export const fetchRandomAlbumsAction = action$(
-  protectedProcedure.action((form, event) => {
-    const take = +(form.get("take") || 0);
-    return findRandom({ ctx: event.ctx, take });
-  })
+  protectedProcedure.typedAction(
+    z.object({ take: z.coerce.number().min(0).max(20).int() }),
+    (form, event) => {
+      return findRandom({ ctx: event.ctx, take: form.take });
+    }
+  )
 );
 
 export default component$(() => {
