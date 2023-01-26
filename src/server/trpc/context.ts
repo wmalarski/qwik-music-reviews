@@ -1,6 +1,6 @@
 import { RequestEvent } from "@builder.io/qwik-city";
 import * as trpc from "@trpc/server";
-import type { Session } from "next-auth";
+import type { Session, User } from "next-auth";
 import { getServerSession } from "../auth/auth";
 import { authOptions } from "../auth/options";
 import { prisma } from "../db/client";
@@ -20,3 +20,14 @@ export const createContext = async (ev: RequestEvent) => {
 };
 
 export type Context = trpc.inferAsyncReturnType<typeof createContext>;
+
+export type RequestContext = {
+  prisma: typeof prisma;
+  session?: Session | null;
+};
+
+export type ProtectedRequestContext = {
+  prisma: typeof prisma;
+  session: Session;
+  user: User;
+};

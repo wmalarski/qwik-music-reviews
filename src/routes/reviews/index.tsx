@@ -4,6 +4,11 @@ import { z } from "zod";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
 import { withProtectedSession } from "~/server/auth/withSession";
+import {
+  countReviewsByDate,
+  deleteReview,
+  findReviews,
+} from "~/server/trpc/router/review";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
@@ -16,10 +21,7 @@ export const collectionLoader = loader$(
     .use(withProtectedSession())
     .use(withTrpc())
     .loader((event) => {
-      return event.trpc.review.findReviews({
-        skip: 0,
-        take: 20,
-      });
+      return findReviews({ ctx: event.ctx, skip: 0, take: 20 });
     })
 );
 
@@ -28,7 +30,7 @@ export const countsLoader = loader$(
     .use(withProtectedSession())
     .use(withTrpc())
     .loader((event) => {
-      return event.trpc.review.countReviewsByDate();
+      return countReviewsByDate({ ctx: event.ctx });
     })
 );
 
@@ -38,7 +40,8 @@ export const deleteReviewAction = action$(
     .use(withProtectedSession())
     .use(withTrpc())
     .action(async (_form, event) => {
-      const result = await event.trpc.review.deleteReview({
+      const result = await deleteReview({
+        ctx: event.ctx,
         id: event.params.reviewId,
       });
 
@@ -57,7 +60,7 @@ export const findReviewsAction = action$(
     .action((form, event) => {
       const skip = +(form.get("skip") || 0);
       const take = +(form.get("take") || 20);
-      return event.trpc.review.findReviews({ skip, take });
+      return findReviews({ ctx: event.ctx, skip, take });
     })
 );
 

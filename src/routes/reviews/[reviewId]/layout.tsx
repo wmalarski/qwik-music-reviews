@@ -2,6 +2,7 @@ import { component$, Slot } from "@builder.io/qwik";
 import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
+import { findReview } from "~/server/trpc/router/review";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
@@ -15,7 +16,7 @@ export const reviewLoader = loader$(
     .use(withTrpc())
     .loader(async (event) => {
       const reviewId = event.params.reviewId;
-      const review = await event.trpc.review.findReview({ id: reviewId });
+      const review = await findReview({ ctx: event.ctx, id: reviewId });
 
       if (!review || review?.userId !== event.session.user?.id) {
         throw event.redirect(302, paths.home);

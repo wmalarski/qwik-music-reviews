@@ -3,6 +3,7 @@ import { action$, DocumentHead, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
 import { withProtectedSession } from "~/server/auth/withSession";
+import { createReview } from "~/server/trpc/router/review";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
@@ -19,8 +20,9 @@ export const createReviewAction = action$(
       const rate = form.get("rate");
       const text = form.get("text");
 
-      await event.trpc.review.createReview({
+      await createReview({
         albumId,
+        ctx: event.ctx,
         rate: rate ? +rate : 0,
         text: text ? (text as string) : "",
       });

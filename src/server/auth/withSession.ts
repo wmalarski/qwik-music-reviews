@@ -1,5 +1,6 @@
 import { paths } from "~/utils/paths";
 import type { RequestEventLoader } from "~/utils/types";
+import { prisma } from "../db/client";
 
 export const withSession = <
   R extends RequestEventLoader = RequestEventLoader
@@ -29,9 +30,9 @@ export const withProtectedSession = <
 
     const session = await getServerSession(event, authOptions);
 
-    if (!session) {
+    if (!session || !session.user) {
       throw event.redirect(302, options.redirectTo || paths.signIn);
     }
-    return { ...event, session };
+    return { ...event, ctx: { prisma, session, user: session.user }, session };
   };
 };

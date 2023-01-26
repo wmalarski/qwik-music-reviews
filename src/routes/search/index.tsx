@@ -9,6 +9,7 @@ import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { withProtectedSession } from "~/server/auth/withSession";
+import { findAlbums } from "~/server/trpc/router/album";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { withTypedQuery } from "~/utils/withTypes";
@@ -26,7 +27,8 @@ export const albumsLoader = loader$(
     .use(withProtectedSession())
     .use(withTrpc())
     .loader((event) => {
-      return event.trpc.album.findAlbums({
+      return findAlbums({
+        ctx: event.ctx,
         query: event.query.query || "",
         skip: (event.query.page || 0) * 20,
         take: 20,
@@ -41,7 +43,8 @@ export const findAlbumsAction = action$(
     .action((form, event) => {
       const query = (form.get("query") || "") as string;
       const page = +(form.get("page") || 0);
-      return event.trpc.album.findAlbums({
+      return findAlbums({
+        ctx: event.ctx,
         query: query,
         skip: page * 20,
         take: 20,

@@ -3,6 +3,7 @@ import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { withProtectedSession } from "~/server/auth/withSession";
+import { findRandom } from "~/server/trpc/router/album";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 
@@ -11,7 +12,7 @@ export const randomAlbumsLoader = loader$(
     .use(withProtectedSession())
     .use(withTrpc())
     .loader((event) => {
-      return event.trpc.album.findRandom({ take: 20 });
+      return findRandom({ ctx: event.ctx, take: 20 });
     })
 );
 
@@ -21,7 +22,7 @@ export const fetchRandomAlbumsAction = action$(
     .use(withTrpc())
     .action((form, event) => {
       const take = +(form.get("take") || 0);
-      return event.trpc.album.findRandom({ take });
+      return findRandom({ ctx: event.ctx, take });
     })
 );
 

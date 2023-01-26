@@ -3,6 +3,8 @@ import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { protectedSessionLoader } from "~/routes/layout";
 import { withProtectedSession } from "~/server/auth/withSession";
+import { deleteAlbum, findAlbum } from "~/server/trpc/router/album";
+import { deleteReview } from "~/server/trpc/router/review";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
@@ -15,7 +17,7 @@ export const albumLoader = loader$(
     .use(withProtectedSession())
     .use(withTrpc())
     .loader((event) => {
-      return event.trpc.album.findAlbum({ id: event.params.albumId });
+      return findAlbum({ ctx: event.ctx, id: event.params.albumId });
     })
 );
 
@@ -27,7 +29,8 @@ export const deleteAlbumAction = action$(
     .action(async (_form, event) => {
       const albumId = event.params.albumId;
 
-      const result = await event.trpc.album.deleteAlbum({
+      const result = await deleteAlbum({
+        ctx: event.ctx,
         id: albumId,
       });
 
@@ -47,7 +50,8 @@ export const deleteReviewAction = action$(
     .action(async (form, event) => {
       const reviewId = form.get("reviewId") as string;
 
-      const result = await event.trpc.review.deleteReview({
+      const result = await deleteReview({
+        ctx: event.ctx,
         id: reviewId,
       });
 

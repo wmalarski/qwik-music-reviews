@@ -2,6 +2,7 @@ import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
+import { updateAlbum } from "~/server/trpc/router/album";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
@@ -19,7 +20,8 @@ export const updateAlbumAction = action$(
       const year = form.get("year");
       const title = form.get("title");
 
-      await event.trpc.album.updateAlbum({
+      await updateAlbum({
+        ctx: event.ctx,
         id: albumId,
         title: title ? (title as string) : undefined,
         year: year ? +year : undefined,

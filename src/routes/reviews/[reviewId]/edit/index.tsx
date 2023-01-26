@@ -3,6 +3,7 @@ import { action$, DocumentHead } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
 import { withProtectedSession } from "~/server/auth/withSession";
+import { updateReview } from "~/server/trpc/router/review";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
@@ -18,7 +19,8 @@ export const updateReviewAction = action$(
       const rate = form.get("rate");
       const text = form.get("text");
 
-      await event.trpc.review.updateReview({
+      await updateReview({
+        ctx: event.ctx,
         id: event.params.reviewId,
         rate: rate ? +rate : undefined,
         text: text ? (text as string) : undefined,
