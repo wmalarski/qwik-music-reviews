@@ -1,4 +1,4 @@
-import { component$, Resource, Slot } from "@builder.io/qwik";
+import { component$, Slot } from "@builder.io/qwik";
 import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -32,10 +32,7 @@ export default component$(() => {
 
   return (
     <div class="flex flex-col">
-      <Resource
-        value={resource}
-        onResolved={(data) => <ReviewHero review={data} />}
-      />
+      <ReviewHero review={resource.value} />
       <Slot />
     </div>
   );

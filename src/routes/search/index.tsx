@@ -1,4 +1,4 @@
-import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
+import { component$, useSignal, useStore } from "@builder.io/qwik";
 import { DocumentHead, loader$, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
@@ -69,29 +69,23 @@ export default component$(() => {
           </button>
         </form>
       </div>
-      <Resource
-        value={resource}
-        onPending={() => <span>Pending</span>}
-        onRejected={() => <span>Rejected</span>}
-        onResolved={(data) => (
-          <AlbumGrid
-            collection={[...data.albums, ...store.results]}
-            currentPage={store.currentPage}
-            pageCount={Math.floor(data.count / 20)}
-            parentContainer={containerRef.value}
-            onMore$={async () => {
-              const trpc = await trpcContext();
-              const newResult = await trpc?.album.findAlbums.query({
-                query: location.query.get("query") || "",
-                skip: (store.currentPage || 0) * 20,
-                take: 20,
-              });
-              const newAlbums = newResult?.albums || [];
-              store.currentPage = store.currentPage + 1;
-              store.results = [...store.results, ...newAlbums];
-            }}
-          />
-        )}
+
+      <AlbumGrid
+        collection={[...resource.value.albums, ...store.results]}
+        currentPage={store.currentPage}
+        pageCount={Math.floor(resource.value.count / 20)}
+        parentContainer={containerRef.value}
+        onMore$={async () => {
+          const trpc = await trpcContext();
+          const newResult = await trpc?.album.findAlbums.query({
+            query: location.query.get("query") || "",
+            skip: (store.currentPage || 0) * 20,
+            take: 20,
+          });
+          const newAlbums = newResult?.albums || [];
+          store.currentPage = store.currentPage + 1;
+          store.results = [...store.results, ...newAlbums];
+        }}
       />
     </div>
   );

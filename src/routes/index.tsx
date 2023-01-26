@@ -1,4 +1,4 @@
-import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
+import { component$, useSignal, useStore } from "@builder.io/qwik";
 import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
@@ -17,7 +17,7 @@ export const randomAlbumLoader = loader$(
 );
 
 export default component$(() => {
-  const resource = randomAlbumLoader.use();
+  const randomAlbum = randomAlbumLoader.use();
 
   const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);
@@ -32,26 +32,19 @@ export default component$(() => {
       class="max-h-screen overflow-y-scroll"
     >
       <h1 class="px-8 pt-8 text-2xl">Random Albums</h1>
-      <Resource
-        value={resource}
-        onPending={() => <span>Pending</span>}
-        onRejected={() => <span>Rejected</span>}
-        onResolved={(data) => (
-          <AlbumGrid
-            collection={[...data.albums, ...store.results]}
-            currentPage={0}
-            pageCount={1}
-            parentContainer={containerRef.value}
-            onMore$={async () => {
-              const trpc = await trpcContext();
-              const newResult = await trpc?.album.findRandom.query({
-                take: 20,
-              });
-              const newAlbums = newResult?.albums || [];
-              store.results = [...store.results, ...newAlbums];
-            }}
-          />
-        )}
+      <AlbumGrid
+        collection={[...randomAlbum.value.albums, ...store.results]}
+        currentPage={0}
+        pageCount={1}
+        parentContainer={containerRef.value}
+        onMore$={async () => {
+          const trpc = await trpcContext();
+          const newResult = await trpc?.album.findRandom.query({
+            take: 20,
+          });
+          const newAlbums = newResult?.albums || [];
+          store.results = [...store.results, ...newAlbums];
+        }}
       />
     </div>
   );

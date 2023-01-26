@@ -1,4 +1,4 @@
-import { component$, Resource, Slot } from "@builder.io/qwik";
+import { component$, Slot } from "@builder.io/qwik";
 import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -8,34 +8,35 @@ import { withTypedParams } from "~/utils/withTypes";
 import { AlbumHero } from "./AlbumHero/AlbumHero";
 import { useAlbumContextProvider } from "./context";
 
+export const sessionLoader = loader$(
+  endpointBuilder()
+    .use(withProtectedSession())
+    .loader((event) => {
+      return event.session;
+    })
+);
+
 export const albumLoader = loader$(
   endpointBuilder()
     .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
     .use(withProtectedSession())
     .use(withTrpc())
-    .loader(async ({ trpc, params, session }) => {
-      const result = await trpc.album.findAlbum({ id: params.albumId });
-      return { ...result, session };
+    .loader((event) => {
+      return event.trpc.album.findAlbum({ id: event.params.albumId });
     })
 );
 
 export default component$(() => {
-  const resource = albumLoader.use();
+  const album = albumLoader.use();
+  const session = sessionLoader.use();
 
-  useAlbumContextProvider(resource);
+  useAlbumContextProvider(album);
 
   return (
     <div class="flex flex-col max-h-screen overflow-y-scroll">
-      <Resource
-        value={resource}
-        onResolved={(data) => (
-          <>
-            {data.album ? (
-              <AlbumHero album={data.album} session={data.session} />
-            ) : null}
-          </>
-        )}
-      />
+      {album.value.album ? (
+        <AlbumHero album={album.value.album} session={session.value} />
+      ) : null}
       <Slot />
     </div>
   );

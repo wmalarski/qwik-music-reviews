@@ -1,4 +1,4 @@
-import { component$, Resource } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -31,20 +31,18 @@ export const updateAlbumAction = action$(
 
 export default component$(() => {
   const location = useLocation();
-  const albumResource = useAlbumContext();
+  const resource = useAlbumContext();
 
   return (
-    <Resource
-      value={albumResource}
-      onResolved={(data) => (
-        <div class="p-8 flex flex-col gap-4">
-          <h2 class="text-xl">Edit album</h2>
-          {data.album ? (
-            <AlbumForm action={location.pathname} initialValue={data.album} />
-          ) : null}
-        </div>
-      )}
-    />
+    <div class="p-8 flex flex-col gap-4">
+      <h2 class="text-xl">Edit album</h2>
+      {resource.value.album ? (
+        <AlbumForm
+          action={location.pathname}
+          initialValue={resource.value.album}
+        />
+      ) : null}
+    </div>
   );
 });
 

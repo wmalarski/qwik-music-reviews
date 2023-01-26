@@ -4,14 +4,9 @@ import {
   useContext,
   useContextProvider,
 } from "@builder.io/qwik";
-import type { Session } from "next-auth";
 import type { RouterOutput } from "~/utils/trpc";
 
-type AlbumContextState = Signal<
-  RouterOutput["album"]["findAlbum"] & {
-    session: Session;
-  }
->;
+type AlbumContextState = Signal<RouterOutput["album"]["findAlbum"]>;
 
 const AlbumContext = createContext<AlbumContextState>("album-context");
 

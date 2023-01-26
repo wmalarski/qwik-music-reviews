@@ -1,4 +1,4 @@
-import { component$, Resource } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
@@ -34,15 +34,10 @@ export default component$(() => {
   const albumResource = useAlbumContext();
 
   return (
-    <Resource
-      value={albumResource}
-      onResolved={(data) => (
-        <div class="p-8 flex flex-col gap-4">
-          <h2 class="text-xl">Add review</h2>
-          {data.album ? <ReviewForm action={location.pathname} /> : null}
-        </div>
-      )}
-    />
+    <div class="p-8 flex flex-col gap-4">
+      <h2 class="text-xl">Add review</h2>
+      {albumResource.value ? <ReviewForm action={location.pathname} /> : null}
+    </div>
   );
 });
 

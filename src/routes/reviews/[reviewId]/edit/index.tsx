@@ -1,4 +1,4 @@
-import { component$, Resource } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
@@ -34,19 +34,12 @@ export default component$(() => {
   return (
     <div class="p-8 flex flex-col gap-4">
       <h2 class="text-xl">Edit review</h2>
-      <Resource
-        value={reviewResource}
-        onResolved={(data) => (
-          <>
-            {data ? (
-              <ReviewForm
-                action={paths.reviewEdit(data.id)}
-                initialValue={data}
-              />
-            ) : null}
-          </>
-        )}
-      />
+      {reviewResource.value ? (
+        <ReviewForm
+          action={paths.reviewEdit(reviewResource.value.id)}
+          initialValue={reviewResource.value}
+        />
+      ) : null}
     </div>
   );
 });

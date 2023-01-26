@@ -1,4 +1,4 @@
-import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
+import { component$, useSignal, useStore } from "@builder.io/qwik";
 import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
@@ -56,34 +56,25 @@ export default component$(() => {
       class="max-h-screen overflow-y-scroll"
     >
       <h1 class="px-8 py-8 text-2xl">Reviews</h1>
-      <Resource
-        value={collection}
-        onPending={() => <span>Pending</span>}
-        onRejected={() => <span>Rejected</span>}
-        onResolved={(data) => (
-          <>
-            <div class="px-8">
-              <ReviewActivity counts={counts.value} />
-            </div>
-            <ReviewList
-              session={session.value}
-              collection={[...data.reviews, ...store.results]}
-              currentPage={store.currentPage}
-              pageCount={Math.floor(data.count / 20)}
-              parentContainer={containerRef.value}
-              onMore$={async () => {
-                const trpc = await trpcContext();
-                const newResult = await trpc?.review.findReviews.query({
-                  skip: (store.currentPage + 1) * 20,
-                  take: 20,
-                });
-                const newAlbums = newResult?.reviews || [];
-                store.currentPage = store.currentPage + 1;
-                store.results = [...store.results, ...newAlbums];
-              }}
-            />
-          </>
-        )}
+      <div class="px-8">
+        <ReviewActivity counts={counts.value} />
+      </div>
+      <ReviewList
+        session={session.value}
+        collection={[...collection.value.reviews, ...store.results]}
+        currentPage={store.currentPage}
+        pageCount={Math.floor(collection.value.count / 20)}
+        parentContainer={containerRef.value}
+        onMore$={async () => {
+          const trpc = await trpcContext();
+          const newResult = await trpc?.review.findReviews.query({
+            skip: (store.currentPage + 1) * 20,
+            take: 20,
+          });
+          const newAlbums = newResult?.reviews || [];
+          store.currentPage = store.currentPage + 1;
+          store.results = [...store.results, ...newAlbums];
+        }}
       />
     </div>
   );
