@@ -1,4 +1,4 @@
-import type { ProtectedRequestContext } from "../context";
+import type { ProtectedRequestContext } from "~/server/auth/types";
 
 type CountReviewsByDate = {
   ctx: ProtectedRequestContext;

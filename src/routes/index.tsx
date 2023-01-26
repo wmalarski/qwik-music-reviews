@@ -2,15 +2,13 @@ import { component$, useSignal, useStore } from "@builder.io/qwik";
 import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
+import { findRandom } from "~/server/album";
 import { withProtectedSession } from "~/server/auth/withSession";
-import { findRandom } from "~/server/trpc/router/album";
-import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 
 export const randomAlbumsLoader = loader$(
   endpointBuilder()
     .use(withProtectedSession())
-    .use(withTrpc())
     .loader((event) => {
       return findRandom({ ctx: event.ctx, take: 20 });
     })
@@ -19,7 +17,6 @@ export const randomAlbumsLoader = loader$(
 export const fetchRandomAlbumsAction = action$(
   endpointBuilder()
     .use(withProtectedSession())
-    .use(withTrpc())
     .action((form, event) => {
       const take = +(form.get("take") || 0);
       return findRandom({ ctx: event.ctx, take });

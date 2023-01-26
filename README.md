@@ -4,7 +4,6 @@
 
 - [Qwik Docs](https://qwik.builder.io/)
 - [Next-Auth.js](https://next-auth.js.org/)
-- [tRPC](https://trpc.io/)
 - [TailwindCSS](https://tailwindcss.com/)
 - [Prisma](https://www.prisma.io/)
 

@@ -2,8 +2,7 @@ import { component$, Slot } from "@builder.io/qwik";
 import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
-import { findReview } from "~/server/trpc/router/review";
-import { withTrpc } from "~/server/trpc/withTrpc";
+import { findReview } from "~/server/review";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
 import { withTypedParams } from "~/utils/withTypes";
@@ -13,7 +12,6 @@ export const reviewLoader = loader$(
   endpointBuilder()
     .use(withTypedParams(z.object({ reviewId: z.string().min(1) })))
     .use(withProtectedSession())
-    .use(withTrpc())
     .loader(async (event) => {
       const reviewId = event.params.reviewId;
       const review = await findReview({ ctx: event.ctx, id: reviewId });

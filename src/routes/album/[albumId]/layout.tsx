@@ -2,10 +2,9 @@ import { component$, Slot } from "@builder.io/qwik";
 import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { protectedSessionLoader } from "~/routes/layout";
+import { deleteAlbum, findAlbum } from "~/server/album";
 import { withProtectedSession } from "~/server/auth/withSession";
-import { deleteAlbum, findAlbum } from "~/server/trpc/router/album";
-import { deleteReview } from "~/server/trpc/router/review";
-import { withTrpc } from "~/server/trpc/withTrpc";
+import { deleteReview } from "~/server/review";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
 import { withTypedParams } from "~/utils/withTypes";
@@ -15,7 +14,6 @@ export const albumLoader = loader$(
   endpointBuilder()
     .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
     .use(withProtectedSession())
-    .use(withTrpc())
     .loader((event) => {
       return findAlbum({ ctx: event.ctx, id: event.params.albumId });
     })
@@ -25,7 +23,6 @@ export const deleteAlbumAction = action$(
   endpointBuilder()
     .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
     .use(withProtectedSession())
-    .use(withTrpc())
     .action(async (_form, event) => {
       const albumId = event.params.albumId;
 
@@ -46,7 +43,6 @@ export const deleteReviewAction = action$(
   endpointBuilder()
     .use(withTypedParams(z.object({ reviewId: z.string().min(1) })))
     .use(withProtectedSession())
-    .use(withTrpc())
     .action(async (form, event) => {
       const reviewId = form.get("reviewId") as string;
 

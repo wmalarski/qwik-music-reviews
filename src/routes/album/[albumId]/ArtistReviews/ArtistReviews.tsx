@@ -1,10 +1,11 @@
 import { component$ } from "@builder.io/qwik";
 import type { Session } from "next-auth";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
-import type { RouterOutput } from "~/utils/trpc";
+import type { findAlbum } from "~/server/album";
+import type { AsyncReturnValue } from "~/utils/types";
 
 type Props = {
-  data: RouterOutput["album"]["findAlbum"];
+  data: AsyncReturnValue<typeof findAlbum>;
   session: Session;
 };
 

@@ -1,9 +1,10 @@
 import { component$ } from "@builder.io/qwik";
-import type { RouterOutput } from "~/utils/trpc";
+import type { countReviewsByDate } from "~/server/review";
+import type { AsyncReturnValue } from "~/utils/types";
 import { getCountItems } from "./ReviewActivity.utils";
 
 type Props = {
-  counts: RouterOutput["review"]["countReviewsByDate"];
+  counts: AsyncReturnValue<typeof countReviewsByDate>;
 };
 
 export const ReviewActivity = component$<Props>((props) => {

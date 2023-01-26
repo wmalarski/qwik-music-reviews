@@ -8,9 +8,8 @@ import {
 import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
+import { findAlbums } from "~/server/album";
 import { withProtectedSession } from "~/server/auth/withSession";
-import { findAlbums } from "~/server/trpc/router/album";
-import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { withTypedQuery } from "~/utils/withTypes";
 
@@ -25,7 +24,6 @@ export const albumsLoader = loader$(
       )
     )
     .use(withProtectedSession())
-    .use(withTrpc())
     .loader((event) => {
       return findAlbums({
         ctx: event.ctx,
@@ -39,7 +37,6 @@ export const albumsLoader = loader$(
 export const findAlbumsAction = action$(
   endpointBuilder()
     .use(withProtectedSession())
-    .use(withTrpc())
     .action((form, event) => {
       const query = (form.get("query") || "") as string;
       const page = +(form.get("page") || 0);

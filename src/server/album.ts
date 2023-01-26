@@ -1,5 +1,5 @@
+import type { ProtectedRequestContext } from "~/server/auth/types";
 import type { DbPrismaClient } from "~/server/db/client";
-import type { ProtectedRequestContext } from "../context";
 
 const addReviewCounts = async <T extends { id: string }>(
   prisma: DbPrismaClient,

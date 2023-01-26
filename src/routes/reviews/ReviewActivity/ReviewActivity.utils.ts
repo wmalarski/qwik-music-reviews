@@ -1,7 +1,8 @@
-import type { RouterOutput } from "~/utils/trpc";
+import type { countReviewsByDate } from "~/server/review";
+import type { AsyncReturnValue } from "~/utils/types";
 
 export const getCountItems = (
-  groups: RouterOutput["review"]["countReviewsByDate"]
+  groups: AsyncReturnValue<typeof countReviewsByDate>
 ) => {
   const groupsMap = groups.reduce<Record<string, number>>((prev, curr) => {
     prev[new Date(curr.date).toDateString()] = curr.count;

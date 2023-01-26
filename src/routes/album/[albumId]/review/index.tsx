@@ -3,8 +3,7 @@ import { action$, DocumentHead, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
 import { withProtectedSession } from "~/server/auth/withSession";
-import { createReview } from "~/server/trpc/router/review";
-import { withTrpc } from "~/server/trpc/withTrpc";
+import { createReview } from "~/server/review";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
 import { withTypedParams } from "~/utils/withTypes";
@@ -14,7 +13,7 @@ export const createReviewAction = action$(
   endpointBuilder()
     .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
     .use(withProtectedSession())
-    .use(withTrpc())
+
     .action(async (form, event) => {
       const albumId = event.params.albumId;
       const rate = form.get("rate");
