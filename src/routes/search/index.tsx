@@ -9,44 +9,33 @@ import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { findAlbums } from "~/server/album";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { endpointBuilder } from "~/utils/endpointBuilder";
-import { withTypedQuery } from "~/utils/withTypes";
+import { protectedProcedure } from "~/server/procedures";
+import { withTypedQuery } from "~/server/withTypes";
 
 export const albumsLoader = loader$(
-  endpointBuilder()
-    .use(
-      withTypedQuery(
-        z.object({
-          page: z.number().min(0).step(1).optional(),
-          query: z.string().optional(),
-        })
-      )
-    )
-    .use(withProtectedSession())
+  protectedProcedure
+    .use(withTypedQuery(z.object({ query: z.string().optional() })))
     .loader((event) => {
       return findAlbums({
         ctx: event.ctx,
         query: event.query.query || "",
-        skip: (event.query.page || 0) * 20,
+        skip: 0,
         take: 20,
       });
     })
 );
 
 export const findAlbumsAction = action$(
-  endpointBuilder()
-    .use(withProtectedSession())
-    .action((form, event) => {
-      const query = (form.get("query") || "") as string;
-      const page = +(form.get("page") || 0);
-      return findAlbums({
-        ctx: event.ctx,
-        query: query,
-        skip: page * 20,
-        take: 20,
-      });
-    })
+  protectedProcedure.action((form, event) => {
+    const query = (form.get("query") || "") as string;
+    const page = +(form.get("page") || 0);
+    return findAlbums({
+      ctx: event.ctx,
+      query: query,
+      skip: page * 20,
+      take: 20,
+    });
+  })
 );
 
 export default component$(() => {

@@ -1,16 +1,13 @@
 import { component$, Slot } from "@builder.io/qwik";
 import { loader$ } from "@builder.io/qwik-city";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { endpointBuilder } from "~/utils/endpointBuilder";
+import { protectedProcedure } from "~/server/procedures";
 import { Footer } from "./Footer/Footer";
 import { Sidebar } from "./Sidebar/Sidebar";
 
 export const protectedSessionLoader = loader$(
-  endpointBuilder()
-    .use(withProtectedSession())
-    .loader((event) => {
-      return event.session;
-    })
+  protectedProcedure.loader((event) => {
+    return event.session;
+  })
 );
 
 export default component$(() => {

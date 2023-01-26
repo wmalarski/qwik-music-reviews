@@ -1,33 +1,26 @@
 import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead } from "@builder.io/qwik-city";
-import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
-import { withProtectedSession } from "~/server/auth/withSession";
+import { protectedAlbumProcedure } from "~/server/procedures";
 import { createReview } from "~/server/review";
-import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
-import { withTypedParams } from "~/utils/withTypes";
 import { albumLoader } from "../layout";
 
 export const createReviewAction = action$(
-  endpointBuilder()
-    .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
-    .use(withProtectedSession())
+  protectedAlbumProcedure.action(async (form, event) => {
+    const albumId = event.typedParams.albumId;
+    const rate = form.get("rate");
+    const text = form.get("text");
 
-    .action(async (form, event) => {
-      const albumId = event.params.albumId;
-      const rate = form.get("rate");
-      const text = form.get("text");
+    await createReview({
+      albumId,
+      ctx: event.ctx,
+      rate: rate ? +rate : 0,
+      text: text ? (text as string) : "",
+    });
 
-      await createReview({
-        albumId,
-        ctx: event.ctx,
-        rate: rate ? +rate : 0,
-        text: text ? (text as string) : "",
-      });
-
-      throw event.redirect(302, paths.album(albumId));
-    })
+    throw event.redirect(302, paths.album(albumId));
+  })
 );
 
 export default component$(() => {

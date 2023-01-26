@@ -1,33 +1,26 @@
 import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead, useLocation } from "@builder.io/qwik-city";
-import { z } from "zod";
 import { updateAlbum } from "~/server/album";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { endpointBuilder } from "~/utils/endpointBuilder";
+import { protectedAlbumProcedure } from "~/server/procedures";
 import { paths } from "~/utils/paths";
-import { withTypedParams } from "~/utils/withTypes";
 import { albumLoader } from "../layout";
 import { AlbumForm } from "./AlbumForm/AlbumForm";
 
 export const updateAlbumAction = action$(
-  endpointBuilder()
-    .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
-    .use(withProtectedSession())
+  protectedAlbumProcedure.action(async (form, event) => {
+    const albumId = event.typedParams.albumId;
+    const year = form.get("year");
+    const title = form.get("title");
 
-    .action(async (form, event) => {
-      const albumId = event.params.albumId;
-      const year = form.get("year");
-      const title = form.get("title");
+    await updateAlbum({
+      ctx: event.ctx,
+      id: albumId,
+      title: title ? (title as string) : undefined,
+      year: year ? +year : undefined,
+    });
 
-      await updateAlbum({
-        ctx: event.ctx,
-        id: albumId,
-        title: title ? (title as string) : undefined,
-        year: year ? +year : undefined,
-      });
-
-      throw event.redirect(302, paths.album(albumId));
-    })
+    throw event.redirect(302, paths.album(albumId));
+  })
 );
 
 export default component$(() => {

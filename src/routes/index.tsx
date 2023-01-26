@@ -3,24 +3,19 @@ import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { findRandom } from "~/server/album";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { endpointBuilder } from "~/utils/endpointBuilder";
+import { protectedProcedure } from "~/server/procedures";
 
 export const randomAlbumsLoader = loader$(
-  endpointBuilder()
-    .use(withProtectedSession())
-    .loader((event) => {
-      return findRandom({ ctx: event.ctx, take: 20 });
-    })
+  protectedProcedure.loader((event) => {
+    return findRandom({ ctx: event.ctx, take: 20 });
+  })
 );
 
 export const fetchRandomAlbumsAction = action$(
-  endpointBuilder()
-    .use(withProtectedSession())
-    .action((form, event) => {
-      const take = +(form.get("take") || 0);
-      return findRandom({ ctx: event.ctx, take });
-    })
+  protectedProcedure.action((form, event) => {
+    const take = +(form.get("take") || 0);
+    return findRandom({ ctx: event.ctx, take });
+  })
 );
 
 export default component$(() => {
