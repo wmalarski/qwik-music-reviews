@@ -1,5 +1,5 @@
 import { component$, Resource, Slot } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
@@ -9,22 +9,25 @@ import { withTypedParams } from "~/utils/withTypes";
 import { useReviewContextProvider } from "./context";
 import { ReviewHero } from "./ReviewHero/ReviewHero";
 
-export const onGet = endpointBuilder()
-  .use(withTypedParams(z.object({ reviewId: z.string().min(1) })))
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(async ({ trpc, params, session, response }) => {
-    const review = await trpc.review.findReview({ id: params.reviewId });
+export const reviewLoader = loader$(
+  endpointBuilder()
+    .use(withTypedParams(z.object({ reviewId: z.string().min(1) })))
+    .use(withProtectedSession())
+    .use(withTrpc())
+    .loader(async (event) => {
+      const reviewId = event.params.reviewId;
+      const review = await event.trpc.review.findReview({ id: reviewId });
 
-    if (review?.userId !== session.user?.id) {
-      throw response.redirect(paths.home);
-    }
+      if (!review || review?.userId !== event.session.user?.id) {
+        throw event.redirect(302, paths.home);
+      }
 
-    return review;
-  });
+      return review;
+    })
+);
 
 export default component$(() => {
-  const resource = useEndpoint<typeof onGet>();
+  const resource = reviewLoader.use();
   useReviewContextProvider(resource);
 
   return (

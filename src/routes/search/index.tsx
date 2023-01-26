@@ -1,5 +1,5 @@
 import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint, useLocation } from "@builder.io/qwik-city";
+import { DocumentHead, loader$, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
@@ -9,28 +9,30 @@ import { endpointBuilder } from "~/utils/endpointBuilder";
 import { withTypedQuery } from "~/utils/withTypes";
 import { useTrpcContext } from "../context";
 
-export const onGet = endpointBuilder()
-  .use(
-    withTypedQuery(
-      z.object({
-        page: z.number().min(0).step(1).optional(),
-        query: z.string().optional(),
-      })
+export const albumsLoader = loader$(
+  endpointBuilder()
+    .use(
+      withTypedQuery(
+        z.object({
+          page: z.number().min(0).step(1).optional(),
+          query: z.string().optional(),
+        })
+      )
     )
-  )
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(({ query, trpc }) => {
-    return trpc.album.findAlbums({
-      query: query.query || "",
-      skip: (query.page || 0) * 20,
-      take: 20,
-    });
-  });
+    .use(withProtectedSession())
+    .use(withTrpc())
+    .loader((event) => {
+      return event.trpc.album.findAlbums({
+        query: event.query.query || "",
+        skip: (event.query.page || 0) * 20,
+        take: 20,
+      });
+    })
+);
 
 export default component$(() => {
   const location = useLocation();
-  const resource = useEndpoint<typeof onGet>();
+  const resource = albumsLoader.use();
 
   const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);
@@ -59,7 +61,7 @@ export default component$(() => {
             name="query"
             id="query"
             aria-label="query"
-            value={location.query.query}
+            value={location.query.get("query") as string}
             class="input input-bordered"
           />
           <button class="btn uppercase" type="submit">
@@ -80,7 +82,7 @@ export default component$(() => {
             onMore$={async () => {
               const trpc = await trpcContext();
               const newResult = await trpc?.album.findAlbums.query({
-                query: location.query["query"] || "",
+                query: location.query.get("query") || "",
                 skip: (store.currentPage || 0) * 20,
                 take: 20,
               });

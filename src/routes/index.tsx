@@ -1,5 +1,5 @@
 import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -7,15 +7,17 @@ import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { useTrpcContext } from "./context";
 
-export const onGet = endpointBuilder()
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(({ trpc }) => {
-    return trpc.album.findRandom({ take: 20 });
-  });
+export const randomAlbumLoader = loader$(
+  endpointBuilder()
+    .use(withProtectedSession())
+    .use(withTrpc())
+    .loader(({ trpc }) => {
+      return trpc.album.findRandom({ take: 20 });
+    })
+);
 
 export default component$(() => {
-  const resource = useEndpoint<typeof onGet>();
+  const resource = randomAlbumLoader.use();
 
   const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);

@@ -1,7 +1,9 @@
-import { RequestEvent } from "@builder.io/qwik-city";
 import { paths } from "~/utils/paths";
+import type { RequestEventLoader } from "~/utils/types";
 
-export const withSession = <R extends RequestEvent = RequestEvent>() => {
+export const withSession = <
+  R extends RequestEventLoader = RequestEventLoader
+>() => {
   return async (event: R) => {
     const { getServerSession } = await import("./auth");
     const { authOptions } = await import("./options");
@@ -16,7 +18,9 @@ type WithProtectedSessionOptions = {
   redirectTo?: string;
 };
 
-export const withProtectedSession = <R extends RequestEvent = RequestEvent>(
+export const withProtectedSession = <
+  R extends RequestEventLoader = RequestEventLoader
+>(
   options: WithProtectedSessionOptions = {}
 ) => {
   return async (event: R) => {
@@ -26,7 +30,7 @@ export const withProtectedSession = <R extends RequestEvent = RequestEvent>(
     const session = await getServerSession(event, authOptions);
 
     if (!session) {
-      throw event.response.redirect(options.redirectTo || paths.signIn);
+      throw event.redirect(302, options.redirectTo || paths.signIn);
     }
     return { ...event, session };
   };

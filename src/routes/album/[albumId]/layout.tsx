@@ -1,5 +1,5 @@
 import { component$, Resource, Slot } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
@@ -8,17 +8,20 @@ import { withTypedParams } from "~/utils/withTypes";
 import { AlbumHero } from "./AlbumHero/AlbumHero";
 import { useAlbumContextProvider } from "./context";
 
-export const onGet = endpointBuilder()
-  .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(async ({ trpc, params, session }) => {
-    const result = await trpc.album.findAlbum({ id: params.albumId });
-    return { ...result, session };
-  });
+export const albumLoader = loader$(
+  endpointBuilder()
+    .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
+    .use(withProtectedSession())
+    .use(withTrpc())
+    .loader(async ({ trpc, params, session }) => {
+      const result = await trpc.album.findAlbum({ id: params.albumId });
+      return { ...result, session };
+    })
+);
 
 export default component$(() => {
-  const resource = useEndpoint<typeof onGet>();
+  const resource = albumLoader.use();
+
   useAlbumContextProvider(resource);
 
   return (

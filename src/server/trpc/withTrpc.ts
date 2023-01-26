@@ -1,8 +1,8 @@
-import { RequestEvent } from "@builder.io/qwik-city";
 import { Session } from "next-auth";
+import type { RequestEventLoader } from "~/utils/types";
 import { prisma } from "../db/client";
 
-type RequestEventWithSession = RequestEvent & { session: Session | null };
+type RequestEventWithSession = RequestEventLoader & { session: Session | null };
 
 export const withTrpc = <
   R extends RequestEventWithSession = RequestEventWithSession

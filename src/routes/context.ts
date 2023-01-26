@@ -4,7 +4,7 @@ import {
   NoSerialize,
   noSerialize,
   QRL,
-  ResourceReturn,
+  Signal,
   useContext,
   useContextProvider,
   useSignal,
@@ -12,7 +12,7 @@ import {
 import type { Session } from "next-auth/core/types";
 import { createTrpc } from "~/utils/trpc";
 
-type SessionContextState = ResourceReturn<Session>;
+type SessionContextState = Signal<Session | null>;
 
 const SessionContext = createContext<SessionContextState>("session-context");
 

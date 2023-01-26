@@ -1,5 +1,5 @@
 import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -8,20 +8,39 @@ import { endpointBuilder } from "~/utils/endpointBuilder";
 import { useTrpcContext } from "../context";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
-export const onGet = endpointBuilder()
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(async ({ trpc, session }) => {
-    const [collection, counts] = await Promise.all([
-      trpc.review.findReviews({ skip: 0, take: 20 }),
-      trpc.review.countReviewsByDate(),
-    ]);
+export const sessionLoader = loader$(
+  endpointBuilder()
+    .use(withProtectedSession())
+    .loader((event) => {
+      return event.session;
+    })
+);
 
-    return { collection, counts, session };
-  });
+export const collectionLoader = loader$(
+  endpointBuilder()
+    .use(withProtectedSession())
+    .use(withTrpc())
+    .loader((event) => {
+      return event.trpc.review.findReviews({
+        skip: 0,
+        take: 20,
+      });
+    })
+);
+
+export const countsLoader = loader$(
+  endpointBuilder()
+    .use(withProtectedSession())
+    .use(withTrpc())
+    .loader((event) => {
+      return event.trpc.review.countReviewsByDate();
+    })
+);
 
 export default component$(() => {
-  const resource = useEndpoint<typeof onGet>();
+  const collection = collectionLoader.use();
+  const counts = countsLoader.use();
+  const session = sessionLoader.use();
 
   const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);
@@ -38,19 +57,19 @@ export default component$(() => {
     >
       <h1 class="px-8 py-8 text-2xl">Reviews</h1>
       <Resource
-        value={resource}
+        value={collection}
         onPending={() => <span>Pending</span>}
         onRejected={() => <span>Rejected</span>}
         onResolved={(data) => (
           <>
             <div class="px-8">
-              <ReviewActivity counts={data.counts} />
+              <ReviewActivity counts={counts.value} />
             </div>
             <ReviewList
-              session={data.session}
-              collection={[...data.collection.reviews, ...store.results]}
+              session={session.value}
+              collection={[...data.reviews, ...store.results]}
               currentPage={store.currentPage}
-              pageCount={Math.floor(data.collection.count / 20)}
+              pageCount={Math.floor(data.count / 20)}
               parentContainer={containerRef.value}
               onMore$={async () => {
                 const trpc = await trpcContext();

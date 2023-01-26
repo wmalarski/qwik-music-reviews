@@ -1,12 +1,12 @@
 import {
   createContext,
-  ResourceReturn,
+  Signal,
   useContext,
   useContextProvider,
 } from "@builder.io/qwik";
 import type { RouterOutput } from "~/utils/trpc";
 
-type ReviewContextState = ResourceReturn<RouterOutput["review"]["findReview"]>;
+type ReviewContextState = Signal<RouterOutput["review"]["findReview"]>;
 
 const ReviewContext = createContext<ReviewContextState>("review-context");
 

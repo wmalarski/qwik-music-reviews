@@ -1,13 +1,13 @@
 import {
   createContext,
-  ResourceReturn,
+  Signal,
   useContext,
   useContextProvider,
 } from "@builder.io/qwik";
 import type { Session } from "next-auth";
 import type { RouterOutput } from "~/utils/trpc";
 
-type AlbumContextState = ResourceReturn<
+type AlbumContextState = Signal<
   RouterOutput["album"]["findAlbum"] & {
     session: Session;
   }

@@ -1,26 +1,31 @@
-import { RequestEvent } from "@builder.io/qwik-city";
+import type { RequestEventLoader } from "./types";
 
-type HandlerBuilderResult<R extends RequestEvent> = {
-  resolver: <T>(
+type HandlerBuilderResult<R extends RequestEventLoader> = {
+  action: <T>(
+    inner: (form: FormData, e: R) => T | Promise<T>
+  ) => (form: FormData, e: RequestEventLoader) => T | Promise<T>;
+  loader: <T>(
     inner: (e: R) => T | Promise<T>
-  ) => (e: RequestEvent) => T | Promise<T>;
+  ) => (e: RequestEventLoader) => T | Promise<T>;
   use: <N extends R>(
     middleware: (r: R) => N | Promise<N>
   ) => HandlerBuilderResult<N>;
 };
 
-const handlerBuilderInner = <R extends RequestEvent = RequestEvent>(
-  h: (e: RequestEvent) => R | Promise<R>
+const handlerBuilderInner = <R extends RequestEventLoader = RequestEventLoader>(
+  h: (e: RequestEventLoader) => R | Promise<R>
 ): HandlerBuilderResult<R> => {
   return {
-    resolver: (inner) => async (e) => inner(await h(e)),
+    action: (inner) => async (f, e) => inner(f, await h(e)),
+    loader: (inner) => async (e) => inner(await h(e)),
     use: (middle) => handlerBuilderInner(async (e) => middle(await h(e))),
   };
 };
 
-export const endpointBuilder = (): HandlerBuilderResult<RequestEvent> => {
+export const endpointBuilder = (): HandlerBuilderResult<RequestEventLoader> => {
   return {
-    resolver: (inner) => inner,
+    action: (inner) => inner,
+    loader: (inner) => inner,
     use: (middle) => handlerBuilderInner((e) => middle(e)),
   };
 };

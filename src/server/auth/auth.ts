@@ -14,6 +14,7 @@ import type {
   NextAuthOptions,
   Session,
 } from "next-auth/core/types";
+import { RequestEventLoader } from "~/utils/types";
 import { env } from "../env";
 
 const getBody = (formData: FormData | null): Record<string, unknown> => {
@@ -113,7 +114,7 @@ const QWikNextAuthHandler = async (
 };
 
 export const getServerSession = async (
-  event: RequestEvent,
+  event: RequestEventLoader,
   options: NextAuthOptions
 ): Promise<Session | null> => {
   const { request, response } = event;
