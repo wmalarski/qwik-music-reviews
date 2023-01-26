@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { RequestEventLoader } from "../utils/types";
+import { RequestEventLoader } from "./types";
 
 export const withTypedParams = <
   P extends z.ZodRawShape = z.ZodRawShape,

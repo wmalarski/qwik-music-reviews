@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import type { countReviewsByDate } from "~/server/review";
-import type { AsyncReturnValue } from "~/utils/types";
+import type { AsyncReturnValue } from "~/server/types";
 import { getCountItems } from "./ReviewActivity.utils";
 
 type Props = {

@@ -1,5 +1,5 @@
 import type { countReviewsByDate } from "~/server/review";
-import type { AsyncReturnValue } from "~/utils/types";
+import type { AsyncReturnValue } from "~/server/types";
 
 export const getCountItems = (
   groups: AsyncReturnValue<typeof countReviewsByDate>

@@ -1,5 +1,5 @@
+import type { RequestEventLoader } from "~/server/types";
 import { paths } from "~/utils/paths";
-import type { RequestEventLoader } from "~/utils/types";
 import { prisma } from "../db/client";
 import { getServerSession } from "./auth";
 import { authOptions } from "./options";

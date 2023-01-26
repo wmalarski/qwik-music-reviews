@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { withProtectedSession } from "~/server/auth/withSession";
+import type { RequestEventLoader } from "~/server/types";
 import { withTypedParams } from "~/server/withTypes";
-import type { RequestEventLoader } from "~/utils/types";
 
 type ProcedureBuilderResult<R extends RequestEventLoader> = {
   action: <T>(
