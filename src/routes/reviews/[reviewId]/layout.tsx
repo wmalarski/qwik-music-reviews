@@ -6,7 +6,6 @@ import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
 import { withTypedParams } from "~/utils/withTypes";
-import { useReviewContextProvider } from "./context";
 import { ReviewHero } from "./ReviewHero/ReviewHero";
 
 export const reviewLoader = loader$(
@@ -28,7 +27,6 @@ export const reviewLoader = loader$(
 
 export default component$(() => {
   const resource = reviewLoader.use();
-  useReviewContextProvider(resource);
 
   return (
     <div class="flex flex-col">

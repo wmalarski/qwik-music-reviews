@@ -6,7 +6,7 @@ import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
 import { withTypedParams } from "~/utils/withTypes";
-import { useAlbumContext } from "../context";
+import { albumLoader } from "../layout";
 import { AlbumForm } from "./AlbumForm/AlbumForm";
 
 export const updateAlbumAction = action$(
@@ -31,7 +31,7 @@ export const updateAlbumAction = action$(
 
 export default component$(() => {
   const location = useLocation();
-  const resource = useAlbumContext();
+  const resource = albumLoader.use();
 
   return (
     <div class="p-8 flex flex-col gap-4">

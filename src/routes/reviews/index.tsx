@@ -1,20 +1,16 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { z } from "zod";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
+import { paths } from "~/utils/paths";
+import { withTypedParams } from "~/utils/withTypes";
 import { useTrpcContext } from "../context";
+import { protectedSessionLoader } from "../layout";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
-
-export const sessionLoader = loader$(
-  endpointBuilder()
-    .use(withProtectedSession())
-    .loader((event) => {
-      return event.session;
-    })
-);
 
 export const collectionLoader = loader$(
   endpointBuilder()
@@ -37,10 +33,28 @@ export const countsLoader = loader$(
     })
 );
 
+export const deleteReviewAction = action$(
+  endpointBuilder()
+    .use(withTypedParams(z.object({ reviewId: z.string().min(1) })))
+    .use(withProtectedSession())
+    .use(withTrpc())
+    .action(async (_form, event) => {
+      const result = await event.trpc.review.deleteReview({
+        id: event.params.reviewId,
+      });
+
+      if (result.count <= 0) {
+        return;
+      }
+
+      throw event.redirect(302, paths.reviews);
+    })
+);
+
 export default component$(() => {
   const collection = collectionLoader.use();
   const counts = countsLoader.use();
-  const session = sessionLoader.use();
+  const session = protectedSessionLoader.use();
 
   const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);

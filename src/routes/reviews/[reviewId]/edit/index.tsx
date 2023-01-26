@@ -7,7 +7,7 @@ import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
 import { withTypedParams } from "~/utils/withTypes";
-import { useReviewContext } from "../context";
+import { reviewLoader } from "../layout";
 
 export const updateReviewAction = action$(
   endpointBuilder()
@@ -29,7 +29,7 @@ export const updateReviewAction = action$(
 );
 
 export default component$(() => {
-  const reviewResource = useReviewContext();
+  const reviewResource = reviewLoader.use();
 
   return (
     <div class="p-8 flex flex-col gap-4">
