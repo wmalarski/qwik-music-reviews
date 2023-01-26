@@ -8,7 +8,6 @@ import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { paths } from "~/utils/paths";
 import { withTypedParams } from "~/utils/withTypes";
-import { useTrpcContext } from "../context";
 import { protectedSessionLoader } from "../layout";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
@@ -51,12 +50,23 @@ export const deleteReviewAction = action$(
     })
 );
 
+export const findReviewsAction = action$(
+  endpointBuilder()
+    .use(withProtectedSession())
+    .use(withTrpc())
+    .action((form, event) => {
+      const skip = +(form.get("skip") || 0);
+      const take = +(form.get("take") || 20);
+      return event.trpc.review.findReviews({ skip, take });
+    })
+);
+
 export default component$(() => {
   const collection = collectionLoader.use();
   const counts = countsLoader.use();
   const session = protectedSessionLoader.use();
+  const findReviews = findReviewsAction.use();
 
-  const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
@@ -80,12 +90,11 @@ export default component$(() => {
         pageCount={Math.floor(collection.value.count / 20)}
         parentContainer={containerRef.value}
         onMore$={async () => {
-          const trpc = await trpcContext();
-          const newResult = await trpc?.review.findReviews.query({
-            skip: (store.currentPage + 1) * 20,
-            take: 20,
+          await findReviews.execute({
+            skip: `${(store.currentPage + 1) * 20}`,
+            take: `${20}`,
           });
-          const newAlbums = newResult?.reviews || [];
+          const newAlbums = findReviews.value?.reviews || [];
           store.currentPage = store.currentPage + 1;
           store.results = [...store.results, ...newAlbums];
         }}

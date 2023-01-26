@@ -1,25 +1,34 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
-import { useTrpcContext } from "./context";
 
-export const randomAlbumLoader = loader$(
+export const randomAlbumsLoader = loader$(
   endpointBuilder()
     .use(withProtectedSession())
     .use(withTrpc())
-    .loader(({ trpc }) => {
-      return trpc.album.findRandom({ take: 20 });
+    .loader((event) => {
+      return event.trpc.album.findRandom({ take: 20 });
+    })
+);
+
+export const fetchRandomAlbumsAction = action$(
+  endpointBuilder()
+    .use(withProtectedSession())
+    .use(withTrpc())
+    .action((form, event) => {
+      const take = +(form.get("take") || 0);
+      return event.trpc.album.findRandom({ take });
     })
 );
 
 export default component$(() => {
-  const randomAlbum = randomAlbumLoader.use();
+  const randomAlbum = randomAlbumsLoader.use();
+  const fetchRandomAlbums = fetchRandomAlbumsAction.use();
 
-  const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
@@ -38,11 +47,8 @@ export default component$(() => {
         pageCount={1}
         parentContainer={containerRef.value}
         onMore$={async () => {
-          const trpc = await trpcContext();
-          const newResult = await trpc?.album.findRandom.query({
-            take: 20,
-          });
-          const newAlbums = newResult?.albums || [];
+          await fetchRandomAlbums.execute({ take: `${20}` });
+          const newAlbums = fetchRandomAlbums.value?.albums || [];
           store.results = [...store.results, ...newAlbums];
         }}
       />

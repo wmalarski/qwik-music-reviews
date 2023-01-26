@@ -1,5 +1,10 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, loader$, useLocation } from "@builder.io/qwik-city";
+import {
+  action$,
+  DocumentHead,
+  loader$,
+  useLocation,
+} from "@builder.io/qwik-city";
 import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
@@ -7,7 +12,6 @@ import { withProtectedSession } from "~/server/auth/withSession";
 import { withTrpc } from "~/server/trpc/withTrpc";
 import { endpointBuilder } from "~/utils/endpointBuilder";
 import { withTypedQuery } from "~/utils/withTypes";
-import { useTrpcContext } from "../context";
 
 export const albumsLoader = loader$(
   endpointBuilder()
@@ -30,11 +34,26 @@ export const albumsLoader = loader$(
     })
 );
 
+export const findAlbumsAction = action$(
+  endpointBuilder()
+    .use(withProtectedSession())
+    .use(withTrpc())
+    .action((form, event) => {
+      const query = (form.get("query") || "") as string;
+      const page = +(form.get("page") || 0);
+      return event.trpc.album.findAlbums({
+        query: query,
+        skip: page * 20,
+        take: 20,
+      });
+    })
+);
+
 export default component$(() => {
   const location = useLocation();
   const resource = albumsLoader.use();
+  const findAlbums = findAlbumsAction.use();
 
-  const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
@@ -76,13 +95,11 @@ export default component$(() => {
         pageCount={Math.floor(resource.value.count / 20)}
         parentContainer={containerRef.value}
         onMore$={async () => {
-          const trpc = await trpcContext();
-          const newResult = await trpc?.album.findAlbums.query({
+          await findAlbums.execute({
             query: location.query.get("query") || "",
-            skip: (store.currentPage || 0) * 20,
-            take: 20,
+            skip: `${(store.currentPage || 0) * 20}`,
           });
-          const newAlbums = newResult?.albums || [];
+          const newAlbums = findAlbums.value?.albums || [];
           store.currentPage = store.currentPage + 1;
           store.results = [...store.results, ...newAlbums];
         }}
