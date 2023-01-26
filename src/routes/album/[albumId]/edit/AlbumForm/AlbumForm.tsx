@@ -1,5 +1,7 @@
 import { component$ } from "@builder.io/qwik";
+import { Form } from "@builder.io/qwik-city";
 import { Button } from "~/components/Button/Button";
+import { updateAlbumAction } from "..";
 
 export type AlbumFormData = {
   title: string;
@@ -12,8 +14,10 @@ type Props = {
 };
 
 export const AlbumForm = component$<Props>((props) => {
+  const action = updateAlbumAction.use();
+
   return (
-    <form class="flex flex-col gap-2" method="post" action={props.action}>
+    <Form class="flex flex-col gap-2" method="post" action={action}>
       <div class="form-control w-full">
         <label for="title" class="label">
           <span class="label-text">Title</span>
@@ -45,6 +49,6 @@ export const AlbumForm = component$<Props>((props) => {
         />
       </div>
       <Button type="submit">Save</Button>
-    </form>
+    </Form>
   );
 });

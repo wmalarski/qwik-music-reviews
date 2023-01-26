@@ -3,6 +3,7 @@ import type { Session } from "next-auth";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import type { findAlbum } from "~/server/album";
 import type { AsyncReturnValue } from "~/utils/types";
+import { deleteReviewAction } from "../layout";
 
 type Props = {
   data: AsyncReturnValue<typeof findAlbum>;
@@ -10,6 +11,8 @@ type Props = {
 };
 
 export const ArtistReviews = component$<Props>((props) => {
+  const deleteReview = deleteReviewAction.use();
+
   const reviews = props.data.reviews.flatMap((review) => {
     const album = props.data.albums.find(
       (value) => value.id === review.albumId
@@ -33,6 +36,7 @@ export const ArtistReviews = component$<Props>((props) => {
             collection={reviews}
             currentPage={0}
             pageCount={1}
+            removeAction={deleteReview}
             session={props.session}
           />
         </div>

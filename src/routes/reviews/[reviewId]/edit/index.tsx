@@ -30,15 +30,13 @@ export const updateReviewAction = action$(
 
 export default component$(() => {
   const reviewResource = reviewLoader.use();
+  const updateReview = updateReviewAction.use();
 
   return (
     <div class="p-8 flex flex-col gap-4">
       <h2 class="text-xl">Edit review</h2>
       {reviewResource.value ? (
-        <ReviewForm
-          action={paths.reviewEdit(reviewResource.value.id)}
-          initialValue={reviewResource.value}
-        />
+        <ReviewForm action={updateReview} initialValue={reviewResource.value} />
       ) : null}
     </div>
   );

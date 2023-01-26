@@ -60,6 +60,7 @@ export default component$(() => {
   const counts = countsLoader.use();
   const session = protectedSessionLoader.use();
   const findReviews = findReviewsAction.use();
+  const deleteReview = deleteReviewAction.use();
 
   const containerRef = useSignal<Element | null>(null);
 
@@ -79,6 +80,7 @@ export default component$(() => {
       </div>
       <ReviewList
         session={session.value}
+        removeAction={deleteReview}
         collection={[...collection.value.reviews, ...store.results]}
         currentPage={store.currentPage}
         pageCount={Math.floor(collection.value.count / 20)}

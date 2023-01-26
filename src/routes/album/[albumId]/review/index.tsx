@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import { action$, DocumentHead, useLocation } from "@builder.io/qwik-city";
+import { action$, DocumentHead } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
 import { withProtectedSession } from "~/server/auth/withSession";
@@ -31,13 +31,13 @@ export const createReviewAction = action$(
 );
 
 export default component$(() => {
-  const location = useLocation();
   const albumResource = albumLoader.use();
+  const createReview = createReviewAction.use();
 
   return (
     <div class="p-8 flex flex-col gap-4">
       <h2 class="text-xl">Add review</h2>
-      {albumResource.value ? <ReviewForm action={location.pathname} /> : null}
+      {albumResource.value ? <ReviewForm action={createReview} /> : null}
     </div>
   );
 });

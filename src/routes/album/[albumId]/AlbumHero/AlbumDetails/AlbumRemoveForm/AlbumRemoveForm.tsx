@@ -1,18 +1,16 @@
 import { component$ } from "@builder.io/qwik";
-import type { Album } from "@prisma/client";
+import { Form } from "@builder.io/qwik-city";
 import { Button } from "~/components/Button/Button";
-import { paths } from "~/utils/paths";
+import { deleteAlbumAction } from "../../../layout";
 
-type Props = {
-  album: Album;
-};
+export const AlbumRemoveForm = component$(() => {
+  const action = deleteAlbumAction.use();
 
-export const AlbumRemoveForm = component$<Props>((props) => {
   return (
-    <form method="post" action={paths.albumRemove(props.album.id)}>
+    <Form action={action}>
       <Button class="btn btn-sm uppercase" type="submit">
         Remove
       </Button>
-    </form>
+    </Form>
   );
 });

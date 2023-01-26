@@ -1,4 +1,5 @@
 import { component$ } from "@builder.io/qwik";
+import { Form, FormProps } from "@builder.io/qwik-city";
 import { Button } from "~/components/Button/Button";
 
 export type ReviewFormData = {
@@ -8,12 +9,12 @@ export type ReviewFormData = {
 
 type Props = {
   initialValue?: ReviewFormData;
-  action: string;
+  action: FormProps<unknown>["action"];
 };
 
 export const ReviewForm = component$<Props>((props) => {
   return (
-    <form class="flex flex-col gap-2" method="post" action={props.action}>
+    <Form class="flex flex-col gap-2" action={props.action}>
       <div class="form-control w-full">
         <label for="text" class="label">
           <span class="label-text">Text</span>
@@ -45,6 +46,6 @@ export const ReviewForm = component$<Props>((props) => {
         />
       </div>
       <Button type="submit">Save</Button>
-    </form>
+    </Form>
   );
 });
