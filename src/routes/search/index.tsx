@@ -9,8 +9,7 @@ import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { findAlbums } from "~/server/data/album";
-import { protectedProcedure } from "~/server/procedures";
-import { withTypedQuery } from "~/server/withTypes";
+import { protectedProcedure, withTypedQuery } from "~/server/procedures";
 
 export const albumsLoader = loader$(
   protectedProcedure

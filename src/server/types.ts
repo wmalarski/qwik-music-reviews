@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { loader$ } from "@builder.io/qwik-city";
+import type { loader$ } from "@builder.io/qwik-city";
 
 export type LoaderParameter = Parameters<typeof loader$>[0];
 export type ServerLoader<T> = ReturnType<typeof loader$<unknown, T>>;
