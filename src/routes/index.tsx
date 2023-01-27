@@ -3,7 +3,7 @@ import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
-import { findRandom } from "~/server/album";
+import { findRandom } from "~/server/data/album";
 import { protectedProcedure } from "~/server/procedures";
 
 export const randomAlbumsLoader = loader$(

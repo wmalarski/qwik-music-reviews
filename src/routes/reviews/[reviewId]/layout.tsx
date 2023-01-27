@@ -1,7 +1,7 @@
 import { component$, Slot } from "@builder.io/qwik";
 import { DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { findReview } from "~/server/data/review";
 import { protectedReviewProcedure } from "~/server/procedures";
-import { findReview } from "~/server/review";
 import { paths } from "~/utils/paths";
 import { ReviewHero } from "./ReviewHero/ReviewHero";
 

@@ -1,16 +1,10 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import type { NextAuthOptions } from "next-auth/core/types";
+import type { AuthOptions } from "next-auth/core/types";
 import Auth0Provider from "next-auth/providers/auth0";
 import { prisma } from "../db/client";
 import { env } from "../env";
 
-const Auth0 =
-  typeof Auth0Provider === "function"
-    ? Auth0Provider
-    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ((Auth0Provider as any).default as typeof Auth0Provider);
-
-export const authOptions: NextAuthOptions = {
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   callbacks: {
     session: ({ session, user }) => {
@@ -21,7 +15,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   providers: [
-    Auth0({
+    Auth0Provider({
       clientId: env.AUTH0_CLIENT_ID,
       clientSecret: env.AUTH0_CLIENT_SECRET,
       issuer: env.AUTH0_ISSUER,

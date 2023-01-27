@@ -2,8 +2,8 @@ import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
+import { createReview } from "~/server/data/review";
 import { protectedAlbumProcedure } from "~/server/procedures";
-import { createReview } from "~/server/review";
 import { paths } from "~/utils/paths";
 import { albumLoader } from "../layout";
 

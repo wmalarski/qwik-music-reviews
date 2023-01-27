@@ -1,4 +1,4 @@
-import type { ProtectedRequestContext } from "~/server/auth/types";
+import type { ProtectedRequestContext } from "~/server/auth/withSession";
 import type { DbPrismaClient } from "~/server/db/client";
 
 const addReviewCounts = async <T extends { id: string }>(

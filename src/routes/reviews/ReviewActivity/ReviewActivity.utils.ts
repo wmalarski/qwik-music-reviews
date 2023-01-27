@@ -1,4 +1,4 @@
-import type { countReviewsByDate } from "~/server/review";
+import type { countReviewsByDate } from "~/server/data/review";
 import type { AsyncReturnValue } from "~/server/types";
 
 export const getCountItems = (

@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead, useLocation } from "@builder.io/qwik-city";
 import { z } from "zod";
-import { updateAlbum } from "~/server/album";
+import { updateAlbum } from "~/server/data/album";
 import { protectedAlbumProcedure } from "~/server/procedures";
 import { paths } from "~/utils/paths";
 import { albumLoader } from "../layout";

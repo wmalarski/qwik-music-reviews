@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import type { Session } from "next-auth";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
-import type { findAlbum } from "~/server/album";
+import type { findAlbum } from "~/server/data/album";
 import type { AsyncReturnValue } from "~/server/types";
 import { deleteReviewAction } from "../layout";
 

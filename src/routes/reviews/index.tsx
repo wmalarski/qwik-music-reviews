@@ -3,8 +3,12 @@ import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
+import {
+  countReviewsByDate,
+  deleteReview,
+  findReviews,
+} from "~/server/data/review";
 import { protectedProcedure } from "~/server/procedures";
-import { countReviewsByDate, deleteReview, findReviews } from "~/server/review";
 import { paths } from "~/utils/paths";
 import { protectedSessionLoader } from "../layout";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
