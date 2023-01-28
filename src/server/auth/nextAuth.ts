@@ -3,6 +3,7 @@
 import type { RequestEvent, RequestHandler } from "@builder.io/qwik-city";
 import * as cookie from "cookie";
 import { AuthHandler } from "next-auth/core";
+import { Cookie } from "next-auth/core/lib/cookie";
 import type { AuthAction, AuthOptions, Session } from "next-auth/core/types";
 import { env } from "../env";
 import type { RequestEventLoader } from "../types";
@@ -29,33 +30,28 @@ const getBody = async (
   }
 };
 
-const tempCookieName = "next-auth.temp";
+const setCookies = (
+  event: RequestEvent | RequestEventLoader,
+  cookies?: Cookie[]
+) => {
+  cookies?.forEach((cookie) => {
+    const sameSite = cookie.options.sameSite;
+    event.cookie.set(cookie.name, cookie.value, {
+      ...cookie.options,
+      sameSite:
+        sameSite === true ? "lax" : sameSite === false ? "none" : sameSite,
+    });
+  });
+};
 
-// const setCookies = (event: RequestEventLoader, cookies?: Cookie[]) => {
-//   if (!cookies || cookies.length < 1) {
-//     return;
-//   }
-
-//   // TODO: change to new api when available
-//   // this is temporary fix for not able to save multiple cookies
-//   // using 'set-cookie' header
-//   const value = JSON.stringify(cookies.map((c) => [c.name, c.value]));
-//   const options = cookies[0].options;
-
-//   event.headers.set(
-//     "set-cookie",
-//     cookie.serialize(tempCookieName, value, options)
-//   );
-// };
-
-const getCookie = (headers: Headers) => {
-  const result = cookie.parse(headers.get("cookie") || "");
-
-  // TODO: change to new api when available
-  const parsed = JSON.parse(result[tempCookieName] || "[]");
-  const restoredCookies = Object.fromEntries(parsed);
-
-  return { ...result, ...restoredCookies };
+const getCookie = (event: RequestEvent | RequestEventLoader) => {
+  return Object.entries(event.cookie.getAll()).reduce<Record<string, string>>(
+    (prev, [key, cookie]) => {
+      prev[key] = cookie.value;
+      return prev;
+    },
+    {}
+  );
 };
 
 const QWikNextAuthHandler = async (
@@ -65,8 +61,10 @@ const QWikNextAuthHandler = async (
   const [action, providerId] = event.params.nextauth.split("/");
   const body = await getBody(event);
   const query = Object.fromEntries(event.url.searchParams);
-  const cookies = getCookie(event.request.headers);
+  const cookies = getCookie(event);
   const error = (query.error as string | undefined) ?? providerId;
+
+  console.log("=============QWikNextAuthHandler=============");
 
   const res = await AuthHandler({
     options,
@@ -83,6 +81,12 @@ const QWikNextAuthHandler = async (
     },
   });
 
+  for (const header of res.headers || []) {
+    event.headers.append(header.key, header.value);
+  }
+
+  setCookies(event, res.cookies);
+
   console.log({
     action,
     body,
@@ -90,12 +94,9 @@ const QWikNextAuthHandler = async (
     error,
     providerId,
     query,
-    res,
+    res: JSON.stringify(res, null, 2),
+    headers: Array.from(event.headers.entries()),
   });
-
-  for (const header of res.headers || []) {
-    event.headers.append(header.key, header.value);
-  }
 
   // setCookies(response, cookies);
 
@@ -104,6 +105,7 @@ const QWikNextAuthHandler = async (
     //   throw event.redirect(302, res.redirect);
     // }
     event.redirect(res.status || 302, res.redirect);
+    event.send(res.status || 302, "");
     return;
     // event.headers.set("Content-Type", "application/json");
     // return { url: res.redirect };
@@ -116,9 +118,7 @@ export const getServerSession = async (
   event: RequestEventLoader,
   options: AuthOptions
 ): Promise<Session | null> => {
-  const cookies = getCookie(event.request.headers);
-
-  console.log({ cookies });
+  const cookies = getCookie(event);
 
   const res = await AuthHandler({
     options,
@@ -131,9 +131,9 @@ export const getServerSession = async (
     },
   });
 
-  console.log({ res });
-
-  // setCookies(event, cookies);
+  setCookies(event, res.cookies);
+  console.log("=============getServerSession=============");
+  console.log(JSON.stringify(res, null, 2));
 
   if (
     res.body &&
@@ -149,7 +149,12 @@ export const getServerCsrfToken = async (
   event: RequestEventLoader,
   options: AuthOptions
 ) => {
-  const cookies = getCookie(event.request.headers);
+  const cookies = getCookie(event);
+
+  console.log("getServerCsrfToken", {
+    cookie,
+    cookies2: event.cookie.getAll(),
+  });
 
   const { body } = await AuthHandler({
     options,

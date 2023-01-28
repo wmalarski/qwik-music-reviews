@@ -20,7 +20,6 @@ const getRequestSession = (
     return sessionPromise;
   }
 
-  console.log("getRequestSession");
   const newPromise = getServerSession(event, authOptions);
   event.sharedMap.set("session", newPromise);
   return newPromise;
@@ -32,9 +31,7 @@ export const withProtectedSession = <
   return async (event: R) => {
     const session = await getRequestSession(event);
 
-    console.log("withProtectedSession", { session });
     if (!session || !session.user) {
-      console.log("throwing");
       throw event.redirect(302, paths.signIn);
     }
     return { ...event, ctx: { prisma, session, user: session.user }, session };
