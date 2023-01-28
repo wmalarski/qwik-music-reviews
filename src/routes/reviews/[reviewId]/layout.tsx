@@ -1,6 +1,6 @@
 import { component$, Slot } from "@builder.io/qwik";
 import { DocumentHead, loader$ } from "@builder.io/qwik-city";
-import { getProtectedRequestContext } from "~/server/auth/withSession";
+import { getProtectedRequestContext } from "~/server/auth/context";
 import { findReview } from "~/server/data/review";
 import { paths } from "~/utils/paths";
 import { ReviewHero } from "./ReviewHero/ReviewHero";

@@ -1,7 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead } from "@builder.io/qwik-city";
 import { z } from "zod";
-import { getProtectedRequestContext } from "~/server/auth/withSession";
+import { getProtectedRequestContext } from "~/server/auth/context";
 import { updateAlbum } from "~/server/data/album";
 import { formEntries } from "~/utils/form";
 import { paths } from "~/utils/paths";

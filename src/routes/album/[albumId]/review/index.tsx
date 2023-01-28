@@ -2,7 +2,7 @@ import { component$, useTask$ } from "@builder.io/qwik";
 import { action$, DocumentHead, useNavigate } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
-import { getProtectedRequestContext } from "~/server/auth/withSession";
+import { getProtectedRequestContext } from "~/server/auth/context";
 import { createReview } from "~/server/data/review";
 import { formEntries } from "~/utils/form";
 import { paths } from "~/utils/paths";

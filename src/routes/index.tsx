@@ -2,7 +2,7 @@ import { component$, useSignal, useStore } from "@builder.io/qwik";
 import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
-import { getProtectedRequestContext } from "~/server/auth/withSession";
+import { getProtectedRequestContext } from "~/server/auth/context";
 import { findRandom } from "~/server/data/album";
 
 export const randomAlbumsLoader = loader$(async (event) => {

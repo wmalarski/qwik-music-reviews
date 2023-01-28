@@ -3,7 +3,7 @@ import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
-import { getProtectedRequestContext } from "~/server/auth/withSession";
+import { getProtectedRequestContext } from "~/server/auth/context";
 import {
   countReviewsByDate,
   deleteReview,

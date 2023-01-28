@@ -1,4 +1,4 @@
-import type { ProtectedRequestContext } from "~/server/auth/withSession";
+import type { ProtectedRequestContext } from "~/server/auth/context";
 import type { DbPrismaClient } from "~/server/db/client";
 import { stringifyDates } from "./stringifyDates";
 

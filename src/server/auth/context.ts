@@ -34,21 +34,3 @@ export const getProtectedRequestContext = async (event: RequestEventLoader) => {
   }
   return { prisma, session, user: session.user };
 };
-
-export const withProtectedSession = <
-  R extends RequestEventLoader = RequestEventLoader
->() => {
-  return async (event: R) => {
-    console.log("withProtectedSession", typeof window === "undefined");
-
-    const { paths } = await import("~/utils/paths");
-    const { prisma } = await import("../db/client");
-
-    const session = await getRequestSession(event);
-
-    if (!session || !session.user) {
-      throw event.redirect(302, paths.signIn);
-    }
-    return { ...event, ctx: { prisma, session, user: session.user }, session };
-  };
-};
