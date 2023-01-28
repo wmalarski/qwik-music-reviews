@@ -1,6 +1,5 @@
 import { component$ } from "@builder.io/qwik";
 import { Form, FormProps } from "@builder.io/qwik-city";
-import { Button } from "~/components/Button/Button";
 
 export type ReviewFormData = {
   text: string;
@@ -45,7 +44,9 @@ export const ReviewForm = component$<Props>((props) => {
           value={props.initialValue?.rate}
         />
       </div>
-      <Button type="submit">Save</Button>
+      <button type="submit" class="btn uppercase">
+        Save
+      </button>
     </Form>
   );
 });

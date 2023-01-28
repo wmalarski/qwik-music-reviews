@@ -51,7 +51,7 @@ export const AlbumGrid = component$<Props>((props) => {
       }}
     >
       {props.collection?.map((media) => (
-        <AlbumGridCard album={media} />
+        <AlbumGridCard key={media.id} album={media} />
       ))}
     </div>
   );

@@ -18,6 +18,7 @@ export const ReviewActivity = component$<Props>((props) => {
         }).format(new Date(0, item.month));
         return (
           <span
+            key={`${item.position}-${item.span}`}
             class="btn btn-xs truncate"
             style={`grid-column: ${item.position} / span ${item.span};`}
             title={content}
@@ -28,6 +29,7 @@ export const ReviewActivity = component$<Props>((props) => {
       })}
       {items.map((item) => (
         <span
+          key={item.date.getTime()}
           class={`bg-activity-${item.suffix} hover:bg-activity-${item.suffix}`}
           title={new Intl.DateTimeFormat("pl").format(item.date)}
         >

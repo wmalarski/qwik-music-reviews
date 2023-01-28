@@ -1,32 +1,31 @@
 import { component$ } from "@builder.io/qwik";
 import { action$, DocumentHead } from "@builder.io/qwik-city";
-import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
-import { createReview } from "~/server/data/review";
-import { protectedAlbumProcedure } from "~/server/procedures";
-import { paths } from "~/utils/paths";
 import { albumLoader } from "../layout";
 
-export const createReviewAction = action$(
-  protectedAlbumProcedure.typedAction(
-    z.object({
-      rate: z.coerce.number().min(0).max(10),
-      text: z.string().optional().default(""),
-    }),
-    async (form, event) => {
-      const albumId = event.typedParams.albumId;
+export const createReviewAction = action$((form, event) => {
+  console.log("createReviewAction", form, event);
+  return {};
+  // const { protectedAlbumProcedure } = await import("~/server/procedures");
+  // return protectedAlbumProcedure.typedAction(
+  //   z.object({
+  //     rate: z.coerce.number().min(0).max(10),
+  //     text: z.string().optional().default(""),
+  //   }),
+  //   async (form, event) => {
+  //     const albumId = event.typedParams.albumId;
 
-      await createReview({
-        albumId,
-        ctx: event.ctx,
-        rate: form.rate,
-        text: form.text,
-      });
+  //     await createReview({
+  //       albumId,
+  //       ctx: event.ctx,
+  //       rate: form.rate,
+  //       text: form.text,
+  //     });
 
-      throw event.redirect(302, paths.album(albumId));
-    }
-  )
-);
+  //     throw event.redirect(302, paths.album(albumId));
+  //   }
+  // )(form, event);
+});
 
 export default component$(() => {
   const albumResource = albumLoader.use();

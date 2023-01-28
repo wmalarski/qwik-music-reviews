@@ -60,6 +60,7 @@ export const ReviewList = component$<Props>((props) => {
       >
         {props.collection?.map((review) => (
           <ReviewListCard
+            key={review.id}
             removeAction={props.removeAction}
             review={review}
             session={props.session}

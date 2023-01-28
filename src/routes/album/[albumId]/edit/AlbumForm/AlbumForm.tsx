@@ -1,6 +1,5 @@
 import { component$ } from "@builder.io/qwik";
 import { Form } from "@builder.io/qwik-city";
-import { Button } from "~/components/Button/Button";
 import { updateAlbumAction } from "..";
 
 export type AlbumFormData = {
@@ -48,7 +47,7 @@ export const AlbumForm = component$<Props>((props) => {
           value={props.initialValue?.year}
         />
       </div>
-      <Button type="submit">Save</Button>
+      <button type="submit">Save</button>
     </Form>
   );
 });

@@ -1,19 +1,19 @@
 import type { Session, User } from "next-auth";
-import type { RequestEventLoader } from "~/server/types";
-import { paths } from "~/utils/paths";
-import { prisma } from "../db/client";
-import { getServerSession } from "./nextAuth";
-import { authOptions } from "./options";
+import type { DbPrismaClient } from "../db/client";
+import type { RequestEventLoader } from "../types";
 
 export type ProtectedRequestContext = {
-  prisma: typeof prisma;
+  prisma: DbPrismaClient;
   session: Session;
   user: User;
 };
 
-const getRequestSession = (
+const getRequestSession = async (
   event: RequestEventLoader
 ): Promise<Session | null> => {
+  const { getServerSession } = await import("./nextAuth");
+  const { authOptions } = await import("./options");
+
   const sessionPromise = event.sharedMap.get("session");
 
   if (sessionPromise) {
@@ -29,6 +29,11 @@ export const withProtectedSession = <
   R extends RequestEventLoader = RequestEventLoader
 >() => {
   return async (event: R) => {
+    console.log("withProtectedSession", typeof window === "undefined");
+
+    const { paths } = await import("~/utils/paths");
+    const { prisma } = await import("../db/client");
+
     const session = await getRequestSession(event);
 
     if (!session || !session.user) {
