@@ -1,5 +1,6 @@
 import type { ProtectedRequestContext } from "~/server/auth/withSession";
 import type { DbPrismaClient } from "~/server/db/client";
+import { stringifyDates } from "./stringifyDates";
 
 const addReviewCounts = async <T extends { id: string }>(
   prisma: DbPrismaClient,
@@ -26,11 +27,13 @@ const addReviewCounts = async <T extends { id: string }>(
     return prev;
   }, {});
 
-  return albums.map((album) => ({
-    ...album,
-    avg: averages[album.id] || 0,
-    reviews: counts[album.id] || 0,
-  }));
+  return stringifyDates(
+    albums.map((album) => ({
+      ...album,
+      avg: averages[album.id] || 0,
+      reviews: counts[album.id] || 0,
+    }))
+  );
 };
 
 type DeleteAlbum = {
@@ -80,7 +83,7 @@ export const findAlbum = async ({ ctx, id }: FindAlbum) => {
     reviews: counts[album.id] || 0,
   }));
 
-  return { album, albums: withCounts, reviews };
+  return stringifyDates({ album, albums: withCounts, reviews });
 };
 
 type FindAlbums = {
@@ -124,7 +127,7 @@ export const findAlbums = async ({ ctx, query, skip, take }: FindAlbums) => {
     ctx.user.id
   );
 
-  return { albums: albumsWithCounts, count };
+  return stringifyDates({ albums: albumsWithCounts, count });
 };
 
 type FindRandom = {
@@ -154,7 +157,7 @@ export const findRandom = async ({ ctx, take }: FindRandom) => {
     reviews: 0,
   }));
 
-  return { albums: withReviews };
+  return stringifyDates({ albums: withReviews });
 };
 
 type UpdateAlbum = {

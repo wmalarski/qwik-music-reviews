@@ -1,4 +1,5 @@
 import type { ProtectedRequestContext } from "~/server/auth/withSession";
+import { stringifyDates } from "./stringifyDates";
 
 type CountReviewsByDate = {
   ctx: ProtectedRequestContext;
@@ -26,10 +27,16 @@ type CreateReview = {
   text: string;
 };
 
-export const createReview = ({ ctx, albumId, rate, text }: CreateReview) => {
-  return ctx.prisma.review.create({
+export const createReview = async ({
+  ctx,
+  albumId,
+  rate,
+  text,
+}: CreateReview) => {
+  const result = await ctx.prisma.review.create({
     data: { albumId, rate, text, userId: ctx.user.id },
   });
+  return stringifyDates(result);
 };
 
 type DeleteReview = {
@@ -48,11 +55,12 @@ type FindReview = {
   id: string;
 };
 
-export const findReview = ({ ctx, id }: FindReview) => {
-  return ctx.prisma.review.findFirst({
+export const findReview = async ({ ctx, id }: FindReview) => {
+  const result = await ctx.prisma.review.findFirst({
     include: { album: { include: { artist: true } } },
     where: { id, userId: ctx.user.id },
   });
+  return stringifyDates(result);
 };
 
 type FindReviews = {
@@ -74,7 +82,7 @@ export const findReviews = async ({ ctx, skip, take }: FindReviews) => {
       where: { userId: ctx.user.id },
     }),
   ]);
-  return { count, reviews };
+  return stringifyDates({ count, reviews });
 };
 
 type UpdateReview = {
