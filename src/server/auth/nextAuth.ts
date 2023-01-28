@@ -1,7 +1,4 @@
-// Code copied from
-// https://gist.github.com/langbamit/a09161e844ad9b4a3cb756bacde67796
 import type { RequestEvent, RequestHandler } from "@builder.io/qwik-city";
-import * as cookie from "cookie";
 import { AuthHandler } from "next-auth/core";
 import { Cookie } from "next-auth/core/lib/cookie";
 import type { AuthAction, AuthOptions, Session } from "next-auth/core/types";
@@ -62,9 +59,6 @@ const QWikNextAuthHandler = async (
   const body = await getBody(event);
   const query = Object.fromEntries(event.url.searchParams);
   const cookies = getCookie(event);
-  const error = (query.error as string | undefined) ?? providerId;
-
-  console.log("=============QWikNextAuthHandler=============");
 
   const res = await AuthHandler({
     options,
@@ -72,7 +66,7 @@ const QWikNextAuthHandler = async (
       action: action as AuthAction,
       body,
       cookies,
-      error,
+      error: query.error,
       headers: event.request.headers,
       host: env.NEXTAUTH_URL,
       method: event.request.method,
@@ -87,28 +81,10 @@ const QWikNextAuthHandler = async (
 
   setCookies(event, res.cookies);
 
-  console.log({
-    action,
-    body,
-    cookies,
-    error,
-    providerId,
-    query,
-    res: JSON.stringify(res, null, 2),
-    headers: Array.from(event.headers.entries()),
-  });
-
-  // setCookies(response, cookies);
-
   if (res.redirect) {
-    // if (body?.json !== "true") {
-    //   throw event.redirect(302, res.redirect);
-    // }
     event.redirect(res.status || 302, res.redirect);
-    event.send(res.status || 302, "");
+    event.send(res.status || 302, res.body || "");
     return;
-    // event.headers.set("Content-Type", "application/json");
-    // return { url: res.redirect };
   }
 
   event.send(res.status || 200, res.body);
@@ -132,8 +108,6 @@ export const getServerSession = async (
   });
 
   setCookies(event, res.cookies);
-  console.log("=============getServerSession=============");
-  console.log(JSON.stringify(res, null, 2));
 
   if (
     res.body &&
@@ -150,11 +124,6 @@ export const getServerCsrfToken = async (
   options: AuthOptions
 ) => {
   const cookies = getCookie(event);
-
-  console.log("getServerCsrfToken", {
-    cookie,
-    cookies2: event.cookie.getAll(),
-  });
 
   const { body } = await AuthHandler({
     options,
