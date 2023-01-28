@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import { useLocation } from "@builder.io/qwik-city";
+import { Link, useLocation } from "@builder.io/qwik-city";
 import { cva } from "class-variance-authority";
 import { paths } from "~/utils/paths";
 
@@ -25,28 +25,28 @@ export const Sidebar = component$(() => {
     <nav class="border-r-2 border-base-300">
       <ul class="flex flex-col gap-6 px-4 py-8 h-full w-28 items-center">
         <li>
-          <a
+          <Link
             class={link({ isActive: paths.home === location.pathname })}
             href={paths.home}
           >
             Home
-          </a>
+          </Link>
         </li>
         <li>
-          <a
+          <Link
             class={link({ isActive: paths.search === location.pathname })}
             href={paths.search}
           >
             Search
-          </a>
+          </Link>
         </li>
         <li class="flex-grow">
-          <a
+          <Link
             class={link({ isActive: paths.reviews === location.pathname })}
             href={paths.reviews}
           >
             Reviews
-          </a>
+          </Link>
         </li>
         <li>
           <a class={link()} href={paths.nextSignOut}>

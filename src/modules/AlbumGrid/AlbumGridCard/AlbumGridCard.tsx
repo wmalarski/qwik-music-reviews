@@ -1,4 +1,5 @@
 import { component$ } from "@builder.io/qwik";
+import { Link } from "@builder.io/qwik-city";
 import type { Album, Artist } from "@prisma/client";
 import { Stars } from "~/components/Stars/Stars";
 import { AlbumCover } from "~/modules/AlbumCover/AlbumCover";
@@ -24,15 +25,15 @@ export const AlbumGridCard = component$<Props>((props) => {
 
   return (
     <div class="w-64">
-      <a href={paths.album(props.album.id)}>
+      <Link href={paths.album(props.album.id)}>
         <div class="transition-scale scale-95 duration-300 ease-in-out hover:scale-100">
           <AlbumCover album={props.album} />
         </div>
         <span>{heading}</span>
-      </a>
-      <a href={paths.albumReview(props.album.id)}>
+      </Link>
+      <Link href={paths.albumReview(props.album.id)}>
         <Stars rating={props.album.avg} />
-      </a>
+      </Link>
       <AlbumLinks album={props.album} />
     </div>
   );

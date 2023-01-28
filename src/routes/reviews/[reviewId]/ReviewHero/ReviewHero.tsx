@@ -1,4 +1,5 @@
 import { component$ } from "@builder.io/qwik";
+import { Link } from "@builder.io/qwik-city";
 import type { Album, Artist, Review } from "@prisma/client";
 import { Stars } from "~/components/Stars/Stars";
 import { AlbumCover } from "~/modules/AlbumCover/AlbumCover";
@@ -23,9 +24,9 @@ export const ReviewHero = component$<Props>((props) => {
           <AlbumCover album={props.review.album} />
         </div>
         <div class="flex flex-col gap-6">
-          <a href={paths.album(props.review.albumId)}>
+          <Link href={paths.album(props.review.albumId)}>
             <h2 class="mb-4 text-3xl">{heading}</h2>
-          </a>
+          </Link>
           <div class="grid grid-cols-[max-content_1fr] items-center gap-3 text-sm opacity-80 lg:grid-cols-[max-content_1fr_max-content_1fr]">
             <div>Title</div>
             <div>{props.review.album.title}</div>
