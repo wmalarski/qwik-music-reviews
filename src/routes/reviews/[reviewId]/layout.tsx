@@ -1,22 +1,22 @@
 import { component$, Slot } from "@builder.io/qwik";
 import { DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { getProtectedRequestContext } from "~/server/auth/withSession";
 import { findReview } from "~/server/data/review";
-import { protectedReviewProcedure } from "~/server/procedures";
 import { paths } from "~/utils/paths";
 import { ReviewHero } from "./ReviewHero/ReviewHero";
 
-export const reviewLoader = loader$(
-  protectedReviewProcedure.loader(async (event) => {
-    const reviewId = event.typedParams.reviewId;
-    const review = await findReview({ ctx: event.ctx, id: reviewId });
+export const reviewLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
 
-    if (!review || review?.userId !== event.session.user?.id) {
-      throw event.redirect(302, paths.home);
-    }
+  const reviewId = event.params.reviewId;
+  const review = await findReview({ ctx, id: reviewId });
 
-    return review;
-  })
-);
+  if (!review || review?.userId !== ctx.session.user?.id) {
+    throw event.redirect(302, paths.home);
+  }
+
+  return review;
+});
 
 export default component$(() => {
   const resource = reviewLoader.use();

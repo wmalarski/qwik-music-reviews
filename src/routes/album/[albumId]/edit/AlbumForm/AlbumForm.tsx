@@ -1,5 +1,6 @@
-import { component$ } from "@builder.io/qwik";
-import { Form } from "@builder.io/qwik-city";
+import { component$, useTask$ } from "@builder.io/qwik";
+import { Form, useNavigate } from "@builder.io/qwik-city";
+import { paths } from "~/utils/paths";
 import { updateAlbumAction } from "..";
 
 export type AlbumFormData = {
@@ -8,12 +9,21 @@ export type AlbumFormData = {
 };
 
 type Props = {
-  initialValue?: AlbumFormData;
-  action: string;
+  albumId: string;
+  initialValue: AlbumFormData;
 };
 
 export const AlbumForm = component$<Props>((props) => {
+  const navigate = useNavigate();
+
   const action = updateAlbumAction.use();
+
+  useTask$(({ track }) => {
+    const status = track(() => action.value?.status);
+    if (status === "success") {
+      navigate(paths.album(props.albumId));
+    }
+  });
 
   return (
     <Form class="flex flex-col gap-2" method="post" action={action}>

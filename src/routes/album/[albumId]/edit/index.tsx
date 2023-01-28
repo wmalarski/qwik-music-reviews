@@ -1,35 +1,41 @@
 import { component$ } from "@builder.io/qwik";
-import { action$, DocumentHead, useLocation } from "@builder.io/qwik-city";
+import { action$, DocumentHead } from "@builder.io/qwik-city";
 import { z } from "zod";
+import { getProtectedRequestContext } from "~/server/auth/withSession";
 import { updateAlbum } from "~/server/data/album";
-import { protectedAlbumProcedure } from "~/server/procedures";
+import { formEntries } from "~/utils/form";
 import { paths } from "~/utils/paths";
 import { albumLoader } from "../layout";
 import { AlbumForm } from "./AlbumForm/AlbumForm";
 
-export const updateAlbumAction = action$(
-  protectedAlbumProcedure.typedAction(
-    z.object({
+export const updateAlbumAction = action$(async (form, event) => {
+  const ctx = await getProtectedRequestContext(event);
+  const albumId = event.params.albumId;
+
+  const parsed = z
+    .object({
       title: z.string().optional(),
       year: z.coerce.number().min(0).max(2100).int().optional(),
-    }),
-    async (form, event) => {
-      const albumId = event.typedParams.albumId;
+    })
+    .safeParse(formEntries(form));
 
-      await updateAlbum({
-        ctx: event.ctx,
-        id: albumId,
-        title: form.title,
-        year: form.year,
-      });
+  if (!parsed.success) {
+    return { message: parsed.error.message, status: "invalid" as const };
+  }
 
-      throw event.redirect(302, paths.album(albumId));
-    }
-  )
-);
+  await updateAlbum({
+    ctx,
+    id: albumId,
+    title: parsed.data.title,
+    year: parsed.data.year,
+  });
+
+  event.redirect(302, paths.album(albumId));
+
+  return { status: "success" as const };
+});
 
 export default component$(() => {
-  const location = useLocation();
   const resource = albumLoader.use();
 
   return (
@@ -37,8 +43,8 @@ export default component$(() => {
       <h2 class="text-xl">Edit album</h2>
       {resource.value.album ? (
         <AlbumForm
-          action={location.pathname}
           initialValue={resource.value.album}
+          albumId={resource.value.album.id}
         />
       ) : null}
     </div>

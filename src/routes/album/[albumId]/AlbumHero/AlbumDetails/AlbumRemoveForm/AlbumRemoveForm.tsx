@@ -1,9 +1,19 @@
-import { component$ } from "@builder.io/qwik";
-import { Form } from "@builder.io/qwik-city";
+import { component$, useTask$ } from "@builder.io/qwik";
+import { Form, useNavigate } from "@builder.io/qwik-city";
+import { paths } from "~/utils/paths";
 import { deleteAlbumAction } from "../../../layout";
 
 export const AlbumRemoveForm = component$(() => {
+  const navigate = useNavigate();
+
   const action = deleteAlbumAction.use();
+
+  useTask$(({ track }) => {
+    const status = track(() => action.value?.status);
+    if (status === "success") {
+      navigate(paths.reviews);
+    }
+  });
 
   return (
     <Form action={action}>

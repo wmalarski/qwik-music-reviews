@@ -1,35 +1,52 @@
-import { component$ } from "@builder.io/qwik";
-import { action$, DocumentHead } from "@builder.io/qwik-city";
+import { component$, useTask$ } from "@builder.io/qwik";
+import { action$, DocumentHead, useNavigate } from "@builder.io/qwik-city";
+import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
+import { getProtectedRequestContext } from "~/server/auth/withSession";
+import { createReview } from "~/server/data/review";
+import { formEntries } from "~/utils/form";
+import { paths } from "~/utils/paths";
 import { albumLoader } from "../layout";
 
-export const createReviewAction = action$((form, event) => {
-  console.log("createReviewAction", form, event);
-  return {};
-  // const { protectedAlbumProcedure } = await import("~/server/procedures");
-  // return protectedAlbumProcedure.typedAction(
-  //   z.object({
-  //     rate: z.coerce.number().min(0).max(10),
-  //     text: z.string().optional().default(""),
-  //   }),
-  //   async (form, event) => {
-  //     const albumId = event.typedParams.albumId;
+export const createReviewAction = action$(async (form, event) => {
+  const ctx = await getProtectedRequestContext(event);
+  const albumId = event.params.albumId;
 
-  //     await createReview({
-  //       albumId,
-  //       ctx: event.ctx,
-  //       rate: form.rate,
-  //       text: form.text,
-  //     });
+  const parsed = z
+    .object({
+      rate: z.coerce.number().min(0).max(10),
+      text: z.string().optional().default(""),
+    })
+    .safeParse(formEntries(form));
 
-  //     throw event.redirect(302, paths.album(albumId));
-  //   }
-  // )(form, event);
+  if (!parsed.success) {
+    return { message: parsed.error.message, status: "invalid" as const };
+  }
+
+  const review = await createReview({
+    albumId,
+    ctx,
+    rate: parsed.data.rate,
+    text: parsed.data.text,
+  });
+
+  event.redirect(302, paths.album(albumId));
+  return { review, status: "success" as const };
 });
 
 export default component$(() => {
+  const navigate = useNavigate();
+
   const albumResource = albumLoader.use();
   const createReview = createReviewAction.use();
+
+  useTask$(({ track }) => {
+    const status = track(() => createReview.value?.status);
+    const albumId = createReview.value?.review?.albumId;
+    if (status === "success" && albumId) {
+      navigate(paths.album(albumId));
+    }
+  });
 
   return (
     <div class="p-8 flex flex-col gap-4">

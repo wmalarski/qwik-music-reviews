@@ -8,38 +8,44 @@ import {
 import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
+import { getProtectedRequestContext } from "~/server/auth/withSession";
 import { findAlbums } from "~/server/data/album";
-import { protectedProcedure, withTypedQuery } from "~/server/procedures";
+import { formEntries } from "~/utils/form";
 
-export const albumsLoader = loader$(
-  protectedProcedure
-    .use(withTypedQuery(z.object({ query: z.string().default("") })))
-    .loader((event) => {
-      return findAlbums({
-        ctx: event.ctx,
-        query: event.query.query,
-        skip: 0,
-        take: 20,
-      });
-    })
-);
+export const albumsLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
 
-export const findAlbumsAction = action$(
-  protectedProcedure.typedAction(
-    z.object({
+  return findAlbums({
+    ctx,
+    query: event.query.get("query") || "",
+    skip: 0,
+    take: 20,
+  });
+});
+
+export const findAlbumsAction = action$(async (form, event) => {
+  const ctx = await getProtectedRequestContext(event);
+
+  const parsed = z
+    .object({
       page: z.coerce.number().min(0).int().default(0),
       query: z.string().default(""),
-    }),
-    (form, event) => {
-      return findAlbums({
-        ctx: event.ctx,
-        query: form.query,
-        skip: form.page * 20,
-        take: 20,
-      });
-    }
-  )
-);
+    })
+    .safeParse(formEntries(form));
+
+  if (!parsed.success) {
+    return { message: parsed.error.message, status: "invalid" as const };
+  }
+
+  const result = await findAlbums({
+    ctx,
+    query: parsed.data.query,
+    skip: parsed.data.page * 20,
+    take: 20,
+  });
+
+  return { status: "success" as const, ...result };
+});
 
 export default component$(() => {
   const location = useLocation();
@@ -91,9 +97,11 @@ export default component$(() => {
             query: location.query.get("query") || "",
             skip: `${(store.currentPage || 0) * 20}`,
           });
-          const newAlbums = findAlbums.value?.albums || [];
-          store.currentPage = store.currentPage + 1;
-          store.results = [...store.results, ...newAlbums];
+          if (findAlbums.value?.status === "success") {
+            const newAlbums = findAlbums.value?.albums || [];
+            store.currentPage = store.currentPage + 1;
+            store.results = [...store.results, ...newAlbums];
+          }
         }}
       />
     </div>

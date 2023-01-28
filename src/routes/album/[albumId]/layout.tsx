@@ -1,61 +1,57 @@
 import { component$, Slot } from "@builder.io/qwik";
 import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
+import { getProtectedRequestContext } from "~/server/auth/withSession";
 import { deleteAlbum, findAlbum } from "~/server/data/album";
 import { deleteReview } from "~/server/data/review";
-import {
-  protectedAlbumProcedure,
-  protectedProcedure,
-} from "~/server/procedures";
+import { formEntries } from "~/utils/form";
 import { paths } from "~/utils/paths";
 import { AlbumHero } from "./AlbumHero/AlbumHero";
 
-export const protectedSessionLoader = loader$(
-  protectedProcedure.loader((event) => {
-    return event.session;
-  })
-);
+export const protectedSessionLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return ctx.session;
+});
 
-export const albumLoader = loader$(
-  protectedAlbumProcedure.loader((event) => {
-    return findAlbum({ ctx: event.ctx, id: event.typedParams.albumId });
-  })
-);
+export const albumLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return findAlbum({ ctx, id: event.params.albumId });
+});
 
-export const deleteAlbumAction = action$(
-  protectedAlbumProcedure.action(async (_form, event) => {
-    const albumId = event.typedParams.albumId;
+export const deleteAlbumAction = action$(async (_form, event) => {
+  const ctx = await getProtectedRequestContext(event);
+  const albumId = event.params.albumId;
 
-    const result = await deleteAlbum({
-      ctx: event.ctx,
-      id: albumId,
-    });
+  const result = await deleteAlbum({ ctx, id: albumId });
 
-    if (result.count <= 0) {
-      throw event.redirect(302, paths.album(albumId));
-    }
+  if (result.count <= 0) {
+    return { status: "invalid" as const };
+  }
 
-    throw event.redirect(302, paths.home);
-  })
-);
+  event.redirect(302, paths.home);
+  return { status: "success" as const };
+});
 
-export const deleteReviewAction = action$(
-  protectedProcedure.typedAction(
-    z.object({ reviewId: z.string() }),
-    async (form, event) => {
-      const result = await deleteReview({
-        ctx: event.ctx,
-        id: form.reviewId,
-      });
+export const deleteReviewAction = action$(async (form, event) => {
+  const ctx = await getProtectedRequestContext(event);
 
-      if (result.count <= 0) {
-        return;
-      }
+  const parsed = z
+    .object({ reviewId: z.string() })
+    .safeParse(formEntries(form));
 
-      throw event.redirect(302, paths.reviews);
-    }
-  )
-);
+  if (!parsed.success) {
+    return { message: parsed.error.message, status: "invalid" as const };
+  }
+
+  const result = await deleteReview({ ctx, id: parsed.data.reviewId });
+
+  if (result.count <= 0) {
+    return { status: "error" as const };
+  }
+
+  event.redirect(302, paths.reviews);
+  return { status: "success" as const };
+});
 
 export default component$(() => {
   const album = albumLoader.use();

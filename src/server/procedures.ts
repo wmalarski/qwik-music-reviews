@@ -103,3 +103,12 @@ export const protectedAlbumProcedure = procedureBuilder()
 export const protectedReviewProcedure = procedureBuilder()
   .use(withTypedParams(z.object({ reviewId: z.string().min(1) })))
   .use(withProtectedSession());
+
+// export const parseForm = <S extends z.ZodRawShape = z.ZodRawShape>(
+//   form: FormData,
+//   schema: z.ZodObject<S>
+// ): z.SafeParseReturnType<z.infer<z.ZodObject<S>>, z.infer<z.ZodObject<S>>> => {
+//   const entries = Object.fromEntries(form.entries());
+//   const parsed = schema.safeParse(entries);
+//   return parsed;
+// };

@@ -3,66 +3,77 @@ import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
+import { getProtectedRequestContext } from "~/server/auth/withSession";
 import {
   countReviewsByDate,
   deleteReview,
   findReviews,
 } from "~/server/data/review";
-import { protectedProcedure } from "~/server/procedures";
+import { formEntries } from "~/utils/form";
 import { paths } from "~/utils/paths";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
-export const protectedSessionLoader = loader$(
-  protectedProcedure.loader((event) => {
-    return event.session;
-  })
-);
+export const protectedSessionLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return ctx.session;
+});
 
-export const collectionLoader = loader$(
-  protectedProcedure.loader((event) => {
-    return findReviews({ ctx: event.ctx, skip: 0, take: 20 });
-  })
-);
+export const collectionLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return findReviews({ ctx, skip: 0, take: 20 });
+});
 
-export const countsLoader = loader$(
-  protectedProcedure.loader((event) => {
-    return countReviewsByDate({ ctx: event.ctx });
-  })
-);
+export const countsLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return countReviewsByDate({ ctx });
+});
 
-export const deleteReviewAction = action$(
-  protectedProcedure.typedAction(
-    z.object({ reviewId: z.string() }),
-    async (form, event) => {
-      const result = await deleteReview({
-        ctx: event.ctx,
-        id: form.reviewId,
-      });
+export const deleteReviewAction = action$(async (form, event) => {
+  const ctx = await getProtectedRequestContext(event);
 
-      if (result.count <= 0) {
-        return;
-      }
+  const parsed = z
+    .object({ reviewId: z.string() })
+    .safeParse(formEntries(form));
 
-      throw event.redirect(302, paths.reviews);
-    }
-  )
-);
+  if (!parsed.success) {
+    return { message: parsed.error.message, status: "invalid" as const };
+  }
 
-export const findReviewsAction = action$(
-  protectedProcedure.typedAction(
-    z.object({
+  const result = await deleteReview({
+    ctx,
+    id: parsed.data.reviewId,
+  });
+
+  if (result.count <= 0) {
+    return { status: "error" as const };
+  }
+
+  event.redirect(302, paths.reviews);
+  return { status: "success" as const };
+});
+
+export const findReviewsAction = action$(async (form, event) => {
+  const ctx = await getProtectedRequestContext(event);
+
+  const parsed = z
+    .object({
       skip: z.coerce.number().int().min(0).default(0),
       take: z.coerce.number().int().min(0).max(100).default(20),
-    }),
-    (form, event) => {
-      return findReviews({
-        ctx: event.ctx,
-        skip: form.skip,
-        take: form.take,
-      });
-    }
-  )
-);
+    })
+    .safeParse(formEntries(form));
+
+  if (!parsed.success) {
+    return { message: parsed.error.message, status: "invalid" as const };
+  }
+
+  const result = await findReviews({
+    ctx,
+    skip: parsed.data.skip,
+    take: parsed.data.take,
+  });
+
+  return { status: "success" as const, ...result };
+});
 
 export default component$(() => {
   const collection = collectionLoader.use();
@@ -99,9 +110,11 @@ export default component$(() => {
             skip: `${(store.currentPage + 1) * 20}`,
             take: `${20}`,
           });
-          const newAlbums = findReviews.value?.reviews || [];
-          store.currentPage = store.currentPage + 1;
-          store.results = [...store.results, ...newAlbums];
+          if (findReviews.value?.status === "success") {
+            const newAlbums = findReviews.value?.reviews || [];
+            store.currentPage = store.currentPage + 1;
+            store.results = [...store.results, ...newAlbums];
+          }
         }}
       />
     </div>

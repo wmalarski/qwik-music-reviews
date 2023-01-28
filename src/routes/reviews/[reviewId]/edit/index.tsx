@@ -1,34 +1,51 @@
-import { component$ } from "@builder.io/qwik";
-import { action$, DocumentHead } from "@builder.io/qwik-city";
+import { component$, useTask$ } from "@builder.io/qwik";
+import { action$, DocumentHead, useNavigate } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
+import { getProtectedRequestContext } from "~/server/auth/withSession";
 import { updateReview } from "~/server/data/review";
-import { protectedReviewProcedure } from "~/server/procedures";
+import { formEntries } from "~/utils/form";
 import { paths } from "~/utils/paths";
 import { reviewLoader } from "../layout";
 
-export const updateReviewAction = action$(
-  protectedReviewProcedure.typedAction(
-    z.object({
+export const updateReviewAction = action$(async (form, event) => {
+  const ctx = await getProtectedRequestContext(event);
+
+  const parsed = z
+    .object({
       rate: z.coerce.number().min(0).max(10).optional(),
       text: z.string().optional(),
-    }),
-    async (form, event) => {
-      await updateReview({
-        ctx: event.ctx,
-        id: event.typedParams.reviewId,
-        rate: form.rate,
-        text: form.text,
-      });
+    })
+    .safeParse(formEntries(form));
 
-      throw event.redirect(302, paths.reviews);
-    }
-  )
-);
+  if (!parsed.success) {
+    return { message: parsed.error.message, status: "invalid" as const };
+  }
+
+  await updateReview({
+    ctx,
+    id: event.params.reviewId,
+    rate: parsed.data.rate,
+    text: parsed.data.text,
+  });
+
+  event.redirect(302, paths.reviews);
+
+  return { status: "success" as const };
+});
 
 export default component$(() => {
+  const navigate = useNavigate();
+
   const reviewResource = reviewLoader.use();
   const updateReview = updateReviewAction.use();
+
+  useTask$(({ track }) => {
+    const status = track(() => updateReview.value?.status);
+    if (status === "success") {
+      navigate(paths.reviews);
+    }
+  });
 
   return (
     <div class="p-8 flex flex-col gap-4">

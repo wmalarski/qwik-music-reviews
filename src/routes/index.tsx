@@ -1,25 +1,19 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
 import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
-import { z } from "zod";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
+import { getProtectedRequestContext } from "~/server/auth/withSession";
 import { findRandom } from "~/server/data/album";
-import { protectedProcedure } from "~/server/procedures";
 
-export const randomAlbumsLoader = loader$(
-  protectedProcedure.loader((event) => {
-    return findRandom({ ctx: event.ctx, take: 20 });
-  })
-);
+export const randomAlbumsLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return findRandom({ ctx, take: 20 });
+});
 
-export const fetchRandomAlbumsAction = action$(
-  protectedProcedure.typedAction(
-    z.object({ take: z.coerce.number().min(0).max(20).int() }),
-    (form, event) => {
-      return findRandom({ ctx: event.ctx, take: form.take });
-    }
-  )
-);
+export const fetchRandomAlbumsAction = action$(async (_form, event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return findRandom({ ctx, take: 20 });
+});
 
 export default component$(() => {
   const randomAlbum = randomAlbumsLoader.use();
@@ -43,7 +37,7 @@ export default component$(() => {
         pageCount={1}
         parentContainer={containerRef.value}
         onMore$={async () => {
-          await fetchRandomAlbums.execute({ take: `${20}` });
+          await fetchRandomAlbums.execute({});
           const newAlbums = fetchRandomAlbums.value?.albums || [];
           store.results = [...store.results, ...newAlbums];
         }}

@@ -1,5 +1,6 @@
 import type { Session, User } from "next-auth";
-import type { DbPrismaClient } from "../db/client";
+import { paths } from "~/utils/paths";
+import { DbPrismaClient, prisma } from "../db/client";
 import type { RequestEventLoader } from "../types";
 
 export type ProtectedRequestContext = {
@@ -23,6 +24,15 @@ const getRequestSession = async (
   const newPromise = getServerSession(event, authOptions);
   event.sharedMap.set("session", newPromise);
   return newPromise;
+};
+
+export const getProtectedRequestContext = async (event: RequestEventLoader) => {
+  const session = await getRequestSession(event);
+
+  if (!session || !session.user) {
+    throw event.redirect(302, paths.signIn);
+  }
+  return { prisma, session, user: session.user };
 };
 
 export const withProtectedSession = <
