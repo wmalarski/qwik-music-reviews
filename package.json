@@ -60,7 +60,7 @@
     "@prisma/client": "^4.9.0",
     "class-variance-authority": "^0.4.0",
     "daisyui": "^2.49.0",
-    "next-auth": "^4.18.10",
+    "next-auth": "^4.19.0",
     "zod": "^3.20.2"
   }
 }
