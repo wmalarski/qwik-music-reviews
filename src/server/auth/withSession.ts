@@ -15,13 +15,27 @@ type WithProtectedSessionOptions = {
   redirectTo?: string;
 };
 
+const getRequestSession = (
+  event: RequestEventLoader
+): Promise<Session | null> => {
+  const sessionPromise = event.sharedMap.get("session");
+
+  if (sessionPromise) {
+    return sessionPromise;
+  }
+
+  const newPromise = getServerSession(event, authOptions);
+  event.sharedMap.set("session", newPromise);
+  return newPromise;
+};
+
 export const withProtectedSession = <
   R extends RequestEventLoader = RequestEventLoader
 >(
   options: WithProtectedSessionOptions = {}
 ) => {
   return async (event: R) => {
-    const session = await getServerSession(event, authOptions);
+    const session = await getRequestSession(event);
 
     if (!session || !session.user) {
       throw event.redirect(302, options.redirectTo || paths.signIn);
