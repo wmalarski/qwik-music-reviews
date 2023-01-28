@@ -1,4 +1,13 @@
-import { NextAuth } from "~/server/auth/nextAuth";
-import { authOptions } from "~/server/auth/options";
+import { RequestEvent } from "@builder.io/qwik-city";
 
-export const { onGet, onPost } = NextAuth(authOptions);
+export const onGet = async (event: RequestEvent) => {
+  const { QWikNextAuthHandler } = await import("~/server/auth/nextAuth");
+  const { authOptions } = await import("~/server/auth/options");
+  return QWikNextAuthHandler(event, authOptions);
+};
+
+export const onPost = async (event: RequestEvent) => {
+  const { QWikNextAuthHandler } = await import("~/server/auth/nextAuth");
+  const { authOptions } = await import("~/server/auth/options");
+  return QWikNextAuthHandler(event, authOptions);
+};

@@ -1,4 +1,4 @@
-import type { RequestEvent, RequestHandler } from "@builder.io/qwik-city";
+import type { RequestEvent } from "@builder.io/qwik-city";
 import { AuthHandler } from "next-auth/core";
 import { Cookie } from "next-auth/core/lib/cookie";
 import type { AuthAction, AuthOptions, Session } from "next-auth/core/types";
@@ -51,7 +51,7 @@ const getCookie = (event: RequestEvent | RequestEventLoader) => {
   );
 };
 
-const QWikNextAuthHandler = async (
+export const QWikNextAuthHandler = async (
   event: RequestEvent,
   options: AuthOptions
 ) => {
@@ -138,10 +138,3 @@ export const getServerCsrfToken = async (
 
   return (body as { csrfToken: string }).csrfToken;
 };
-
-export const NextAuth = (
-  options: AuthOptions
-): { onGet: RequestHandler; onPost: RequestHandler } => ({
-  onGet: (event) => QWikNextAuthHandler(event, options),
-  onPost: (event) => QWikNextAuthHandler(event, options),
-});
