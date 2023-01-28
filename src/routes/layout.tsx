@@ -1,14 +1,6 @@
 import { component$, Slot } from "@builder.io/qwik";
-import { loader$ } from "@builder.io/qwik-city";
-import { protectedProcedure } from "~/server/procedures";
 import { Footer } from "./Footer/Footer";
 import { Sidebar } from "./Sidebar/Sidebar";
-
-export const protectedSessionLoader = loader$(
-  protectedProcedure.loader((event) => {
-    return event.session;
-  })
-);
 
 export default component$(() => {
   return (

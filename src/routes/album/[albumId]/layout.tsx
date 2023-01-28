@@ -1,7 +1,6 @@
 import { component$, Slot } from "@builder.io/qwik";
 import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
-import { protectedSessionLoader } from "~/routes/layout";
 import { deleteAlbum, findAlbum } from "~/server/data/album";
 import { deleteReview } from "~/server/data/review";
 import {
@@ -10,6 +9,12 @@ import {
 } from "~/server/procedures";
 import { paths } from "~/utils/paths";
 import { AlbumHero } from "./AlbumHero/AlbumHero";
+
+export const protectedSessionLoader = loader$(
+  protectedProcedure.loader((event) => {
+    return event.session;
+  })
+);
 
 export const albumLoader = loader$(
   protectedAlbumProcedure.loader((event) => {

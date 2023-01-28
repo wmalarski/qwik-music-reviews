@@ -1,9 +1,8 @@
 import { component$ } from "@builder.io/qwik";
 import { DocumentHead } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
-import { protectedSessionLoader } from "~/routes/layout";
 import { ArtistReviews } from "./ArtistReviews/ArtistReviews";
-import { albumLoader } from "./layout";
+import { albumLoader, protectedSessionLoader } from "./layout";
 
 export default component$(() => {
   const album = albumLoader.use();

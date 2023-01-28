@@ -10,8 +10,13 @@ import {
 } from "~/server/data/review";
 import { protectedProcedure } from "~/server/procedures";
 import { paths } from "~/utils/paths";
-import { protectedSessionLoader } from "../layout";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
+
+export const protectedSessionLoader = loader$(
+  protectedProcedure.loader((event) => {
+    return event.session;
+  })
+);
 
 export const collectionLoader = loader$(
   protectedProcedure.loader((event) => {

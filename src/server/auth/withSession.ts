@@ -11,10 +11,6 @@ export type ProtectedRequestContext = {
   user: User;
 };
 
-type WithProtectedSessionOptions = {
-  redirectTo?: string;
-};
-
 const getRequestSession = (
   event: RequestEventLoader
 ): Promise<Session | null> => {
@@ -24,6 +20,7 @@ const getRequestSession = (
     return sessionPromise;
   }
 
+  console.log("getRequestSession");
   const newPromise = getServerSession(event, authOptions);
   event.sharedMap.set("session", newPromise);
   return newPromise;
@@ -31,14 +28,14 @@ const getRequestSession = (
 
 export const withProtectedSession = <
   R extends RequestEventLoader = RequestEventLoader
->(
-  options: WithProtectedSessionOptions = {}
-) => {
+>() => {
   return async (event: R) => {
     const session = await getRequestSession(event);
 
+    console.log("withProtectedSession", { session });
     if (!session || !session.user) {
-      throw event.redirect(302, options.redirectTo || paths.signIn);
+      console.log("throwing");
+      throw event.redirect(302, paths.signIn);
     }
     return { ...event, ctx: { prisma, session, user: session.user }, session };
   };

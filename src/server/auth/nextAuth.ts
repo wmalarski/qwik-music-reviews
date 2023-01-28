@@ -2,9 +2,8 @@
 // https://gist.github.com/langbamit/a09161e844ad9b4a3cb756bacde67796
 import type { RequestEvent, RequestHandler } from "@builder.io/qwik-city";
 import * as cookie from "cookie";
-import { type NextAuthOptions } from "next-auth";
 import { AuthHandler } from "next-auth/core";
-import type { AuthAction, Session } from "next-auth/core/types";
+import type { AuthAction, AuthOptions, Session } from "next-auth/core/types";
 import { env } from "../env";
 import type { RequestEventLoader } from "../types";
 
@@ -61,7 +60,7 @@ const getCookie = (headers: Headers) => {
 
 const QWikNextAuthHandler = async (
   event: RequestEvent,
-  options: NextAuthOptions
+  options: AuthOptions
 ) => {
   const [action, providerId] = event.params.nextauth.split("/");
   const body = await getBody(event);
@@ -115,9 +114,11 @@ const QWikNextAuthHandler = async (
 
 export const getServerSession = async (
   event: RequestEventLoader,
-  options: NextAuthOptions
+  options: AuthOptions
 ): Promise<Session | null> => {
   const cookies = getCookie(event.request.headers);
+
+  console.log({ cookies });
 
   const res = await AuthHandler({
     options,
@@ -129,6 +130,8 @@ export const getServerSession = async (
       method: "GET",
     },
   });
+
+  console.log({ res });
 
   // setCookies(event, cookies);
 
@@ -144,7 +147,7 @@ export const getServerSession = async (
 
 export const getServerCsrfToken = async (
   event: RequestEventLoader,
-  options: NextAuthOptions
+  options: AuthOptions
 ) => {
   const cookies = getCookie(event.request.headers);
 
@@ -163,10 +166,8 @@ export const getServerCsrfToken = async (
 };
 
 export const NextAuth = (
-  options: NextAuthOptions
+  options: AuthOptions
 ): { onGet: RequestHandler; onPost: RequestHandler } => ({
   onGet: (event) => QWikNextAuthHandler(event, options),
   onPost: (event) => QWikNextAuthHandler(event, options),
 });
-
-export { NextAuthOptions };
