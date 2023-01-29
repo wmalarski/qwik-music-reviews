@@ -8,9 +8,13 @@
     "signout",
     "superjson",
     "tailwindcss",
-    "trpc"
+    "trpc",
+    "undici"
   ],
   "tailwindCSS.experimental.classRegex": [
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+    [
+      "cva\\(([^)]*)\\)",
+      "[\"'`]([^\"'`]*).*?[\"'`]"
+    ]
   ]
 }
