@@ -31,18 +31,23 @@ export const deleteAlbumAction = action$(async (_form, event) => {
   return { status: "success" as const };
 });
 
-export const deleteReviewAction = action$(async (data, event) => {
-  const ctx = await getProtectedRequestContext(event);
+export const deleteReviewAction = action$(
+  async (data, event) => {
+    const ctx = await getProtectedRequestContext(event);
 
-  const result = await deleteReview({ ctx, id: data.reviewId });
+    const result = await deleteReview({ ctx, id: data.reviewId });
 
-  if (result.count <= 0) {
-    return { status: "error" as const };
-  }
+    if (result.count <= 0) {
+      return { status: "error" as const };
+    }
 
-  event.redirect(302, paths.reviews);
-  return { status: "success" as const };
-}, zod$(z.object({ reviewId: z.string() }).shape));
+    event.redirect(302, paths.reviews);
+    return { status: "success" as const };
+  },
+  zod$({
+    reviewId: z.string(),
+  })
+);
 
 export default component$(() => {
   const album = albumLoader.use();

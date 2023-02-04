@@ -27,12 +27,10 @@ export const createReviewAction = action$(
     event.redirect(302, paths.album(albumId));
     return { review, status: "success" as const };
   },
-  zod$(
-    z.object({
-      rate: z.coerce.number().min(0).max(10),
-      text: z.string().optional().default(""),
-    }).shape
-  )
+  zod$({
+    rate: z.coerce.number().min(0).max(10),
+    text: z.string().optional().default(""),
+  })
 );
 
 export default component$(() => {

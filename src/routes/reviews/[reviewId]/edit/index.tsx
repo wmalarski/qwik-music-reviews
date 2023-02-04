@@ -27,12 +27,10 @@ export const updateReviewAction = action$(
 
     return { status: "success" as const };
   },
-  zod$(
-    z.object({
-      rate: z.coerce.number().min(0).max(10).optional(),
-      text: z.string().optional(),
-    }).shape
-  )
+  zod$({
+    rate: z.coerce.number().min(0).max(10).optional(),
+    text: z.string().optional(),
+  })
 );
 
 export default component$(() => {

@@ -23,12 +23,10 @@ export const updateAlbumAction = action$(
 
     return { status: "success" as const };
   },
-  zod$(
-    z.object({
-      title: z.string().optional(),
-      year: z.coerce.number().min(0).max(2100).int().optional(),
-    }).shape
-  )
+  zod$({
+    title: z.string().optional(),
+    year: z.coerce.number().min(0).max(2100).int().optional(),
+  })
 );
 
 export default component$(() => {
