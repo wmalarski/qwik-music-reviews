@@ -82,7 +82,8 @@ export const QWikNextAuthHandler = async (
   setCookies(event, res.cookies);
 
   if (res.redirect) {
-    event.redirect(302, res.redirect);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    event.redirect((res.status || 302) as any, res.redirect);
     event.send(res.status || 302, res.body || "");
     return;
   }

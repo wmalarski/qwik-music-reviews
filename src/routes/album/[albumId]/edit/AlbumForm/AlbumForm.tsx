@@ -37,7 +37,7 @@ export const AlbumForm = component$<Props>((props) => {
           id="title"
           placeholder="Title"
           type="text"
-          value={props.initialValue?.title}
+          value={action.formData?.get("text") || props.initialValue?.title}
         />
       </div>
 
@@ -54,9 +54,10 @@ export const AlbumForm = component$<Props>((props) => {
           min={1900}
           max={2100}
           step={1}
-          value={props.initialValue?.year}
+          value={action.formData?.get("year") || props.initialValue?.year}
         />
       </div>
+      <pre>{JSON.stringify(action.fail, null, 2)}</pre>
       <button type="submit">Save</button>
     </Form>
   );

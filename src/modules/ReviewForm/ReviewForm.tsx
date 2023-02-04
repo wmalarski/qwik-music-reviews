@@ -24,7 +24,7 @@ export const ReviewForm = component$<Props>((props) => {
           id="text"
           placeholder="Type here"
           type="text"
-          value={props.initialValue?.text}
+          value={props.action.formData?.get("text") || props.initialValue?.text}
         />
       </div>
 
@@ -41,9 +41,10 @@ export const ReviewForm = component$<Props>((props) => {
           min={0}
           max={10}
           step={0.1}
-          value={props.initialValue?.rate}
+          value={props.action.formData?.get("rate") || props.initialValue?.rate}
         />
       </div>
+      <pre>{JSON.stringify(props.action.fail, null, 2)}</pre>
       <button type="submit" class="btn uppercase">
         Save
       </button>

@@ -17,6 +17,7 @@ export const AlbumRemoveForm = component$(() => {
 
   return (
     <Form action={action}>
+      <pre>{JSON.stringify(action.fail, null, 2)}</pre>
       <button class="btn btn-sm uppercase" type="submit">
         Remove
       </button>

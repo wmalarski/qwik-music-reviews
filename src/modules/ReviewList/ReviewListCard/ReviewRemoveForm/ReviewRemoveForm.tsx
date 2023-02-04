@@ -11,6 +11,7 @@ export const ReviewRemoveForm = component$<Props>((props) => {
   return (
     <Form action={props.action}>
       <input type="hidden" name="reviewId" value={props.review.id} />
+      <pre>{JSON.stringify(props.action.fail, null, 2)}</pre>
       <button class="btn btn-sm uppercase" type="submit">
         Remove
       </button>
