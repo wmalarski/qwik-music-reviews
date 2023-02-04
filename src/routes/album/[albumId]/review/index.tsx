@@ -1,46 +1,59 @@
-import { component$, Resource } from "@builder.io/qwik";
-import { DocumentHead, useLocation } from "@builder.io/qwik-city";
+import { component$, useTask$ } from "@builder.io/qwik";
+import {
+  action$,
+  DocumentHead,
+  useNavigate,
+  zod$,
+} from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { withTrpc } from "~/server/trpc/withTrpc";
-import { endpointBuilder } from "~/utils/endpointBuilder";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import { createReview } from "~/server/data/review";
 import { paths } from "~/utils/paths";
-import { withTypedParams } from "~/utils/withTypes";
-import { useAlbumContext } from "../context";
+import { albumLoader } from "../layout";
 
-export const onPost = endpointBuilder()
-  .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(async ({ request, trpc, params, response }) => {
-    const formData = await request.formData();
-    const rate = formData.get("rate");
-    const text = formData.get("text");
+export const createReviewAction = action$(
+  async (data, event) => {
+    const ctx = await getProtectedRequestContext(event);
+    const albumId = event.params.albumId;
 
-    await trpc.review.createReview({
-      albumId: params.albumId,
-      rate: rate ? +rate : 0,
-      text: text ? (text as string) : "",
+    const review = await createReview({
+      albumId,
+      ctx,
+      rate: data.rate,
+      text: data.text,
     });
 
-    throw response.redirect(paths.album(params.albumId));
-  });
+    event.redirect(302, paths.album(albumId));
+    return { review, status: "success" as const };
+  },
+  zod$(
+    z.object({
+      rate: z.coerce.number().min(0).max(10),
+      text: z.string().optional().default(""),
+    }).shape
+  )
+);
 
 export default component$(() => {
-  const location = useLocation();
-  const albumResource = useAlbumContext();
+  const navigate = useNavigate();
+
+  const albumResource = albumLoader.use();
+  const createReview = createReviewAction.use();
+
+  useTask$(({ track }) => {
+    const status = track(() => createReview.value?.status);
+    const albumId = createReview.value?.review?.albumId;
+    if (status === "success" && albumId) {
+      navigate(paths.album(albumId));
+    }
+  });
 
   return (
-    <Resource
-      value={albumResource}
-      onResolved={(data) => (
-        <div class="p-8 flex flex-col gap-4">
-          <h2 class="text-xl">Add review</h2>
-          {data.album ? <ReviewForm action={location.pathname} /> : null}
-        </div>
-      )}
-    />
+    <div class="p-8 flex flex-col gap-4">
+      <h2 class="text-xl">Add review</h2>
+      {albumResource.value ? <ReviewForm action={createReview} /> : null}
+    </div>
   );
 });
 

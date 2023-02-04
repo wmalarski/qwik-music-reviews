@@ -1,9 +1,10 @@
 import { component$ } from "@builder.io/qwik";
-import type { RouterOutput } from "~/utils/trpc";
+import type { countReviewsByDate } from "~/server/data/review";
+import type { AsyncReturnValue } from "~/server/types";
 import { getCountItems } from "./ReviewActivity.utils";
 
 type Props = {
-  counts: RouterOutput["review"]["countReviewsByDate"];
+  counts: AsyncReturnValue<typeof countReviewsByDate>;
 };
 
 export const ReviewActivity = component$<Props>((props) => {
@@ -17,6 +18,7 @@ export const ReviewActivity = component$<Props>((props) => {
         }).format(new Date(0, item.month));
         return (
           <span
+            key={`${item.position}-${item.span}`}
             class="btn btn-xs truncate"
             style={`grid-column: ${item.position} / span ${item.span};`}
             title={content}
@@ -27,6 +29,7 @@ export const ReviewActivity = component$<Props>((props) => {
       })}
       {items.map((item) => (
         <span
+          key={item.date.getTime()}
           class={`bg-activity-${item.suffix} hover:bg-activity-${item.suffix}`}
           title={new Intl.DateTimeFormat("pl").format(item.date)}
         >

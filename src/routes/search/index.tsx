@@ -1,38 +1,26 @@
-import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint, useLocation } from "@builder.io/qwik-city";
-import { z } from "zod";
+import { component$, useSignal, useStore } from "@builder.io/qwik";
+import { DocumentHead, loader$, useLocation } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { withTrpc } from "~/server/trpc/withTrpc";
-import { endpointBuilder } from "~/utils/endpointBuilder";
-import { withTypedQuery } from "~/utils/withTypes";
-import { useTrpcContext } from "../context";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import { findAlbums } from "~/server/data/album";
 
-export const onGet = endpointBuilder()
-  .use(
-    withTypedQuery(
-      z.object({
-        page: z.number().min(0).step(1).optional(),
-        query: z.string().optional(),
-      })
-    )
-  )
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(({ query, trpc }) => {
-    return trpc.album.findAlbums({
-      query: query.query || "",
-      skip: (query.page || 0) * 20,
-      take: 20,
-    });
+export const albumsLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+
+  return findAlbums({
+    ctx,
+    query: event.query.get("query") || "",
+    skip: 0,
+    take: 20,
   });
+});
 
 export default component$(() => {
   const location = useLocation();
-  const resource = useEndpoint<typeof onGet>();
 
-  const trpcContext = useTrpcContext();
+  const resource = albumsLoader.use();
+
   const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
@@ -59,7 +47,7 @@ export default component$(() => {
             name="query"
             id="query"
             aria-label="query"
-            value={location.query.query}
+            value={location.query.get("query") as string}
             class="input input-bordered"
           />
           <button class="btn uppercase" type="submit">
@@ -67,29 +55,26 @@ export default component$(() => {
           </button>
         </form>
       </div>
-      <Resource
-        value={resource}
-        onPending={() => <span>Pending</span>}
-        onRejected={() => <span>Rejected</span>}
-        onResolved={(data) => (
-          <AlbumGrid
-            collection={[...data.albums, ...store.results]}
-            currentPage={store.currentPage}
-            pageCount={Math.floor(data.count / 20)}
-            parentContainer={containerRef.value}
-            onMore$={async () => {
-              const trpc = await trpcContext();
-              const newResult = await trpc?.album.findAlbums.query({
-                query: location.query["query"] || "",
-                skip: (store.currentPage || 0) * 20,
-                take: 20,
-              });
-              const newAlbums = newResult?.albums || [];
-              store.currentPage = store.currentPage + 1;
-              store.results = [...store.results, ...newAlbums];
-            }}
-          />
-        )}
+
+      <AlbumGrid
+        collection={[...resource.value.albums, ...store.results]}
+        currentPage={store.currentPage}
+        pageCount={Math.floor(resource.value.count / 20)}
+        parentContainer={containerRef.value}
+        onMore$={async () => {
+          const url = `${location.href}api?${new URLSearchParams({
+            query: location.query.get("query") || "",
+            skip: `${(store.currentPage || 0) * 20}`,
+          })}`;
+
+          const json = await (await fetch(url)).json();
+
+          if (json?.status === "success") {
+            const newAlbums = json.albums || [];
+            store.currentPage = store.currentPage + 1;
+            store.results = [...store.results, ...newAlbums];
+          }
+        }}
       />
     </div>
   );

@@ -1,38 +1,29 @@
-import { component$, Resource, Slot } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
-import { z } from "zod";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { withTrpc } from "~/server/trpc/withTrpc";
-import { endpointBuilder } from "~/utils/endpointBuilder";
+import { component$, Slot } from "@builder.io/qwik";
+import { DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import { findReview } from "~/server/data/review";
 import { paths } from "~/utils/paths";
-import { withTypedParams } from "~/utils/withTypes";
-import { useReviewContextProvider } from "./context";
 import { ReviewHero } from "./ReviewHero/ReviewHero";
 
-export const onGet = endpointBuilder()
-  .use(withTypedParams(z.object({ reviewId: z.string().min(1) })))
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(async ({ trpc, params, session, response }) => {
-    const review = await trpc.review.findReview({ id: params.reviewId });
+export const reviewLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
 
-    if (review?.userId !== session.user?.id) {
-      throw response.redirect(paths.home);
-    }
+  const reviewId = event.params.reviewId;
+  const review = await findReview({ ctx, id: reviewId });
 
-    return review;
-  });
+  if (!review || review?.userId !== ctx.session.user?.id) {
+    throw event.redirect(302, paths.home);
+  }
+
+  return review;
+});
 
 export default component$(() => {
-  const resource = useEndpoint<typeof onGet>();
-  useReviewContextProvider(resource);
+  const resource = reviewLoader.use();
 
   return (
     <div class="flex flex-col">
-      <Resource
-        value={resource}
-        onResolved={(data) => <ReviewHero review={data} />}
-      />
+      <ReviewHero review={resource.value} />
       <Slot />
     </div>
   );

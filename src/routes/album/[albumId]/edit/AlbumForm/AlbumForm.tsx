@@ -1,5 +1,7 @@
-import { component$ } from "@builder.io/qwik";
-import { Button } from "~/components/Button/Button";
+import { component$, useTask$ } from "@builder.io/qwik";
+import { Form, useNavigate } from "@builder.io/qwik-city";
+import { paths } from "~/utils/paths";
+import { updateAlbumAction } from "..";
 
 export type AlbumFormData = {
   title: string;
@@ -7,13 +9,24 @@ export type AlbumFormData = {
 };
 
 type Props = {
-  initialValue?: AlbumFormData;
-  action: string;
+  albumId: string;
+  initialValue: AlbumFormData;
 };
 
 export const AlbumForm = component$<Props>((props) => {
+  const navigate = useNavigate();
+
+  const action = updateAlbumAction.use();
+
+  useTask$(({ track }) => {
+    const status = track(() => action.value?.status);
+    if (status === "success") {
+      navigate(paths.album(props.albumId));
+    }
+  });
+
   return (
-    <form class="flex flex-col gap-2" method="post" action={props.action}>
+    <Form class="flex flex-col gap-2" action={action}>
       <div class="form-control w-full">
         <label for="title" class="label">
           <span class="label-text">Title</span>
@@ -24,7 +37,7 @@ export const AlbumForm = component$<Props>((props) => {
           id="title"
           placeholder="Title"
           type="text"
-          value={props.initialValue?.title}
+          value={action.formData?.get("text") || props.initialValue?.title}
         />
       </div>
 
@@ -41,10 +54,11 @@ export const AlbumForm = component$<Props>((props) => {
           min={1900}
           max={2100}
           step={1}
-          value={props.initialValue?.year}
+          value={action.formData?.get("year") || props.initialValue?.year}
         />
       </div>
-      <Button type="submit">Save</Button>
-    </form>
+      <pre>{JSON.stringify(action.fail, null, 2)}</pre>
+      <button type="submit">Save</button>
+    </Form>
   );
 });

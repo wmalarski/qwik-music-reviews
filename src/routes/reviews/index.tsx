@@ -1,29 +1,59 @@
-import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { component$, useSignal, useStore } from "@builder.io/qwik";
+import {
+  action$,
+  DocumentHead,
+  loader$,
+  useLocation,
+  zod$,
+} from "@builder.io/qwik-city";
+import { z } from "zod";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { withTrpc } from "~/server/trpc/withTrpc";
-import { endpointBuilder } from "~/utils/endpointBuilder";
-import { useTrpcContext } from "../context";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import {
+  countReviewsByDate,
+  deleteReview,
+  findReviews,
+} from "~/server/data/review";
+import { paths } from "~/utils/paths";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
-export const onGet = endpointBuilder()
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(async ({ trpc, session }) => {
-    const [collection, counts] = await Promise.all([
-      trpc.review.findReviews({ skip: 0, take: 20 }),
-      trpc.review.countReviewsByDate(),
-    ]);
+export const protectedSessionLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return ctx.session;
+});
 
-    return { collection, counts, session };
-  });
+export const collectionLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return findReviews({ ctx, skip: 0, take: 20 });
+});
+
+export const countsLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return countReviewsByDate({ ctx });
+});
+
+export const deleteReviewAction = action$(async (data, event) => {
+  const ctx = await getProtectedRequestContext(event);
+
+  const result = await deleteReview({ ctx, id: data.reviewId });
+
+  if (result.count <= 0) {
+    return { status: "error" as const };
+  }
+
+  event.redirect(302, paths.reviews);
+  return { status: "success" as const };
+}, zod$(z.object({ reviewId: z.string() }).shape));
 
 export default component$(() => {
-  const resource = useEndpoint<typeof onGet>();
+  const location = useLocation();
 
-  const trpcContext = useTrpcContext();
+  const collection = collectionLoader.use();
+  const counts = countsLoader.use();
+  const session = protectedSessionLoader.use();
+  const deleteReview = deleteReviewAction.use();
+
   const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
@@ -37,34 +67,30 @@ export default component$(() => {
       class="max-h-screen overflow-y-scroll"
     >
       <h1 class="px-8 py-8 text-2xl">Reviews</h1>
-      <Resource
-        value={resource}
-        onPending={() => <span>Pending</span>}
-        onRejected={() => <span>Rejected</span>}
-        onResolved={(data) => (
-          <>
-            <div class="px-8">
-              <ReviewActivity counts={data.counts} />
-            </div>
-            <ReviewList
-              session={data.session}
-              collection={[...data.collection.reviews, ...store.results]}
-              currentPage={store.currentPage}
-              pageCount={Math.floor(data.collection.count / 20)}
-              parentContainer={containerRef.value}
-              onMore$={async () => {
-                const trpc = await trpcContext();
-                const newResult = await trpc?.review.findReviews.query({
-                  skip: (store.currentPage + 1) * 20,
-                  take: 20,
-                });
-                const newAlbums = newResult?.reviews || [];
-                store.currentPage = store.currentPage + 1;
-                store.results = [...store.results, ...newAlbums];
-              }}
-            />
-          </>
-        )}
+      <div class="px-8">
+        <ReviewActivity counts={counts.value} />
+      </div>
+      <ReviewList
+        session={session.value}
+        removeAction={deleteReview}
+        collection={[...collection.value.reviews, ...store.results]}
+        currentPage={store.currentPage}
+        pageCount={Math.floor(collection.value.count / 20)}
+        parentContainer={containerRef.value}
+        onMore$={async () => {
+          const url = `${location.href}api?${new URLSearchParams({
+            query: location.query.get("query") || "",
+            skip: `${(store.currentPage || 0) * 20}`,
+          })}`;
+
+          const json = await (await fetch(url)).json();
+
+          if (json?.status === "success") {
+            const newAlbums = json?.reviews || [];
+            store.currentPage = store.currentPage + 1;
+            store.results = [...store.results, ...newAlbums];
+          }
+        }}
       />
     </div>
   );

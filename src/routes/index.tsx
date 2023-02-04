@@ -1,23 +1,18 @@
-import { component$, Resource, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { component$, useSignal, useStore } from "@builder.io/qwik";
+import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { withTrpc } from "~/server/trpc/withTrpc";
-import { endpointBuilder } from "~/utils/endpointBuilder";
-import { useTrpcContext } from "./context";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import { findRandom } from "~/server/data/album";
 
-export const onGet = endpointBuilder()
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(({ trpc }) => {
-    return trpc.album.findRandom({ take: 20 });
-  });
+export const randomAlbumsLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return findRandom({ ctx, take: 20 });
+});
 
 export default component$(() => {
-  const resource = useEndpoint<typeof onGet>();
+  const randomAlbum = randomAlbumsLoader.use();
 
-  const trpcContext = useTrpcContext();
   const containerRef = useSignal<Element | null>(null);
 
   const store = useStore({
@@ -30,26 +25,17 @@ export default component$(() => {
       class="max-h-screen overflow-y-scroll"
     >
       <h1 class="px-8 pt-8 text-2xl">Random Albums</h1>
-      <Resource
-        value={resource}
-        onPending={() => <span>Pending</span>}
-        onRejected={() => <span>Rejected</span>}
-        onResolved={(data) => (
-          <AlbumGrid
-            collection={[...data.albums, ...store.results]}
-            currentPage={0}
-            pageCount={1}
-            parentContainer={containerRef.value}
-            onMore$={async () => {
-              const trpc = await trpcContext();
-              const newResult = await trpc?.album.findRandom.query({
-                take: 20,
-              });
-              const newAlbums = newResult?.albums || [];
-              store.results = [...store.results, ...newAlbums];
-            }}
-          />
-        )}
+      <AlbumGrid
+        collection={[...randomAlbum.value.albums, ...store.results]}
+        currentPage={0}
+        pageCount={1}
+        parentContainer={containerRef.value}
+        onMore$={async () => {
+          const url = `${location.href}api`;
+          const json = await (await fetch(url)).json();
+          const newAlbums = json?.albums || [];
+          store.results = [...store.results, ...newAlbums];
+        }}
       />
     </div>
   );

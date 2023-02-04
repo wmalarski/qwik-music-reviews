@@ -1,38 +1,58 @@
-import { component$, Resource, Slot } from "@builder.io/qwik";
-import { DocumentHead, useEndpoint } from "@builder.io/qwik-city";
+import { component$, Slot } from "@builder.io/qwik";
+import { action$, DocumentHead, loader$, zod$ } from "@builder.io/qwik-city";
 import { z } from "zod";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { withTrpc } from "~/server/trpc/withTrpc";
-import { endpointBuilder } from "~/utils/endpointBuilder";
-import { withTypedParams } from "~/utils/withTypes";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import { deleteAlbum, findAlbum } from "~/server/data/album";
+import { deleteReview } from "~/server/data/review";
+import { paths } from "~/utils/paths";
 import { AlbumHero } from "./AlbumHero/AlbumHero";
-import { useAlbumContextProvider } from "./context";
 
-export const onGet = endpointBuilder()
-  .use(withTypedParams(z.object({ albumId: z.string().min(1) })))
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(async ({ trpc, params, session }) => {
-    const result = await trpc.album.findAlbum({ id: params.albumId });
-    return { ...result, session };
-  });
+export const protectedSessionLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return ctx.session;
+});
+
+export const albumLoader = loader$(async (event) => {
+  const ctx = await getProtectedRequestContext(event);
+  return findAlbum({ ctx, id: event.params.albumId });
+});
+
+export const deleteAlbumAction = action$(async (_form, event) => {
+  const ctx = await getProtectedRequestContext(event);
+  const albumId = event.params.albumId;
+
+  const result = await deleteAlbum({ ctx, id: albumId });
+
+  if (result.count <= 0) {
+    return { status: "invalid" as const };
+  }
+
+  event.redirect(302, paths.home);
+  return { status: "success" as const };
+});
+
+export const deleteReviewAction = action$(async (data, event) => {
+  const ctx = await getProtectedRequestContext(event);
+
+  const result = await deleteReview({ ctx, id: data.reviewId });
+
+  if (result.count <= 0) {
+    return { status: "error" as const };
+  }
+
+  event.redirect(302, paths.reviews);
+  return { status: "success" as const };
+}, zod$(z.object({ reviewId: z.string() }).shape));
 
 export default component$(() => {
-  const resource = useEndpoint<typeof onGet>();
-  useAlbumContextProvider(resource);
+  const album = albumLoader.use();
+  const session = protectedSessionLoader.use();
 
   return (
     <div class="flex flex-col max-h-screen overflow-y-scroll">
-      <Resource
-        value={resource}
-        onResolved={(data) => (
-          <>
-            {data.album ? (
-              <AlbumHero album={data.album} session={data.session} />
-            ) : null}
-          </>
-        )}
-      />
+      {album.value.album ? (
+        <AlbumHero album={album.value.album} session={session.value} />
+      ) : null}
       <Slot />
     </div>
   );

@@ -1,18 +1,20 @@
 import { component$ } from "@builder.io/qwik";
+import { Form, FormProps } from "@builder.io/qwik-city";
 import type { Review } from "@prisma/client";
-import { Button } from "~/components/Button/Button";
-import { paths } from "~/utils/paths";
 
 type Props = {
   review: Review;
+  action: FormProps<unknown, { reviewId: string }>["action"];
 };
 
 export const ReviewRemoveForm = component$<Props>((props) => {
   return (
-    <form method="post" action={paths.reviewRemove(props.review.id)}>
-      <Button class="btn btn-sm uppercase" type="submit">
+    <Form action={props.action}>
+      <input type="hidden" name="reviewId" value={props.review.id} />
+      <pre>{JSON.stringify(props.action.fail, null, 2)}</pre>
+      <button class="btn btn-sm uppercase" type="submit">
         Remove
-      </Button>
-    </form>
+      </button>
+    </Form>
   );
 });

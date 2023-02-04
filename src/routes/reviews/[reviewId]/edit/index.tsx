@@ -1,51 +1,59 @@
-import { component$, Resource } from "@builder.io/qwik";
-import { DocumentHead } from "@builder.io/qwik-city";
+import { component$, useTask$ } from "@builder.io/qwik";
+import {
+  action$,
+  DocumentHead,
+  useNavigate,
+  zod$,
+} from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
-import { withProtectedSession } from "~/server/auth/withSession";
-import { withTrpc } from "~/server/trpc/withTrpc";
-import { endpointBuilder } from "~/utils/endpointBuilder";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import { updateReview } from "~/server/data/review";
 import { paths } from "~/utils/paths";
-import { withTypedParams } from "~/utils/withTypes";
-import { useReviewContext } from "../context";
+import { reviewLoader } from "../layout";
 
-export const onPost = endpointBuilder()
-  .use(withTypedParams(z.object({ reviewId: z.string().min(1) })))
-  .use(withProtectedSession())
-  .use(withTrpc())
-  .resolver(async ({ request, trpc, params, response }) => {
-    const formData = await request.formData();
-    const rate = formData.get("rate");
-    const text = formData.get("text");
+export const updateReviewAction = action$(
+  async (data, event) => {
+    const ctx = await getProtectedRequestContext(event);
 
-    await trpc.review.updateReview({
-      id: params.reviewId,
-      rate: rate ? +rate : undefined,
-      text: text ? (text as string) : undefined,
+    await updateReview({
+      ctx,
+      id: event.params.reviewId,
+      rate: data.rate,
+      text: data.text,
     });
 
-    throw response.redirect(paths.reviews);
-  });
+    event.redirect(302, paths.reviews);
+
+    return { status: "success" as const };
+  },
+  zod$(
+    z.object({
+      rate: z.coerce.number().min(0).max(10).optional(),
+      text: z.string().optional(),
+    }).shape
+  )
+);
 
 export default component$(() => {
-  const reviewResource = useReviewContext();
+  const navigate = useNavigate();
+
+  const reviewResource = reviewLoader.use();
+  const updateReview = updateReviewAction.use();
+
+  useTask$(({ track }) => {
+    const status = track(() => updateReview.value?.status);
+    if (status === "success") {
+      navigate(paths.reviews);
+    }
+  });
 
   return (
     <div class="p-8 flex flex-col gap-4">
       <h2 class="text-xl">Edit review</h2>
-      <Resource
-        value={reviewResource}
-        onResolved={(data) => (
-          <>
-            {data ? (
-              <ReviewForm
-                action={paths.reviewEdit(data.id)}
-                initialValue={data}
-              />
-            ) : null}
-          </>
-        )}
-      />
+      {reviewResource.value ? (
+        <ReviewForm action={updateReview} initialValue={reviewResource.value} />
+      ) : null}
     </div>
   );
 });

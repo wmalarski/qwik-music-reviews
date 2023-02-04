@@ -5,17 +5,20 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-export const prisma =
-  global.prisma ||
-  new PrismaClient({
+const getPrisma = () => {
+  return new PrismaClient({
     log:
       process.env.NODE_ENV === "development"
         ? ["query", "error", "warn"]
         : ["error"],
   });
+};
+
+export const prisma =
+  typeof global !== "undefined" ? global.prisma || getPrisma() : getPrisma();
 
 export type DbPrismaClient = typeof prisma;
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production" && typeof global !== "undefined") {
   global.prisma = prisma;
 }

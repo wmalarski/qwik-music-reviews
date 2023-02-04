@@ -1,18 +1,26 @@
-import { component$ } from "@builder.io/qwik";
-import type { Album } from "@prisma/client";
-import { Button } from "~/components/Button/Button";
+import { component$, useTask$ } from "@builder.io/qwik";
+import { Form, useNavigate } from "@builder.io/qwik-city";
 import { paths } from "~/utils/paths";
+import { deleteAlbumAction } from "../../../layout";
 
-type Props = {
-  album: Album;
-};
+export const AlbumRemoveForm = component$(() => {
+  const navigate = useNavigate();
 
-export const AlbumRemoveForm = component$<Props>((props) => {
+  const action = deleteAlbumAction.use();
+
+  useTask$(({ track }) => {
+    const status = track(() => action.value?.status);
+    if (status === "success") {
+      navigate(paths.reviews);
+    }
+  });
+
   return (
-    <form method="post" action={paths.albumRemove(props.album.id)}>
-      <Button class="btn btn-sm uppercase" type="submit">
+    <Form action={action}>
+      <pre>{JSON.stringify(action.fail, null, 2)}</pre>
+      <button class="btn btn-sm uppercase" type="submit">
         Remove
-      </Button>
-    </form>
+      </button>
+    </Form>
   );
 });

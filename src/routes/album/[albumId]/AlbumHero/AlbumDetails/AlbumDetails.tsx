@@ -32,9 +32,7 @@ export const AlbumDetails = component$<Props>((props) => {
             ) : null}
           </div>
           <AlbumLinks album={props.album} />
-          {props.session.user?.id === props.album.userId && (
-            <AlbumRemoveForm album={props.album} />
-          )}
+          {props.session.user?.id === props.album.userId && <AlbumRemoveForm />}
         </div>
       </div>
     </section>

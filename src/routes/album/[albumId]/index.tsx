@@ -1,34 +1,27 @@
-import { component$, Resource } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import { DocumentHead } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { ArtistReviews } from "./ArtistReviews/ArtistReviews";
-import { useAlbumContext } from "./context";
+import { albumLoader, protectedSessionLoader } from "./layout";
 
 export default component$(() => {
-  const albumResource = useAlbumContext();
+  const album = albumLoader.use();
+  const session = protectedSessionLoader.use();
+
+  const artist = album.value.album?.artist;
 
   return (
-    <Resource
-      value={albumResource}
-      onPending={() => <span>Pending</span>}
-      onRejected={() => <span>Rejected</span>}
-      onResolved={(data) => (
-        <div>
-          <h2 class="py-4 px-8 text-2xl">Other albums</h2>
-          {data.album ? (
-            <AlbumGrid
-              collection={data.albums.map((album) => ({
-                ...album,
-                artist: data.album.artist,
-              }))}
-              currentPage={0}
-              pageCount={1}
-            />
-          ) : null}
-          <ArtistReviews data={data} session={data.session} />
-        </div>
-      )}
-    />
+    <div>
+      <h2 class="py-4 px-8 text-2xl">Other albums</h2>
+      {album.value && artist ? (
+        <AlbumGrid
+          collection={album.value.albums.map((entry) => ({ ...entry, artist }))}
+          currentPage={0}
+          pageCount={1}
+        />
+      ) : null}
+      <ArtistReviews data={album.value} session={session.value} />
+    </div>
   );
 });
 

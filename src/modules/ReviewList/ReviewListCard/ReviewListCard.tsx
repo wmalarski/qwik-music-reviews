@@ -1,4 +1,5 @@
 import { component$ } from "@builder.io/qwik";
+import { FormProps, Link } from "@builder.io/qwik-city";
 import type { Album, Artist, Review } from "@prisma/client";
 import type { Session } from "next-auth";
 import { Stars } from "~/components/Stars/Stars";
@@ -15,6 +16,7 @@ export type ReviewListItem = Review & {
 };
 
 type Props = {
+  removeAction: FormProps<unknown, { reviewId: string }>["action"];
   review: ReviewListItem;
   session: Session;
 };
@@ -27,22 +29,25 @@ export const ReviewListCard = component$<Props>((props) => {
 
   return (
     <div class="flex flex-row">
-      <a href={paths.album(props.review.album.id)} class="w-64">
+      <Link href={paths.album(props.review.album.id)} class="w-64">
         <div class="transition-scale scale-95 duration-300 ease-in-out hover:scale-100">
           <AlbumCover album={props.review.album} />
         </div>
-      </a>
+      </Link>
       <div class="flex flex-col">
-        <a href={paths.album(props.review.album.id)} class="w-64">
+        <Link href={paths.album(props.review.album.id)} class="w-64">
           {heading}
-        </a>
+        </Link>
         <Stars rating={props.review.rate} />
         {props.session.user?.id === props.review.userId && (
           <>
-            <a class="link" href={paths.reviewEdit(props.review.id)}>
+            <Link class="link" href={paths.reviewEdit(props.review.id)}>
               Edit
-            </a>
-            <ReviewRemoveForm review={props.review} />
+            </Link>
+            <ReviewRemoveForm
+              action={props.removeAction}
+              review={props.review}
+            />
           </>
         )}
         <AlbumLinks album={props.review.album} />

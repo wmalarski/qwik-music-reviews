@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import { useLocation } from "@builder.io/qwik-city";
+import { Link, useLocation } from "@builder.io/qwik-city";
 import type { Album, Artist } from "@prisma/client";
 import { cva } from "class-variance-authority";
 import type { Session } from "next-auth";
@@ -32,37 +32,37 @@ export const AlbumNavigation = component$<Props>(({ album, session }) => {
     <nav class="border-b-2 pb-4 border-base-300">
       <ul class="w-full flex flex-row justify-center gap-8">
         <li>
-          <a
+          <Link
             class={link({
               isActive: paths.album(album.id) === location.pathname,
             })}
             href={paths.album(album.id)}
           >
             Details
-          </a>
+          </Link>
         </li>
         {album.userId === session.user?.id ? (
           <li>
-            <a
+            <Link
               class={link({
                 isActive: paths.albumEdit(album.id) === location.pathname,
               })}
               href={paths.albumEdit(album.id)}
             >
               Edit
-            </a>
+            </Link>
           </li>
         ) : null}
 
         <li>
-          <a
+          <Link
             class={link({
               isActive: paths.albumReview(album.id) === location.pathname,
             })}
             href={paths.albumReview(album.id)}
           >
             Review
-          </a>
+          </Link>
         </li>
       </ul>
     </nav>
