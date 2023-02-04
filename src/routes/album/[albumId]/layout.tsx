@@ -1,10 +1,9 @@
 import { component$, Slot } from "@builder.io/qwik";
-import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { action$, DocumentHead, loader$, zod$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { deleteAlbum, findAlbum } from "~/server/data/album";
 import { deleteReview } from "~/server/data/review";
-import { formEntries } from "~/utils/form";
 import { paths } from "~/utils/paths";
 import { AlbumHero } from "./AlbumHero/AlbumHero";
 
@@ -32,18 +31,10 @@ export const deleteAlbumAction = action$(async (_form, event) => {
   return { status: "success" as const };
 });
 
-export const deleteReviewAction = action$(async (form, event) => {
+export const deleteReviewAction = action$(async (data, event) => {
   const ctx = await getProtectedRequestContext(event);
 
-  const parsed = z
-    .object({ reviewId: z.string() })
-    .safeParse(formEntries(form));
-
-  if (!parsed.success) {
-    return { message: parsed.error.message, status: "invalid" as const };
-  }
-
-  const result = await deleteReview({ ctx, id: parsed.data.reviewId });
+  const result = await deleteReview({ ctx, id: data.reviewId });
 
   if (result.count <= 0) {
     return { status: "error" as const };
@@ -51,7 +42,7 @@ export const deleteReviewAction = action$(async (form, event) => {
 
   event.redirect(302, paths.reviews);
   return { status: "success" as const };
-});
+}, zod$(z.object({ reviewId: z.string() }).shape));
 
 export default component$(() => {
   const album = albumLoader.use();

@@ -12,7 +12,7 @@ type Props = {
   onMore$?: PropFunction<() => void>;
   pageCount: number;
   parentContainer?: Element | null;
-  removeAction: FormProps<unknown>["action"];
+  removeAction: FormProps<unknown, { reviewId: string }>["action"];
   session: Session;
 };
 

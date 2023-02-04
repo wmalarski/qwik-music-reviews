@@ -1,5 +1,5 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
-import { action$, DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { DocumentHead, loader$ } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { getProtectedRequestContext } from "~/server/auth/context";
@@ -10,14 +10,8 @@ export const randomAlbumsLoader = loader$(async (event) => {
   return findRandom({ ctx, take: 20 });
 });
 
-export const fetchRandomAlbumsAction = action$(async (_form, event) => {
-  const ctx = await getProtectedRequestContext(event);
-  return findRandom({ ctx, take: 20 });
-});
-
 export default component$(() => {
   const randomAlbum = randomAlbumsLoader.use();
-  const fetchRandomAlbums = fetchRandomAlbumsAction.use();
 
   const containerRef = useSignal<Element | null>(null);
 
@@ -37,8 +31,9 @@ export default component$(() => {
         pageCount={1}
         parentContainer={containerRef.value}
         onMore$={async () => {
-          await fetchRandomAlbums.execute({});
-          const newAlbums = fetchRandomAlbums.value?.albums || [];
+          const url = `${location.href}api`;
+          const json = await (await fetch(url)).json();
+          const newAlbums = json?.albums || [];
           store.results = [...store.results, ...newAlbums];
         }}
       />

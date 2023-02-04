@@ -1,38 +1,39 @@
 import { component$, useTask$ } from "@builder.io/qwik";
-import { action$, DocumentHead, useNavigate } from "@builder.io/qwik-city";
+import {
+  action$,
+  DocumentHead,
+  useNavigate,
+  zod$,
+} from "@builder.io/qwik-city";
 import { z } from "zod";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { createReview } from "~/server/data/review";
-import { formEntries } from "~/utils/form";
 import { paths } from "~/utils/paths";
 import { albumLoader } from "../layout";
 
-export const createReviewAction = action$(async (form, event) => {
-  const ctx = await getProtectedRequestContext(event);
-  const albumId = event.params.albumId;
+export const createReviewAction = action$(
+  async (data, event) => {
+    const ctx = await getProtectedRequestContext(event);
+    const albumId = event.params.albumId;
 
-  const parsed = z
-    .object({
+    const review = await createReview({
+      albumId,
+      ctx,
+      rate: data.rate,
+      text: data.text,
+    });
+
+    event.redirect(302, paths.album(albumId));
+    return { review, status: "success" as const };
+  },
+  zod$(
+    z.object({
       rate: z.coerce.number().min(0).max(10),
       text: z.string().optional().default(""),
-    })
-    .safeParse(formEntries(form));
-
-  if (!parsed.success) {
-    return { message: parsed.error.message, status: "invalid" as const };
-  }
-
-  const review = await createReview({
-    albumId,
-    ctx,
-    rate: parsed.data.rate,
-    text: parsed.data.text,
-  });
-
-  event.redirect(302, paths.album(albumId));
-  return { review, status: "success" as const };
-});
+    }).shape
+  )
+);
 
 export default component$(() => {
   const navigate = useNavigate();

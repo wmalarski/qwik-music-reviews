@@ -1,39 +1,35 @@
 import { component$ } from "@builder.io/qwik";
-import { action$, DocumentHead } from "@builder.io/qwik-city";
+import { action$, DocumentHead, zod$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { updateAlbum } from "~/server/data/album";
-import { formEntries } from "~/utils/form";
 import { paths } from "~/utils/paths";
 import { albumLoader } from "../layout";
 import { AlbumForm } from "./AlbumForm/AlbumForm";
 
-export const updateAlbumAction = action$(async (form, event) => {
-  const ctx = await getProtectedRequestContext(event);
-  const albumId = event.params.albumId;
+export const updateAlbumAction = action$(
+  async (data, event) => {
+    const ctx = await getProtectedRequestContext(event);
+    const albumId = event.params.albumId;
 
-  const parsed = z
-    .object({
+    await updateAlbum({
+      ctx,
+      id: albumId,
+      title: data.title,
+      year: data.year,
+    });
+
+    event.redirect(302, paths.album(albumId));
+
+    return { status: "success" as const };
+  },
+  zod$(
+    z.object({
       title: z.string().optional(),
       year: z.coerce.number().min(0).max(2100).int().optional(),
-    })
-    .safeParse(formEntries(form));
-
-  if (!parsed.success) {
-    return { message: parsed.error.message, status: "invalid" as const };
-  }
-
-  await updateAlbum({
-    ctx,
-    id: albumId,
-    title: parsed.data.title,
-    year: parsed.data.year,
-  });
-
-  event.redirect(302, paths.album(albumId));
-
-  return { status: "success" as const };
-});
+    }).shape
+  )
+);
 
 export default component$(() => {
   const resource = albumLoader.use();

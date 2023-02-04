@@ -16,7 +16,7 @@ export type ReviewListItem = Review & {
 };
 
 type Props = {
-  removeAction: FormProps<unknown>["action"];
+  removeAction: FormProps<unknown, { reviewId: string }>["action"];
   review: ReviewListItem;
   session: Session;
 };

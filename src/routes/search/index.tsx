@@ -1,16 +1,9 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
-import {
-  action$,
-  DocumentHead,
-  loader$,
-  useLocation,
-} from "@builder.io/qwik-city";
-import { z } from "zod";
+import { DocumentHead, loader$, useLocation } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { findAlbums } from "~/server/data/album";
-import { formEntries } from "~/utils/form";
 
 export const albumsLoader = loader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
@@ -23,34 +16,10 @@ export const albumsLoader = loader$(async (event) => {
   });
 });
 
-export const findAlbumsAction = action$(async (form, event) => {
-  const ctx = await getProtectedRequestContext(event);
-
-  const parsed = z
-    .object({
-      page: z.coerce.number().min(0).int().default(0),
-      query: z.string().default(""),
-    })
-    .safeParse(formEntries(form));
-
-  if (!parsed.success) {
-    return { message: parsed.error.message, status: "invalid" as const };
-  }
-
-  const result = await findAlbums({
-    ctx,
-    query: parsed.data.query,
-    skip: parsed.data.page * 20,
-    take: 20,
-  });
-
-  return { status: "success" as const, ...result };
-});
-
 export default component$(() => {
   const location = useLocation();
+
   const resource = albumsLoader.use();
-  const findAlbums = findAlbumsAction.use();
 
   const containerRef = useSignal<Element | null>(null);
 
@@ -93,12 +62,15 @@ export default component$(() => {
         pageCount={Math.floor(resource.value.count / 20)}
         parentContainer={containerRef.value}
         onMore$={async () => {
-          await findAlbums.execute({
+          const url = `${location.href}api?${new URLSearchParams({
             query: location.query.get("query") || "",
             skip: `${(store.currentPage || 0) * 20}`,
-          });
-          if (findAlbums.value?.status === "success") {
-            const newAlbums = findAlbums.value?.albums || [];
+          })}`;
+
+          const json = await (await fetch(url)).json();
+
+          if (json?.status === "success") {
+            const newAlbums = json.albums || [];
             store.currentPage = store.currentPage + 1;
             store.results = [...store.results, ...newAlbums];
           }

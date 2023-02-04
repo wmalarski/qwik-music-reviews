@@ -4,7 +4,7 @@ import type { Review } from "@prisma/client";
 
 type Props = {
   review: Review;
-  action: FormProps<unknown>["action"];
+  action: FormProps<unknown, { reviewId: string }>["action"];
 };
 
 export const ReviewRemoveForm = component$<Props>((props) => {

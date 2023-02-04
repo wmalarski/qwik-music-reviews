@@ -8,7 +8,7 @@ export type ReviewFormData = {
 
 type Props = {
   initialValue?: ReviewFormData;
-  action: FormProps<unknown>["action"];
+  action: FormProps<unknown, { rate: number; text: string }>["action"];
 };
 
 export const ReviewForm = component$<Props>((props) => {

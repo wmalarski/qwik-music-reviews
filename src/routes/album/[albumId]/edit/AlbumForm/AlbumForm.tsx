@@ -26,7 +26,7 @@ export const AlbumForm = component$<Props>((props) => {
   });
 
   return (
-    <Form class="flex flex-col gap-2" method="post" action={action}>
+    <Form class="flex flex-col gap-2" action={action}>
       <div class="form-control w-full">
         <label for="title" class="label">
           <span class="label-text">Title</span>

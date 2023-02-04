@@ -82,7 +82,7 @@ export const QWikNextAuthHandler = async (
   setCookies(event, res.cookies);
 
   if (res.redirect) {
-    event.redirect(res.status || 302, res.redirect);
+    event.redirect(302, res.redirect);
     event.send(res.status || 302, res.body || "");
     return;
   }
@@ -91,7 +91,7 @@ export const QWikNextAuthHandler = async (
 };
 
 export const getServerSession = async (
-  event: RequestEventLoader,
+  event: RequestEventLoader | RequestEvent,
   options: AuthOptions
 ): Promise<Session | null> => {
   const cookies = getCookie(event);
