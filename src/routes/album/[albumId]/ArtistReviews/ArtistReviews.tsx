@@ -1,11 +1,8 @@
-import { component$, useTask$ } from "@builder.io/qwik";
-import { useNavigate } from "@builder.io/qwik-city";
+import { component$ } from "@builder.io/qwik";
 import type { Session } from "next-auth";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import type { findAlbum } from "~/server/data/album";
 import type { AsyncReturnValue } from "~/server/types";
-import { paths } from "~/utils/paths";
-import { deleteReviewAction } from "../layout";
 
 type Props = {
   data: AsyncReturnValue<typeof findAlbum>;
@@ -13,17 +10,6 @@ type Props = {
 };
 
 export const ArtistReviews = component$<Props>((props) => {
-  const navigate = useNavigate();
-
-  const deleteReview = deleteReviewAction.use();
-
-  useTask$(({ track }) => {
-    const status = track(() => deleteReview.value?.status);
-    if (status === "success") {
-      navigate(paths.reviews);
-    }
-  });
-
   const reviews = props.data.reviews.flatMap((review) => {
     const album = props.data.albums.find(
       (value) => value.id === review.albumId
@@ -47,7 +33,6 @@ export const ArtistReviews = component$<Props>((props) => {
             collection={reviews}
             currentPage={0}
             pageCount={1}
-            removeAction={deleteReview}
             session={props.session}
           />
         </div>

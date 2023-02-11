@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import { action$, Form, FormProps, z, zod$ } from "@builder.io/qwik-city";
+import { action$, Form, z, zod$ } from "@builder.io/qwik-city";
 import type { Review } from "@prisma/client";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { deleteReview } from "~/server/data/review";
@@ -9,7 +9,7 @@ export const deleteReviewAction = action$(
   async (data, event) => {
     const ctx = await getProtectedRequestContext(event);
 
-    const result = await deleteReview({ ctx, id: data.reviewId });
+    const result = await deleteReview({ ctx, ...data });
 
     if (result.count <= 0) {
       return event.fail(400, {
@@ -20,13 +20,12 @@ export const deleteReviewAction = action$(
     event.redirect(302, paths.reviews);
   },
   zod$({
-    reviewId: z.string(),
+    id: z.string(),
   })
 );
 
 type Props = {
   review: Review;
-  action: FormProps<unknown, { reviewId: string }>["action"];
 };
 
 export const ReviewRemoveForm = component$<Props>((props) => {
@@ -34,7 +33,7 @@ export const ReviewRemoveForm = component$<Props>((props) => {
 
   return (
     <Form action={action}>
-      <input type="hidden" name="reviewId" value={props.review.id} />
+      <input type="hidden" name="id" value={props.review.id} />
       <pre>{JSON.stringify(action.value, null, 2)}</pre>
       <button class="btn btn-sm uppercase" type="submit">
         Remove

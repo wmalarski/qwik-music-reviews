@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import { FormProps, Link } from "@builder.io/qwik-city";
+import { Link } from "@builder.io/qwik-city";
 import type { Album, Artist, Review } from "@prisma/client";
 import type { Session } from "next-auth";
 import { Stars } from "~/components/Stars/Stars";
@@ -16,7 +16,6 @@ export type ReviewListItem = Review & {
 };
 
 type Props = {
-  removeAction: FormProps<unknown, { reviewId: string }>["action"];
   review: ReviewListItem;
   session: Session;
 };
@@ -44,10 +43,7 @@ export const ReviewListCard = component$<Props>((props) => {
             <Link class="link" href={paths.reviewEdit(props.review.id)}>
               Edit
             </Link>
-            <ReviewRemoveForm
-              action={props.removeAction}
-              review={props.review}
-            />
+            <ReviewRemoveForm review={props.review} />
           </>
         )}
         <AlbumLinks album={props.review.album} />

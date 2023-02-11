@@ -10,10 +10,7 @@ export default component$(() => {
     <div class="p-8 flex flex-col gap-4">
       <h2 class="text-xl">Edit album</h2>
       {resource.value.album ? (
-        <AlbumForm
-          initialValue={resource.value.album}
-          albumId={resource.value.album.id}
-        />
+        <AlbumForm initialValue={resource.value.album} />
       ) : null}
     </div>
   );

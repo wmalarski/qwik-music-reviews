@@ -1,21 +1,9 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
-import {
-  action$,
-  DocumentHead,
-  loader$,
-  useLocation,
-  zod$,
-} from "@builder.io/qwik-city";
-import { z } from "zod";
+import { DocumentHead, loader$, useLocation } from "@builder.io/qwik-city";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
 import { getProtectedRequestContext } from "~/server/auth/context";
-import {
-  countReviewsByDate,
-  deleteReview,
-  findReviews,
-} from "~/server/data/review";
-import { paths } from "~/utils/paths";
+import { countReviewsByDate, findReviews } from "~/server/data/review";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
 export const protectedSessionLoader = loader$(async (event) => {
@@ -33,31 +21,12 @@ export const countsLoader = loader$(async (event) => {
   return countReviewsByDate({ ctx });
 });
 
-export const deleteReviewAction = action$(
-  async (data, event) => {
-    const ctx = await getProtectedRequestContext(event);
-
-    const result = await deleteReview({ ctx, id: data.reviewId });
-
-    if (result.count <= 0) {
-      return { status: "error" as const };
-    }
-
-    event.redirect(302, paths.reviews);
-    return { status: "success" as const };
-  },
-  zod$({
-    reviewId: z.string(),
-  })
-);
-
 export default component$(() => {
   const location = useLocation();
 
   const collection = collectionLoader.use();
   const counts = countsLoader.use();
   const session = protectedSessionLoader.use();
-  const deleteReview = deleteReviewAction.use();
 
   const containerRef = useSignal<Element | null>(null);
 
@@ -77,7 +46,6 @@ export default component$(() => {
       </div>
       <ReviewList
         session={session.value}
-        removeAction={deleteReview}
         collection={[...collection.value.reviews, ...store.results]}
         currentPage={store.currentPage}
         pageCount={Math.floor(collection.value.count / 20)}

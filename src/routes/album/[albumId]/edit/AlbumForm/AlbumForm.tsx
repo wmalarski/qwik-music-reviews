@@ -1,24 +1,20 @@
-import { component$, useTask$ } from "@builder.io/qwik";
-import { action$, Form, useNavigate, z, zod$ } from "@builder.io/qwik-city";
+import { component$ } from "@builder.io/qwik";
+import { action$, Form, useLocation, z, zod$ } from "@builder.io/qwik-city";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { updateAlbum } from "~/server/data/album";
+import { ActionInput } from "~/server/types";
 import { paths } from "~/utils/paths";
 
 export const updateAlbumAction = action$(
   async (data, event) => {
     const ctx = await getProtectedRequestContext(event);
-    const albumId = event.params.albumId;
 
-    await updateAlbum({
-      ctx,
-      id: albumId,
-      title: data.title,
-      year: data.year,
-    });
+    await updateAlbum({ ctx, ...data });
 
-    event.redirect(302, paths.album(albumId));
+    event.redirect(302, paths.album(data.id));
   },
   zod$({
+    id: z.string(),
     title: z.string().optional(),
     year: z.coerce.number().min(0).max(2100).int().optional(),
   })
@@ -30,24 +26,17 @@ export type AlbumFormData = {
 };
 
 type Props = {
-  albumId: string;
-  initialValue: AlbumFormData;
+  initialValue: ActionInput<typeof updateAlbumAction>;
 };
 
 export const AlbumForm = component$<Props>((props) => {
-  const navigate = useNavigate();
+  const location = useLocation();
 
   const action = updateAlbumAction.use();
 
-  useTask$(({ track }) => {
-    const status = track(() => action.value?.status);
-    if (status === "success") {
-      navigate(paths.album(props.albumId));
-    }
-  });
-
   return (
     <Form class="flex flex-col gap-2" action={action}>
+      <input type="hidden" name="id" value={location.params.albumId} />
       <div class="form-control w-full">
         <label for="title" class="label">
           <span class="label-text">Title</span>

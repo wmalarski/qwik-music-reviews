@@ -1,5 +1,4 @@
 import { $, component$, PropFunction, useSignal } from "@builder.io/qwik";
-import { FormProps } from "@builder.io/qwik-city";
 import type { Session } from "next-auth";
 import {
   ReviewListCard,
@@ -12,7 +11,6 @@ type Props = {
   onMore$?: PropFunction<() => void>;
   pageCount: number;
   parentContainer?: Element | null;
-  removeAction: FormProps<unknown, { reviewId: string }>["action"];
   session: Session;
 };
 
@@ -61,7 +59,6 @@ export const ReviewList = component$<Props>((props) => {
         {props.collection?.map((review) => (
           <ReviewListCard
             key={review.id}
-            removeAction={props.removeAction}
             review={review}
             session={props.session}
           />

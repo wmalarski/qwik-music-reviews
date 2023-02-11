@@ -1,7 +1,8 @@
 import { component$ } from "@builder.io/qwik";
-import { action$, Form, FormProps, z, zod$ } from "@builder.io/qwik-city";
+import { action$, Form, z, zod$ } from "@builder.io/qwik-city";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { createReview, updateReview } from "~/server/data/review";
+import { ActionInput } from "~/server/types";
 import { paths } from "~/utils/paths";
 
 export const createOrUpdateReviewAction = action$(
@@ -25,15 +26,9 @@ export const createOrUpdateReviewAction = action$(
   })
 );
 
-export type ReviewFormData = {
-  id: string;
-  text: string;
-  rate: number;
-};
-
 type Props = {
-  initialValue?: ReviewFormData;
-  action: FormProps<unknown, ReviewFormData>["action"];
+  albumId: string;
+  initialValue?: ActionInput<typeof createOrUpdateReviewAction>;
 };
 
 export const ReviewForm = component$<Props>((props) => {
@@ -41,6 +36,8 @@ export const ReviewForm = component$<Props>((props) => {
 
   return (
     <Form class="flex flex-col gap-2" action={action}>
+      <input type="hidden" name="id" value={props.initialValue?.id} />
+      <input type="hidden" name="albumId" value={props.albumId} />
       <div class="form-control w-full">
         <label for="text" class="label">
           <span class="label-text">Text</span>
