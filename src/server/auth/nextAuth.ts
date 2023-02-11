@@ -3,7 +3,7 @@ import { AuthHandler } from "next-auth/core";
 import { Cookie } from "next-auth/core/lib/cookie";
 import type { AuthAction, AuthOptions, Session } from "next-auth/core/types";
 import { env } from "../env";
-import type { RequestEventLoader } from "../types";
+import type { ServerEvent } from "../types";
 
 const getBody = async (
   event: RequestEvent
@@ -27,10 +27,7 @@ const getBody = async (
   }
 };
 
-const setCookies = (
-  event: RequestEvent | RequestEventLoader,
-  cookies?: Cookie[]
-) => {
+const setCookies = (event: ServerEvent, cookies?: Cookie[]) => {
   cookies?.forEach((cookie) => {
     const sameSite = cookie.options.sameSite;
     event.cookie.set(cookie.name, cookie.value, {
@@ -41,10 +38,12 @@ const setCookies = (
   });
 };
 
-const getCookie = (event: RequestEvent | RequestEventLoader) => {
+const getCookie = (event: ServerEvent) => {
   return Object.entries(event.cookie.getAll()).reduce<Record<string, string>>(
     (prev, [key, cookie]) => {
-      prev[key] = cookie.value;
+      // TODO check what's inside
+      console.log({ key, cookie });
+      prev[key] = (cookie as any).value;
       return prev;
     },
     {}
@@ -92,7 +91,7 @@ export const QWikNextAuthHandler = async (
 };
 
 export const getServerSession = async (
-  event: RequestEventLoader | RequestEvent,
+  event: ServerEvent,
   options: AuthOptions
 ): Promise<Session | null> => {
   const cookies = getCookie(event);
@@ -121,7 +120,7 @@ export const getServerSession = async (
 };
 
 export const getServerCsrfToken = async (
-  event: RequestEventLoader,
+  event: ServerEvent,
   options: AuthOptions
 ) => {
   const cookies = getCookie(event);

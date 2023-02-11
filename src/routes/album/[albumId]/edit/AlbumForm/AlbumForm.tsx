@@ -1,7 +1,28 @@
 import { component$, useTask$ } from "@builder.io/qwik";
-import { Form, useNavigate } from "@builder.io/qwik-city";
+import { action$, Form, useNavigate, z, zod$ } from "@builder.io/qwik-city";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import { updateAlbum } from "~/server/data/album";
 import { paths } from "~/utils/paths";
-import { updateAlbumAction } from "..";
+
+export const updateAlbumAction = action$(
+  async (data, event) => {
+    const ctx = await getProtectedRequestContext(event);
+    const albumId = event.params.albumId;
+
+    await updateAlbum({
+      ctx,
+      id: albumId,
+      title: data.title,
+      year: data.year,
+    });
+
+    event.redirect(302, paths.album(albumId));
+  },
+  zod$({
+    title: z.string().optional(),
+    year: z.coerce.number().min(0).max(2100).int().optional(),
+  })
+);
 
 export type AlbumFormData = {
   title: string;
@@ -57,7 +78,7 @@ export const AlbumForm = component$<Props>((props) => {
           value={action.formData?.get("year") || props.initialValue?.year}
         />
       </div>
-      <pre>{JSON.stringify(action.fail, null, 2)}</pre>
+      <pre>{JSON.stringify(action.value?.fieldErrors, null, 2)}</pre>
       <button type="submit">Save</button>
     </Form>
   );
