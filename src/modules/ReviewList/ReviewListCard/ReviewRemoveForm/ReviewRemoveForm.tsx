@@ -3,7 +3,6 @@ import { action$, Form, z, zod$ } from "@builder.io/qwik-city";
 import type { Review } from "@prisma/client";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { deleteReview } from "~/server/data/review";
-import { paths } from "~/utils/paths";
 
 export const deleteReviewAction = action$(
   async (data, event) => {
@@ -16,8 +15,6 @@ export const deleteReviewAction = action$(
         formErrors: ["No review found"],
       });
     }
-
-    event.redirect(302, paths.reviews);
   },
   zod$({
     id: z.string(),
@@ -34,7 +31,6 @@ export const ReviewRemoveForm = component$<Props>((props) => {
   return (
     <Form action={action}>
       <input type="hidden" name="id" value={props.review.id} />
-      <pre>{JSON.stringify(action.value, null, 2)}</pre>
       <button class="btn btn-sm uppercase" type="submit">
         Remove
       </button>

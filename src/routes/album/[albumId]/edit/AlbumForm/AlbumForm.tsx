@@ -49,6 +49,9 @@ export const AlbumForm = component$<Props>((props) => {
           type="text"
           value={action.formData?.get("text") || props.initialValue?.title}
         />
+        <span class="label text-red-500">
+          {action.value?.fieldErrors.title?.[0]}
+        </span>
       </div>
 
       <div class="form-control w-full">
@@ -66,6 +69,9 @@ export const AlbumForm = component$<Props>((props) => {
           step={1}
           value={action.formData?.get("year") || props.initialValue?.year}
         />
+        <span class="label text-red-500">
+          {action.value?.fieldErrors.year?.[0]}
+        </span>
       </div>
       <pre>{JSON.stringify(action.value?.fieldErrors, null, 2)}</pre>
       <button type="submit">Save</button>

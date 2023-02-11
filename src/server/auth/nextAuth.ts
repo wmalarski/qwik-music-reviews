@@ -41,8 +41,7 @@ const setCookies = (event: ServerEvent, cookies?: Cookie[]) => {
 const getCookie = (event: ServerEvent) => {
   return Object.entries(event.cookie.getAll()).reduce<Record<string, string>>(
     (prev, [key, cookie]) => {
-      // TODO check what's inside
-      console.log({ key, cookie });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       prev[key] = (cookie as any).value;
       return prev;
     },

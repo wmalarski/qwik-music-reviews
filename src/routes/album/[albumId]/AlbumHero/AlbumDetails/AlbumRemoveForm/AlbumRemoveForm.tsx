@@ -29,7 +29,6 @@ export const AlbumRemoveForm = component$(() => {
   return (
     <Form action={action}>
       <input type="hidden" name="id" value={location.params.albumId} />
-      <pre>{JSON.stringify(action.value?.formErrors, null, 2)}</pre>
       <button class="btn btn-sm uppercase" type="submit">
         Remove
       </button>

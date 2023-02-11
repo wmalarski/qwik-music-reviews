@@ -50,6 +50,9 @@ export const ReviewForm = component$<Props>((props) => {
           type="text"
           value={action.formData?.get("text") || props.initialValue?.text}
         />
+        <span class="label text-red-500">
+          {action.value?.fieldErrors.text?.[0]}
+        </span>
       </div>
 
       <div class="form-control w-full">
@@ -67,7 +70,11 @@ export const ReviewForm = component$<Props>((props) => {
           step={0.1}
           value={action.formData?.get("rate") || props.initialValue?.rate}
         />
+        <span class="label text-red-500">
+          {action.value?.fieldErrors.rate?.[0]}
+        </span>
       </div>
+
       <pre>{JSON.stringify(action.value, null, 2)}</pre>
       <button type="submit" class="btn uppercase">
         Save
