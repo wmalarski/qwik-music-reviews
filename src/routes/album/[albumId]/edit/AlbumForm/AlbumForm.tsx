@@ -1,7 +1,24 @@
-import { component$, useTask$ } from "@builder.io/qwik";
-import { Form, useNavigate } from "@builder.io/qwik-city";
+import { component$ } from "@builder.io/qwik";
+import { action$, Form, useLocation, z, zod$ } from "@builder.io/qwik-city";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import { updateAlbum } from "~/server/data/album";
+import { ActionInput } from "~/server/types";
 import { paths } from "~/utils/paths";
-import { updateAlbumAction } from "..";
+
+export const updateAlbumAction = action$(
+  async (data, event) => {
+    const ctx = await getProtectedRequestContext(event);
+
+    await updateAlbum({ ctx, ...data });
+
+    event.redirect(302, paths.album(data.id));
+  },
+  zod$({
+    id: z.string(),
+    title: z.string().optional(),
+    year: z.coerce.number().min(0).max(2100).int().optional(),
+  })
+);
 
 export type AlbumFormData = {
   title: string;
@@ -9,24 +26,17 @@ export type AlbumFormData = {
 };
 
 type Props = {
-  albumId: string;
-  initialValue: AlbumFormData;
+  initialValue: ActionInput<typeof updateAlbumAction>;
 };
 
 export const AlbumForm = component$<Props>((props) => {
-  const navigate = useNavigate();
+  const location = useLocation();
 
   const action = updateAlbumAction.use();
 
-  useTask$(({ track }) => {
-    const status = track(() => action.value?.status);
-    if (status === "success") {
-      navigate(paths.album(props.albumId));
-    }
-  });
-
   return (
     <Form class="flex flex-col gap-2" action={action}>
+      <input type="hidden" name="id" value={location.params.albumId} />
       <div class="form-control w-full">
         <label for="title" class="label">
           <span class="label-text">Title</span>
@@ -39,6 +49,9 @@ export const AlbumForm = component$<Props>((props) => {
           type="text"
           value={action.formData?.get("text") || props.initialValue?.title}
         />
+        <span class="label text-red-500">
+          {action.value?.fieldErrors.title?.[0]}
+        </span>
       </div>
 
       <div class="form-control w-full">
@@ -56,8 +69,11 @@ export const AlbumForm = component$<Props>((props) => {
           step={1}
           value={action.formData?.get("year") || props.initialValue?.year}
         />
+        <span class="label text-red-500">
+          {action.value?.fieldErrors.year?.[0]}
+        </span>
       </div>
-      <pre>{JSON.stringify(action.fail, null, 2)}</pre>
+      <pre>{JSON.stringify(action.value?.fieldErrors, null, 2)}</pre>
       <button type="submit">Save</button>
     </Form>
   );

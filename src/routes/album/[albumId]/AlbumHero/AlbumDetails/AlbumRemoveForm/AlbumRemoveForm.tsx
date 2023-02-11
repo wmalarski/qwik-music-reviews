@@ -1,23 +1,34 @@
-import { component$, useTask$ } from "@builder.io/qwik";
-import { Form, useNavigate } from "@builder.io/qwik-city";
+import { component$ } from "@builder.io/qwik";
+import { action$, Form, useLocation, z, zod$ } from "@builder.io/qwik-city";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import { deleteAlbum } from "~/server/data/album";
 import { paths } from "~/utils/paths";
-import { deleteAlbumAction } from "../../../layout";
+
+export const deleteAlbumAction = action$(
+  async (data, event) => {
+    const ctx = await getProtectedRequestContext(event);
+
+    const result = await deleteAlbum({ ctx, ...data });
+
+    if (result.count <= 0) {
+      return event.fail(400, { formErrors: ["Album not found"] });
+    }
+
+    event.redirect(302, paths.home);
+  },
+  zod$({
+    id: z.string(),
+  })
+);
 
 export const AlbumRemoveForm = component$(() => {
-  const navigate = useNavigate();
+  const location = useLocation();
 
   const action = deleteAlbumAction.use();
 
-  useTask$(({ track }) => {
-    const status = track(() => action.value?.status);
-    if (status === "success") {
-      navigate(paths.reviews);
-    }
-  });
-
   return (
     <Form action={action}>
-      <pre>{JSON.stringify(action.fail, null, 2)}</pre>
+      <input type="hidden" name="id" value={location.params.albumId} />
       <button class="btn btn-sm uppercase" type="submit">
         Remove
       </button>

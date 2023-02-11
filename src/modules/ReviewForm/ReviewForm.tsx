@@ -1,19 +1,43 @@
 import { component$ } from "@builder.io/qwik";
-import { Form, FormProps } from "@builder.io/qwik-city";
+import { action$, Form, z, zod$ } from "@builder.io/qwik-city";
+import { getProtectedRequestContext } from "~/server/auth/context";
+import { createReview, updateReview } from "~/server/data/review";
+import { ActionInput } from "~/server/types";
+import { paths } from "~/utils/paths";
 
-export type ReviewFormData = {
-  text: string;
-  rate: number;
-};
+export const createOrUpdateReviewAction = action$(
+  async (data, event) => {
+    const ctx = await getProtectedRequestContext(event);
+
+    if (data.id) {
+      await updateReview({ ctx, id: data.id, ...data });
+      event.redirect(302, paths.album(data.albumId));
+      return;
+    }
+
+    await createReview({ ctx, ...data });
+    event.redirect(302, paths.album(data.albumId));
+  },
+  zod$({
+    albumId: z.string(),
+    id: z.string().optional(),
+    rate: z.coerce.number().min(0).max(10),
+    text: z.string(),
+  })
+);
 
 type Props = {
-  initialValue?: ReviewFormData;
-  action: FormProps<unknown, { rate: number; text: string }>["action"];
+  albumId: string;
+  initialValue?: ActionInput<typeof createOrUpdateReviewAction>;
 };
 
 export const ReviewForm = component$<Props>((props) => {
+  const action = createOrUpdateReviewAction.use();
+
   return (
-    <Form class="flex flex-col gap-2" action={props.action}>
+    <Form class="flex flex-col gap-2" action={action}>
+      <input type="hidden" name="id" value={props.initialValue?.id} />
+      <input type="hidden" name="albumId" value={props.albumId} />
       <div class="form-control w-full">
         <label for="text" class="label">
           <span class="label-text">Text</span>
@@ -24,8 +48,11 @@ export const ReviewForm = component$<Props>((props) => {
           id="text"
           placeholder="Type here"
           type="text"
-          value={props.action.formData?.get("text") || props.initialValue?.text}
+          value={action.formData?.get("text") || props.initialValue?.text}
         />
+        <span class="label text-red-500">
+          {action.value?.fieldErrors.text?.[0]}
+        </span>
       </div>
 
       <div class="form-control w-full">
@@ -41,10 +68,14 @@ export const ReviewForm = component$<Props>((props) => {
           min={0}
           max={10}
           step={0.1}
-          value={props.action.formData?.get("rate") || props.initialValue?.rate}
+          value={action.formData?.get("rate") || props.initialValue?.rate}
         />
+        <span class="label text-red-500">
+          {action.value?.fieldErrors.rate?.[0]}
+        </span>
       </div>
-      <pre>{JSON.stringify(props.action.fail, null, 2)}</pre>
+
+      <pre>{JSON.stringify(action.value, null, 2)}</pre>
       <button type="submit" class="btn uppercase">
         Save
       </button>

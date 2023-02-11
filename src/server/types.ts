@@ -1,13 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { loader$ } from "@builder.io/qwik-city";
-
-export type LoaderParameter = Parameters<typeof loader$>[0];
-export type ServerLoader<T> = ReturnType<typeof loader$<unknown, T>>;
-
-export type RequestEventLoader = Parameters<LoaderParameter>[0];
-
-export type LoaderValue<T> = T extends ServerLoader<infer D> ? D : never;
+import type { Action, RequestEvent } from "@builder.io/qwik-city";
+import type {
+  RequestEventAction,
+  RequestEventLoader,
+} from "@builder.io/qwik-city/middleware/request-handler";
 
 export type AsyncReturnValue<T> = T extends (...arg: any) => Promise<infer R>
   ? R
   : never;
+
+export type ServerEvent =
+  | RequestEventLoader
+  | RequestEvent
+  | RequestEventAction;
+
+export type ActionInput<T> = T extends Action<any, infer B, any> ? B : never;

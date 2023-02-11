@@ -1,8 +1,7 @@
-import { RequestEvent } from "@builder.io/qwik-city";
 import type { Session, User } from "next-auth";
 import { paths } from "~/utils/paths";
 import { DbPrismaClient, prisma } from "../db/client";
-import type { RequestEventLoader } from "../types";
+import type { ServerEvent } from "../types";
 
 export type ProtectedRequestContext = {
   prisma: DbPrismaClient;
@@ -11,7 +10,7 @@ export type ProtectedRequestContext = {
 };
 
 const getRequestSession = async (
-  event: RequestEventLoader | RequestEvent
+  event: ServerEvent
 ): Promise<Session | null> => {
   const { getServerSession } = await import("./nextAuth");
   const { authOptions } = await import("./options");
@@ -27,9 +26,7 @@ const getRequestSession = async (
   return newPromise;
 };
 
-export const getProtectedRequestContext = async (
-  event: RequestEventLoader | RequestEvent
-) => {
+export const getProtectedRequestContext = async (event: ServerEvent) => {
   const session = await getRequestSession(event);
 
   if (!session || !session.user) {
