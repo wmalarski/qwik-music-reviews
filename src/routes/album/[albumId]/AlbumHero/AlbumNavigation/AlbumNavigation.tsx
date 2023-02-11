@@ -2,12 +2,11 @@ import { component$ } from "@builder.io/qwik";
 import { Link, useLocation } from "@builder.io/qwik-city";
 import type { Album, Artist } from "@prisma/client";
 import { cva } from "class-variance-authority";
-import type { Session } from "next-auth";
 import { paths } from "~/utils/paths";
+import { useSessionContext } from "~/utils/SessionContext";
 
 type Props = {
   album: Album & { artist: Artist };
-  session: Session;
 };
 
 export const link = cva(
@@ -25,8 +24,10 @@ export const link = cva(
   }
 );
 
-export const AlbumNavigation = component$<Props>(({ album, session }) => {
+export const AlbumNavigation = component$<Props>((props) => {
   const location = useLocation();
+
+  const session = useSessionContext();
 
   return (
     <nav class="border-b-2 pb-4 border-base-300">
@@ -34,20 +35,20 @@ export const AlbumNavigation = component$<Props>(({ album, session }) => {
         <li>
           <Link
             class={link({
-              isActive: paths.album(album.id) === location.pathname,
+              isActive: paths.album(props.album.id) === location.pathname,
             })}
-            href={paths.album(album.id)}
+            href={paths.album(props.album.id)}
           >
             Details
           </Link>
         </li>
-        {album.userId === session.user?.id ? (
+        {props.album.userId === session.value.user?.id ? (
           <li>
             <Link
               class={link({
-                isActive: paths.albumEdit(album.id) === location.pathname,
+                isActive: paths.albumEdit(props.album.id) === location.pathname,
               })}
-              href={paths.albumEdit(album.id)}
+              href={paths.albumEdit(props.album.id)}
             >
               Edit
             </Link>
@@ -57,9 +58,9 @@ export const AlbumNavigation = component$<Props>(({ album, session }) => {
         <li>
           <Link
             class={link({
-              isActive: paths.albumReview(album.id) === location.pathname,
+              isActive: paths.albumReview(props.album.id) === location.pathname,
             })}
-            href={paths.albumReview(album.id)}
+            href={paths.albumReview(props.album.id)}
           >
             Review
           </Link>

@@ -4,6 +4,7 @@ import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { countReviewsByDate, findReviews } from "~/server/data/review";
+import { useSessionContextProvider } from "~/utils/SessionContext";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
 export const protectedSessionLoader = loader$(async (event) => {
@@ -26,7 +27,9 @@ export default component$(() => {
 
   const collection = collectionLoader.use();
   const counts = countsLoader.use();
+
   const session = protectedSessionLoader.use();
+  useSessionContextProvider(session);
 
   const containerRef = useSignal<Element | null>(null);
 
@@ -45,7 +48,6 @@ export default component$(() => {
         <ReviewActivity counts={counts.value} />
       </div>
       <ReviewList
-        session={session.value}
         collection={[...collection.value.reviews, ...store.results]}
         currentPage={store.currentPage}
         pageCount={Math.floor(collection.value.count / 20)}

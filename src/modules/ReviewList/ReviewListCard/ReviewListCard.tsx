@@ -1,12 +1,12 @@
 import { component$ } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
 import type { Album, Artist, Review } from "@prisma/client";
-import type { Session } from "next-auth";
 import { Stars } from "~/components/Stars/Stars";
 import { AlbumCover } from "~/modules/AlbumCover/AlbumCover";
 import { AlbumLinks } from "~/modules/AlbumLinks/AlbumLinks";
 import { formatAlbum } from "~/utils/format";
 import { paths } from "~/utils/paths";
+import { useSessionContext } from "~/utils/SessionContext";
 import { ReviewRemoveForm } from "./ReviewRemoveForm/ReviewRemoveForm";
 
 export type ReviewListItem = Review & {
@@ -17,10 +17,11 @@ export type ReviewListItem = Review & {
 
 type Props = {
   review: ReviewListItem;
-  session: Session;
 };
 
 export const ReviewListCard = component$<Props>((props) => {
+  const session = useSessionContext();
+
   const heading = formatAlbum({
     album: props.review.album,
     artist: props.review.album.artist,
@@ -38,7 +39,7 @@ export const ReviewListCard = component$<Props>((props) => {
           {heading}
         </Link>
         <Stars rating={props.review.rate} />
-        {props.session.user?.id === props.review.userId && (
+        {session.value.user?.id === props.review.userId && (
           <>
             <Link class="link" href={paths.reviewEdit(props.review.id)}>
               Edit

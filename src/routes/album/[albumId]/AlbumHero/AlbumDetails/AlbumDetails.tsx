@@ -1,16 +1,17 @@
 import { component$ } from "@builder.io/qwik";
 import type { Album, Artist } from "@prisma/client";
-import type { Session } from "next-auth";
 import { AlbumCover } from "~/modules/AlbumCover/AlbumCover";
 import { AlbumLinks } from "~/modules/AlbumLinks/AlbumLinks";
+import { useSessionContext } from "~/utils/SessionContext";
 import { AlbumRemoveForm } from "./AlbumRemoveForm/AlbumRemoveForm";
 
 type Props = {
   album: Album & { artist: Artist };
-  session: Session;
 };
 
 export const AlbumDetails = component$<Props>((props) => {
+  const session = useSessionContext();
+
   return (
     <section class="flex justify-center p-8">
       <div class="flex max-w-5xl flex-row items-center gap-8">
@@ -32,7 +33,7 @@ export const AlbumDetails = component$<Props>((props) => {
             ) : null}
           </div>
           <AlbumLinks album={props.album} />
-          {props.session.user?.id === props.album.userId && <AlbumRemoveForm />}
+          {session.value.user?.id === props.album.userId && <AlbumRemoveForm />}
         </div>
       </div>
     </section>

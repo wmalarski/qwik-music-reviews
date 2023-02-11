@@ -1,5 +1,4 @@
 import { $, component$, PropFunction, useSignal } from "@builder.io/qwik";
-import type { Session } from "next-auth";
 import {
   ReviewListCard,
   ReviewListItem,
@@ -11,7 +10,6 @@ type Props = {
   onMore$?: PropFunction<() => void>;
   pageCount: number;
   parentContainer?: Element | null;
-  session: Session;
 };
 
 export const ReviewList = component$<Props>((props) => {
@@ -57,11 +55,7 @@ export const ReviewList = component$<Props>((props) => {
         class="grid grid-cols-[repeat(auto-fill,minmax(30rem,1fr))] gap-4 p-8"
       >
         {props.collection?.map((review) => (
-          <ReviewListCard
-            key={review.id}
-            review={review}
-            session={props.session}
-          />
+          <ReviewListCard key={review.id} review={review} />
         ))}
       </div>
     </section>
