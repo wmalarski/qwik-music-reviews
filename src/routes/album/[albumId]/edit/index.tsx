@@ -1,10 +1,10 @@
 import { component$ } from "@builder.io/qwik";
 import { DocumentHead } from "@builder.io/qwik-city";
-import { albumLoader } from "../layout";
+import { useAlbumLoader } from "../layout";
 import { AlbumForm } from "./AlbumForm/AlbumForm";
 
 export default component$(() => {
-  const resource = albumLoader.use();
+  const resource = useAlbumLoader();
 
   return (
     <div class="p-8 flex flex-col gap-4">

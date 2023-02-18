@@ -5,7 +5,7 @@ import { findReview } from "~/server/data/review";
 import { paths } from "~/utils/paths";
 import { ReviewHero } from "./ReviewHero/ReviewHero";
 
-export const reviewLoader = loader$(async (event) => {
+export const useReviewLoader = loader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
 
   const reviewId = event.params.reviewId;
@@ -19,7 +19,7 @@ export const reviewLoader = loader$(async (event) => {
 });
 
 export default component$(() => {
-  const resource = reviewLoader.use();
+  const resource = useReviewLoader();
 
   return (
     <div class="flex flex-col">

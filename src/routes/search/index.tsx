@@ -5,7 +5,7 @@ import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { findAlbums } from "~/server/data/album";
 
-export const albumsLoader = loader$(async (event) => {
+export const useAlbumsLoader = loader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
 
   return findAlbums({
@@ -19,7 +19,7 @@ export const albumsLoader = loader$(async (event) => {
 export default component$(() => {
   const location = useLocation();
 
-  const resource = albumsLoader.use();
+  const resource = useAlbumsLoader();
 
   const containerRef = useSignal<Element | null>(null);
 
