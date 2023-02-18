@@ -26,7 +26,7 @@ type Props = {
 };
 
 export const ReviewRemoveForm = component$<Props>((props) => {
-  const action = deleteReviewAction.use();
+  const action = deleteReviewAction();
 
   return (
     <Form action={action}>

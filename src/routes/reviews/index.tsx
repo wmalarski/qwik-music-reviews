@@ -7,17 +7,17 @@ import { countReviewsByDate, findReviews } from "~/server/data/review";
 import { useSessionContextProvider } from "~/utils/SessionContext";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
-export const protectedSessionLoader = loader$(async (event) => {
+export const useProtectedSessionLoader = loader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return ctx.session;
 });
 
-export const collectionLoader = loader$(async (event) => {
+export const useCollectionLoader = loader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return findReviews({ ctx, skip: 0, take: 20 });
 });
 
-export const countsLoader = loader$(async (event) => {
+export const useCountsLoader = loader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return countReviewsByDate({ ctx });
 });
@@ -25,10 +25,10 @@ export const countsLoader = loader$(async (event) => {
 export default component$(() => {
   const location = useLocation();
 
-  const collection = collectionLoader.use();
-  const counts = countsLoader.use();
+  const collection = useCollectionLoader();
+  const counts = useCountsLoader();
 
-  const session = protectedSessionLoader.use();
+  const session = useProtectedSessionLoader();
   useSessionContextProvider(session);
 
   const containerRef = useSignal<Element | null>(null);

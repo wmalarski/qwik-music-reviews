@@ -1,5 +1,5 @@
 import {
-  createContext,
+  createContextId,
   Signal,
   useContext,
   useContextProvider,
@@ -9,7 +9,7 @@ import type { Session } from "next-auth";
 type SessionContextState = Signal<Session>;
 
 export const SessionContext =
-  createContext<SessionContextState>("session-context");
+  createContextId<SessionContextState>("session-context");
 
 export const useSessionContextProvider = (state: SessionContextState) => {
   useContextProvider(SessionContext, state);

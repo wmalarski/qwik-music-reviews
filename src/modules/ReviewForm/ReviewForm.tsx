@@ -32,7 +32,7 @@ type Props = {
 };
 
 export const ReviewForm = component$<Props>((props) => {
-  const action = createOrUpdateReviewAction.use();
+  const action = createOrUpdateReviewAction();
 
   return (
     <Form class="flex flex-col gap-2" action={action}>

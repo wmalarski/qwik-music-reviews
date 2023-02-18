@@ -5,20 +5,20 @@ import { findAlbum } from "~/server/data/album";
 import { useSessionContextProvider } from "~/utils/SessionContext";
 import { AlbumHero } from "./AlbumHero/AlbumHero";
 
-export const protectedSessionLoader = loader$(async (event) => {
+export const useProtectedSessionLoader = loader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return ctx.session;
 });
 
-export const albumLoader = loader$(async (event) => {
+export const useAlbumLoader = loader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return findAlbum({ ctx, id: event.params.albumId });
 });
 
 export default component$(() => {
-  const album = albumLoader.use();
+  const album = useAlbumLoader();
 
-  const session = protectedSessionLoader.use();
+  const session = useProtectedSessionLoader();
   useSessionContextProvider(session);
 
   return (

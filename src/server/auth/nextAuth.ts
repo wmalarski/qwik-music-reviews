@@ -1,9 +1,8 @@
-import type { RequestEvent } from "@builder.io/qwik-city";
+import type { RequestEvent, RequestEventCommon } from "@builder.io/qwik-city";
 import { AuthHandler } from "next-auth/core";
 import { Cookie } from "next-auth/core/lib/cookie";
 import type { AuthAction, AuthOptions, Session } from "next-auth/core/types";
 import { env } from "../env";
-import type { ServerEvent } from "../types";
 
 const getBody = async (
   event: RequestEvent
@@ -27,7 +26,7 @@ const getBody = async (
   }
 };
 
-const setCookies = (event: ServerEvent, cookies?: Cookie[]) => {
+const setCookies = (event: RequestEventCommon, cookies?: Cookie[]) => {
   cookies?.forEach((cookie) => {
     const sameSite = cookie.options.sameSite;
     event.cookie.set(cookie.name, cookie.value, {
@@ -38,7 +37,7 @@ const setCookies = (event: ServerEvent, cookies?: Cookie[]) => {
   });
 };
 
-const getCookie = (event: ServerEvent) => {
+const getCookie = (event: RequestEventCommon) => {
   return Object.entries(event.cookie.getAll()).reduce<Record<string, string>>(
     (prev, [key, cookie]) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,7 +89,7 @@ export const QWikNextAuthHandler = async (
 };
 
 export const getServerSession = async (
-  event: ServerEvent,
+  event: RequestEventCommon,
   options: AuthOptions
 ): Promise<Session | null> => {
   const cookies = getCookie(event);
@@ -119,7 +118,7 @@ export const getServerSession = async (
 };
 
 export const getServerCsrfToken = async (
-  event: ServerEvent,
+  event: RequestEventCommon,
   options: AuthOptions
 ) => {
   const cookies = getCookie(event);

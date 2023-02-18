@@ -5,13 +5,13 @@ import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { findRandom } from "~/server/data/album";
 
-export const randomAlbumsLoader = loader$(async (event) => {
+export const useRandomAlbumsLoader = loader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return findRandom({ ctx, take: 20 });
 });
 
 export default component$(() => {
-  const randomAlbum = randomAlbumsLoader.use();
+  const randomAlbum = useRandomAlbumsLoader();
 
   const containerRef = useSignal<Element | null>(null);
 

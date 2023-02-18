@@ -1,10 +1,10 @@
 import { component$ } from "@builder.io/qwik";
 import { DocumentHead } from "@builder.io/qwik-city";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
-import { reviewLoader } from "../layout";
+import { useReviewLoader } from "../layout";
 
 export default component$(() => {
-  const reviewResource = reviewLoader.use();
+  const reviewResource = useReviewLoader();
 
   return (
     <div class="p-8 flex flex-col gap-4">
