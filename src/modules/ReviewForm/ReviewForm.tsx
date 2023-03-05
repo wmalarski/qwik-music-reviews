@@ -51,7 +51,7 @@ export const ReviewForm = component$<Props>((props) => {
           value={action.formData?.get("text") || props.initialValue?.text}
         />
         <span class="label text-red-500">
-          {action.value?.fieldErrors.text?.[0]}
+          {action.value?.fieldErrors?.text?.[0]}
         </span>
       </div>
 
@@ -71,7 +71,7 @@ export const ReviewForm = component$<Props>((props) => {
           value={action.formData?.get("rate") || props.initialValue?.rate}
         />
         <span class="label text-red-500">
-          {action.value?.fieldErrors.rate?.[0]}
+          {action.value?.fieldErrors?.rate?.[0]}
         </span>
       </div>
 
