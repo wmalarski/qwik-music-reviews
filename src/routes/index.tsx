@@ -1,11 +1,11 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { routeLoader$, type DocumentHead } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
-import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
+import type { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { findRandom } from "~/server/data/album";
 
-export const useRandomAlbumsLoader = loader$(async (event) => {
+export const useRandomAlbumsLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return findRandom({ ctx, take: 20 });
 });

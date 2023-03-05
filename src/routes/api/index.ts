@@ -1,4 +1,4 @@
-import { RequestHandler } from "@builder.io/qwik-city";
+import type { RequestHandler } from "@builder.io/qwik-city";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { findRandom } from "~/server/data/album";
 

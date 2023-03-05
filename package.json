@@ -17,7 +17,7 @@
     "dev.debug": "node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
     "fmt": "prettier --write .",
     "fmt.check": "prettier --check .",
-    "lint": "eslint src/**/*.ts*",
+    "lint": "eslint src",
     "postinstall": "prisma generate",
     "preview": "qwik build preview && vite preview --open",
     "serve": "node server/entry.express",

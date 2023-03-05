@@ -1,10 +1,10 @@
 import { component$ } from "@builder.io/qwik";
-import { action$, Form, z, zod$ } from "@builder.io/qwik-city";
+import { Form, globalAction$, z, zod$ } from "@builder.io/qwik-city";
 import type { Review } from "@prisma/client";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { deleteReview } from "~/server/data/review";
 
-export const deleteReviewAction = action$(
+export const useDeleteReviewAction = globalAction$(
   async (data, event) => {
     const ctx = await getProtectedRequestContext(event);
 
@@ -26,7 +26,7 @@ type Props = {
 };
 
 export const ReviewRemoveForm = component$<Props>((props) => {
-  const action = deleteReviewAction();
+  const action = useDeleteReviewAction();
 
   return (
     <Form action={action}>

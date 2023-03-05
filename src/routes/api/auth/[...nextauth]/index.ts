@@ -1,4 +1,4 @@
-import { RequestEvent } from "@builder.io/qwik-city";
+import type { RequestEvent } from "@builder.io/qwik-city";
 import { QWikNextAuthHandler } from "~/server/auth/nextAuth";
 import { authOptions } from "~/server/auth/options";
 

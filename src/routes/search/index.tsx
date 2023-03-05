@@ -1,11 +1,15 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, loader$, useLocation } from "@builder.io/qwik-city";
+import {
+  routeLoader$,
+  useLocation,
+  type DocumentHead,
+} from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
-import { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
+import type { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { findAlbums } from "~/server/data/album";
 
-export const useAlbumsLoader = loader$(async (event) => {
+export const useAlbumsLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
 
   return findAlbums({

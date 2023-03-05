@@ -1,4 +1,4 @@
-import { RequestHandler } from "@builder.io/qwik-city";
+import type { RequestHandler } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { findAlbums } from "~/server/data/album";

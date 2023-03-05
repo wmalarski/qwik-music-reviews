@@ -1,5 +1,8 @@
-import { $, component$, PropFunction, useSignal } from "@builder.io/qwik";
-import { AlbumGridCard, AlbumGridItem } from "./AlbumGridCard/AlbumGridCard";
+import { $, component$, useSignal, type PropFunction } from "@builder.io/qwik";
+import {
+  AlbumGridCard,
+  type AlbumGridItem,
+} from "./AlbumGridCard/AlbumGridCard";
 
 type Props = {
   collection: AlbumGridItem[];

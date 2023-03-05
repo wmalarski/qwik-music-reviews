@@ -1,8 +1,8 @@
 import {
   createContextId,
-  Signal,
   useContext,
   useContextProvider,
+  type Signal,
 } from "@builder.io/qwik";
 import type { Session } from "next-auth";
 

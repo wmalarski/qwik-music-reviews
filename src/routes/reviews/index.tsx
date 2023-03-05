@@ -1,23 +1,27 @@
 import { component$, useSignal, useStore } from "@builder.io/qwik";
-import { DocumentHead, loader$, useLocation } from "@builder.io/qwik-city";
+import {
+  routeLoader$,
+  useLocation,
+  type DocumentHead,
+} from "@builder.io/qwik-city";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
-import { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
+import type { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { countReviewsByDate, findReviews } from "~/server/data/review";
 import { useSessionContextProvider } from "~/utils/SessionContext";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
-export const useProtectedSessionLoader = loader$(async (event) => {
+export const useProtectedSessionLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return ctx.session;
 });
 
-export const useCollectionLoader = loader$(async (event) => {
+export const useCollectionLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return findReviews({ ctx, skip: 0, take: 20 });
 });
 
-export const useCountsLoader = loader$(async (event) => {
+export const useCountsLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return countReviewsByDate({ ctx });
 });
