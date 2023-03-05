@@ -1,5 +1,9 @@
-import { component$, useSignal, useStore } from "@builder.io/qwik";
-import { routeLoader$, type DocumentHead } from "@builder.io/qwik-city";
+import { component$, useSignal } from "@builder.io/qwik";
+import {
+  routeLoader$,
+  server$,
+  type DocumentHead,
+} from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import type { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
 import { getProtectedRequestContext } from "~/server/auth/context";
@@ -7,17 +11,22 @@ import { findRandom } from "~/server/data/album";
 
 export const useRandomAlbumsLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
+
+  return findRandom({ ctx, take: 20 });
+});
+
+export const fetchMoreRandomAlbums = server$(async function () {
+  const ctx = await getProtectedRequestContext(this);
+
   return findRandom({ ctx, take: 20 });
 });
 
 export default component$(() => {
-  const randomAlbum = useRandomAlbumsLoader();
+  const randomAlbums = useRandomAlbumsLoader();
 
   const containerRef = useSignal<Element | null>(null);
 
-  const store = useStore({
-    results: [] as AlbumGridItem[],
-  });
+  const collection = useSignal<AlbumGridItem[]>(randomAlbums.value.albums);
 
   return (
     <div
@@ -26,15 +35,14 @@ export default component$(() => {
     >
       <h1 class="px-8 pt-8 text-2xl">Random Albums</h1>
       <AlbumGrid
-        collection={[...randomAlbum.value.albums, ...store.results]}
+        collection={collection.value}
         currentPage={0}
         pageCount={1}
         parentContainer={containerRef.value}
         onMore$={async () => {
-          const url = `${location.href}api`;
-          const json = await (await fetch(url)).json();
+          const json = await fetchMoreRandomAlbums();
           const newAlbums = json?.albums || [];
-          store.results = [...store.results, ...newAlbums];
+          collection.value = [...collection.value, ...newAlbums];
         }}
       />
     </div>

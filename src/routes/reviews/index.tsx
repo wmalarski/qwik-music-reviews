@@ -1,7 +1,8 @@
-import { component$, useSignal, useStore } from "@builder.io/qwik";
+import { component$, useSignal } from "@builder.io/qwik";
 import {
   routeLoader$,
-  useLocation,
+  server$,
+  z,
   type DocumentHead,
 } from "@builder.io/qwik-city";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
@@ -13,23 +14,32 @@ import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
 
 export const useProtectedSessionLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
+
   return ctx.session;
 });
 
-export const useCollectionLoader = routeLoader$(async (event) => {
+export const useReviewsLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
+
   return findReviews({ ctx, skip: 0, take: 20 });
+});
+
+export const fetchMoreReviews = server$(async function (page: number) {
+  const ctx = await getProtectedRequestContext(this);
+
+  const parsedPage = z.coerce.number().min(0).int().default(0).parse(page);
+
+  return findReviews({ ctx, skip: parsedPage * 20, take: 20 });
 });
 
 export const useCountsLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
+
   return countReviewsByDate({ ctx });
 });
 
 export default component$(() => {
-  const location = useLocation();
-
-  const collection = useCollectionLoader();
+  const reviews = useReviewsLoader();
   const counts = useCountsLoader();
 
   const session = useProtectedSessionLoader();
@@ -37,10 +47,8 @@ export default component$(() => {
 
   const containerRef = useSignal<Element | null>(null);
 
-  const store = useStore({
-    currentPage: 1,
-    results: [] as ReviewListItem[],
-  });
+  const collection = useSignal<ReviewListItem[]>(reviews.value.reviews);
+  const currentPage = useSignal(1);
 
   return (
     <div
@@ -52,23 +60,15 @@ export default component$(() => {
         <ReviewActivity counts={counts.value} />
       </div>
       <ReviewList
-        collection={[...collection.value.reviews, ...store.results]}
-        currentPage={store.currentPage}
-        pageCount={Math.floor(collection.value.count / 20)}
+        collection={collection.value}
+        currentPage={currentPage.value}
+        pageCount={Math.floor(reviews.value.count / 20)}
         parentContainer={containerRef.value}
         onMore$={async () => {
-          const url = `${location.href}api?${new URLSearchParams({
-            query: location.query.get("query") || "",
-            skip: `${(store.currentPage || 0) * 20}`,
-          })}`;
-
-          const json = await (await fetch(url)).json();
-
-          if (json?.status === "success") {
-            const newAlbums = json?.reviews || [];
-            store.currentPage = store.currentPage + 1;
-            store.results = [...store.results, ...newAlbums];
-          }
+          const json = await fetchMoreReviews(currentPage.value);
+          const newAlbums = json?.reviews || [];
+          currentPage.value += 1;
+          collection.value = [...collection.value, ...newAlbums];
         }}
       />
     </div>

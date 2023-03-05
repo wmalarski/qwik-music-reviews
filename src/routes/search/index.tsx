@@ -1,7 +1,9 @@
-import { component$, useSignal, useStore } from "@builder.io/qwik";
+import { component$, useSignal } from "@builder.io/qwik";
 import {
   routeLoader$,
+  server$,
   useLocation,
+  z,
   type DocumentHead,
 } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
@@ -12,25 +14,30 @@ import { findAlbums } from "~/server/data/album";
 export const useAlbumsLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
 
-  return findAlbums({
-    ctx,
-    query: event.query.get("query") || "",
-    skip: 0,
-    take: 20,
-  });
+  const query = event.query.get("query") || "";
+
+  return findAlbums({ ctx, query, skip: 0, take: 20 });
+});
+
+// eslint-disable-next-line prefer-arrow-callback
+export const fetchMoreAlbums = server$(async function (page: number) {
+  const ctx = await getProtectedRequestContext(this);
+
+  const parsedPage = z.coerce.number().min(0).int().default(0).parse(page);
+  const query = this.query.get("query") || "";
+
+  return findAlbums({ ctx, query, skip: parsedPage * 20, take: 20 });
 });
 
 export default component$(() => {
   const location = useLocation();
 
-  const resource = useAlbumsLoader();
+  const albums = useAlbumsLoader();
 
   const containerRef = useSignal<Element | null>(null);
 
-  const store = useStore({
-    currentPage: 1,
-    results: [] as AlbumGridItem[],
-  });
+  const collection = useSignal<AlbumGridItem[]>(albums.value.albums);
+  const currentPage = useSignal(1);
 
   return (
     <div
@@ -51,7 +58,7 @@ export default component$(() => {
             name="query"
             id="query"
             aria-label="query"
-            value={location.query.get("query") as string}
+            value={location.url.searchParams.get("query") as string}
             class="input input-bordered"
           />
           <button class="btn uppercase" type="submit">
@@ -61,23 +68,15 @@ export default component$(() => {
       </div>
 
       <AlbumGrid
-        collection={[...resource.value.albums, ...store.results]}
-        currentPage={store.currentPage}
-        pageCount={Math.floor(resource.value.count / 20)}
+        collection={collection.value}
+        currentPage={currentPage.value}
+        pageCount={Math.floor(albums.value.count / 20)}
         parentContainer={containerRef.value}
         onMore$={async () => {
-          const url = `${location.href}api?${new URLSearchParams({
-            query: location.query.get("query") || "",
-            skip: `${(store.currentPage || 0) * 20}`,
-          })}`;
-
-          const json = await (await fetch(url)).json();
-
-          if (json?.status === "success") {
-            const newAlbums = json.albums || [];
-            store.currentPage = store.currentPage + 1;
-            store.results = [...store.results, ...newAlbums];
-          }
+          const result = await fetchMoreAlbums(currentPage.value);
+          const newAlbums = result.albums || [];
+          currentPage.value += 1;
+          collection.value = [...collection.value, ...newAlbums];
         }}
       />
     </div>
