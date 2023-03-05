@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import { DocumentHead, useLocation } from "@builder.io/qwik-city";
+import { useLocation, type DocumentHead } from "@builder.io/qwik-city";
 import { ReviewForm } from "~/modules/ReviewForm/ReviewForm";
 import { useAlbumLoader } from "../layout";
 

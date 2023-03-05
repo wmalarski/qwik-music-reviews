@@ -26,7 +26,7 @@ export const Sidebar = component$(() => {
       <ul class="flex flex-col gap-6 px-4 py-8 h-full w-28 items-center">
         <li>
           <Link
-            class={link({ isActive: paths.home === location.pathname })}
+            class={link({ isActive: paths.home === location.url.pathname })}
             href={paths.home}
           >
             Home
@@ -34,7 +34,7 @@ export const Sidebar = component$(() => {
         </li>
         <li>
           <Link
-            class={link({ isActive: paths.search === location.pathname })}
+            class={link({ isActive: paths.search === location.url.pathname })}
             href={paths.search}
           >
             Search
@@ -42,7 +42,7 @@ export const Sidebar = component$(() => {
         </li>
         <li class="flex-grow">
           <Link
-            class={link({ isActive: paths.reviews === location.pathname })}
+            class={link({ isActive: paths.reviews === location.url.pathname })}
             href={paths.reviews}
           >
             Reviews

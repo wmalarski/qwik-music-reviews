@@ -1,7 +1,7 @@
-import { $, component$, PropFunction, useSignal } from "@builder.io/qwik";
+import { $, component$, useSignal, type PropFunction } from "@builder.io/qwik";
 import {
   ReviewListCard,
-  ReviewListItem,
+  type ReviewListItem,
 } from "./ReviewListCard/ReviewListCard";
 
 type Props = {

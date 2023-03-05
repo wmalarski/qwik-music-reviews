@@ -1,10 +1,16 @@
 import { component$ } from "@builder.io/qwik";
-import { action$, Form, useLocation, z, zod$ } from "@builder.io/qwik-city";
+import {
+  Form,
+  globalAction$,
+  useLocation,
+  z,
+  zod$,
+} from "@builder.io/qwik-city";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { deleteAlbum } from "~/server/data/album";
 import { paths } from "~/utils/paths";
 
-export const deleteAlbumAction = action$(
+export const useDeleteAlbumAction = globalAction$(
   async (data, event) => {
     const ctx = await getProtectedRequestContext(event);
 
@@ -24,7 +30,7 @@ export const deleteAlbumAction = action$(
 export const AlbumRemoveForm = component$(() => {
   const location = useLocation();
 
-  const action = deleteAlbumAction.use();
+  const action = useDeleteAlbumAction();
 
   return (
     <Form action={action}>

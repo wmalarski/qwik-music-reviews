@@ -1,11 +1,17 @@
 import { component$ } from "@builder.io/qwik";
-import { action$, Form, useLocation, z, zod$ } from "@builder.io/qwik-city";
+import {
+  Form,
+  globalAction$,
+  useLocation,
+  z,
+  zod$,
+} from "@builder.io/qwik-city";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { updateAlbum } from "~/server/data/album";
-import { ActionInput } from "~/server/types";
+import type { ActionInput } from "~/server/types";
 import { paths } from "~/utils/paths";
 
-export const updateAlbumAction = action$(
+export const updateAlbumAction = globalAction$(
   async (data, event) => {
     const ctx = await getProtectedRequestContext(event);
 
@@ -32,7 +38,7 @@ type Props = {
 export const AlbumForm = component$<Props>((props) => {
   const location = useLocation();
 
-  const action = updateAlbumAction.use();
+  const action = updateAlbumAction();
 
   return (
     <Form class="flex flex-col gap-2" action={action}>
@@ -50,7 +56,7 @@ export const AlbumForm = component$<Props>((props) => {
           value={action.formData?.get("text") || props.initialValue?.title}
         />
         <span class="label text-red-500">
-          {action.value?.fieldErrors.title?.[0]}
+          {action.value?.fieldErrors?.title?.[0]}
         </span>
       </div>
 
@@ -70,7 +76,7 @@ export const AlbumForm = component$<Props>((props) => {
           value={action.formData?.get("year") || props.initialValue?.year}
         />
         <span class="label text-red-500">
-          {action.value?.fieldErrors.year?.[0]}
+          {action.value?.fieldErrors?.year?.[0]}
         </span>
       </div>
       <pre>{JSON.stringify(action.value?.fieldErrors, null, 2)}</pre>

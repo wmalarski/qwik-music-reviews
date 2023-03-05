@@ -1,11 +1,11 @@
 import { component$ } from "@builder.io/qwik";
-import { action$, Form, z, zod$ } from "@builder.io/qwik-city";
+import { Form, globalAction$, z, zod$ } from "@builder.io/qwik-city";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { createReview, updateReview } from "~/server/data/review";
-import { ActionInput } from "~/server/types";
+import type { ActionInput } from "~/server/types";
 import { paths } from "~/utils/paths";
 
-export const createOrUpdateReviewAction = action$(
+export const useCreateOrUpdateReviewAction = globalAction$(
   async (data, event) => {
     const ctx = await getProtectedRequestContext(event);
 
@@ -28,11 +28,11 @@ export const createOrUpdateReviewAction = action$(
 
 type Props = {
   albumId: string;
-  initialValue?: ActionInput<typeof createOrUpdateReviewAction>;
+  initialValue?: ActionInput<typeof useCreateOrUpdateReviewAction>;
 };
 
 export const ReviewForm = component$<Props>((props) => {
-  const action = createOrUpdateReviewAction();
+  const action = useCreateOrUpdateReviewAction();
 
   return (
     <Form class="flex flex-col gap-2" action={action}>
@@ -51,7 +51,7 @@ export const ReviewForm = component$<Props>((props) => {
           value={action.formData?.get("text") || props.initialValue?.text}
         />
         <span class="label text-red-500">
-          {action.value?.fieldErrors.text?.[0]}
+          {action.value?.fieldErrors?.text?.[0]}
         </span>
       </div>
 
@@ -71,7 +71,7 @@ export const ReviewForm = component$<Props>((props) => {
           value={action.formData?.get("rate") || props.initialValue?.rate}
         />
         <span class="label text-red-500">
-          {action.value?.fieldErrors.rate?.[0]}
+          {action.value?.fieldErrors?.rate?.[0]}
         </span>
       </div>
 

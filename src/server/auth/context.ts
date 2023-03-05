@@ -1,7 +1,7 @@
 import type { RequestEventCommon } from "@builder.io/qwik-city";
 import type { Session, User } from "next-auth";
 import { paths } from "~/utils/paths";
-import { DbPrismaClient, prisma } from "../db/client";
+import { prisma, type DbPrismaClient } from "../db/client";
 
 export type ProtectedRequestContext = {
   prisma: DbPrismaClient;

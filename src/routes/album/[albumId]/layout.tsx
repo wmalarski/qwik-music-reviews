@@ -1,16 +1,16 @@
 import { component$, Slot } from "@builder.io/qwik";
-import { DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { routeLoader$, type DocumentHead } from "@builder.io/qwik-city";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { findAlbum } from "~/server/data/album";
 import { useSessionContextProvider } from "~/utils/SessionContext";
 import { AlbumHero } from "./AlbumHero/AlbumHero";
 
-export const useProtectedSessionLoader = loader$(async (event) => {
+export const useProtectedSessionLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return ctx.session;
 });
 
-export const useAlbumLoader = loader$(async (event) => {
+export const useAlbumLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
   return findAlbum({ ctx, id: event.params.albumId });
 });

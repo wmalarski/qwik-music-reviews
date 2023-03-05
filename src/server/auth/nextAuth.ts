@@ -1,6 +1,6 @@
 import type { RequestEvent, RequestEventCommon } from "@builder.io/qwik-city";
 import { AuthHandler } from "next-auth/core";
-import { Cookie } from "next-auth/core/lib/cookie";
+import type { Cookie } from "next-auth/core/lib/cookie";
 import type { AuthAction, AuthOptions, Session } from "next-auth/core/types";
 import { env } from "../env";
 

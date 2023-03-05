@@ -1,11 +1,11 @@
 import { component$, Slot } from "@builder.io/qwik";
-import { DocumentHead, loader$ } from "@builder.io/qwik-city";
+import { routeLoader$, type DocumentHead } from "@builder.io/qwik-city";
 import { getProtectedRequestContext } from "~/server/auth/context";
 import { findReview } from "~/server/data/review";
 import { paths } from "~/utils/paths";
 import { ReviewHero } from "./ReviewHero/ReviewHero";
 
-export const useReviewLoader = loader$(async (event) => {
+export const useReviewLoader = routeLoader$(async (event) => {
   const ctx = await getProtectedRequestContext(event);
 
   const reviewId = event.params.reviewId;
