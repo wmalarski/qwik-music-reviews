@@ -7,7 +7,10 @@ import {
 } from "@builder.io/qwik-city";
 import { ReviewList } from "~/modules/ReviewList/ReviewList";
 import type { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
-import { getProtectedRequestContext } from "~/server/auth/context";
+import {
+  getNullableProtectedRequestContext,
+  getProtectedRequestContext,
+} from "~/server/auth/context";
 import { countReviewsByDate, findReviews } from "~/server/data/review";
 import { useSessionContextProvider } from "~/utils/SessionContext";
 import { ReviewActivity } from "./ReviewActivity/ReviewActivity";
@@ -25,7 +28,11 @@ export const useReviewsLoader = routeLoader$(async (event) => {
 });
 
 export const fetchMoreReviews = server$(async function (page: number) {
-  const ctx = await getProtectedRequestContext(this);
+  const ctx = await getNullableProtectedRequestContext(this);
+
+  if (!ctx) {
+    return null;
+  }
 
   const parsedPage = z.coerce.number().min(0).int().default(0).parse(page);
 

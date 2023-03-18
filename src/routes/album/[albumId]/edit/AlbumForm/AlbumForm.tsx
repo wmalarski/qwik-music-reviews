@@ -11,7 +11,7 @@ import { updateAlbum } from "~/server/data/album";
 import type { ActionInput } from "~/server/types";
 import { paths } from "~/utils/paths";
 
-export const updateAlbumAction = globalAction$(
+export const useUpdateAlbumAction = globalAction$(
   async (data, event) => {
     const ctx = await getProtectedRequestContext(event);
 
@@ -32,13 +32,13 @@ export type AlbumFormData = {
 };
 
 type Props = {
-  initialValue: ActionInput<typeof updateAlbumAction>;
+  initialValue: ActionInput<typeof useUpdateAlbumAction>;
 };
 
 export const AlbumForm = component$<Props>((props) => {
   const location = useLocation();
 
-  const action = updateAlbumAction();
+  const action = useUpdateAlbumAction();
 
   return (
     <Form class="flex flex-col gap-2" action={action}>

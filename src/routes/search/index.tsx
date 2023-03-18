@@ -8,7 +8,10 @@ import {
 } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import type { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
-import { getProtectedRequestContext } from "~/server/auth/context";
+import {
+  getNullableProtectedRequestContext,
+  getProtectedRequestContext,
+} from "~/server/auth/context";
 import { findAlbums } from "~/server/data/album";
 
 export const useAlbumsLoader = routeLoader$(async (event) => {
@@ -21,7 +24,11 @@ export const useAlbumsLoader = routeLoader$(async (event) => {
 
 // eslint-disable-next-line prefer-arrow-callback
 export const fetchMoreAlbums = server$(async function (page: number) {
-  const ctx = await getProtectedRequestContext(this);
+  const ctx = await getNullableProtectedRequestContext(this);
+
+  if (!ctx) {
+    return null;
+  }
 
   const parsedPage = z.coerce.number().min(0).int().default(0).parse(page);
   const query = this.query.get("query") || "";
@@ -74,7 +81,7 @@ export default component$(() => {
         parentContainer={containerRef.value}
         onMore$={async () => {
           const result = await fetchMoreAlbums(currentPage.value);
-          const newAlbums = result.albums || [];
+          const newAlbums = result?.albums || [];
           currentPage.value += 1;
           collection.value = [...collection.value, ...newAlbums];
         }}

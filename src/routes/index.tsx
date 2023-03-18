@@ -6,7 +6,10 @@ import {
 } from "@builder.io/qwik-city";
 import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
 import type { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
-import { getProtectedRequestContext } from "~/server/auth/context";
+import {
+  getNullableProtectedRequestContext,
+  getProtectedRequestContext,
+} from "~/server/auth/context";
 import { findRandom } from "~/server/data/album";
 
 export const useRandomAlbumsLoader = routeLoader$(async (event) => {
@@ -16,7 +19,11 @@ export const useRandomAlbumsLoader = routeLoader$(async (event) => {
 });
 
 export const fetchMoreRandomAlbums = server$(async function () {
-  const ctx = await getProtectedRequestContext(this);
+  const ctx = await getNullableProtectedRequestContext(this);
+
+  if (!ctx) {
+    return null;
+  }
 
   return findRandom({ ctx, take: 20 });
 });
