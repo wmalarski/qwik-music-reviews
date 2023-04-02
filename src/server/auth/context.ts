@@ -1,8 +1,6 @@
-import type {
-  RequestEventBase,
-  RequestEventCommon,
-} from "@builder.io/qwik-city";
-import type { Session, User } from "next-auth";
+import type { Session, User } from "@auth/core/types";
+import type { RequestEventCommon } from "@builder.io/qwik-city";
+import { getServerSession } from "~/routes/plugin@auth";
 import { paths } from "~/utils/paths";
 import { prisma, type DbPrismaClient } from "../db/client";
 
@@ -12,19 +10,16 @@ export type ProtectedRequestContext = {
   user: User;
 };
 
-const getRequestSession = async (
-  event: RequestEventBase
+const getRequestSession = (
+  event: RequestEventCommon
 ): Promise<Session | null> => {
-  const { getServerSession } = await import("./nextAuth");
-  const { authOptions } = await import("./options");
-
   const sessionPromise = event.sharedMap.get("session");
 
   if (sessionPromise) {
     return sessionPromise;
   }
 
-  const newPromise = getServerSession(event, authOptions);
+  const newPromise = getServerSession(event);
   event.sharedMap.set("session", newPromise);
   return newPromise;
 };
@@ -39,7 +34,7 @@ export const getProtectedRequestContext = async (event: RequestEventCommon) => {
 };
 
 export const getNullableProtectedRequestContext = async (
-  event: RequestEventBase
+  event: RequestEventCommon
 ) => {
   const session = await getRequestSession(event);
 

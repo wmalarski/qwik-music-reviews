@@ -1,10 +1,10 @@
+import type { Session } from "@auth/core/types";
 import {
   createContextId,
   useContext,
   useContextProvider,
   type Signal,
 } from "@builder.io/qwik";
-import type { Session } from "next-auth";
 
 type SessionContextState = Signal<Session>;
 

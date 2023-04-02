@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
-import type { DefaultSession } from "next-auth";
+import "@auth/core/types";
 
-declare module "next-auth" {
+declare module "@auth/core/types" {
   /**
    * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
    */
