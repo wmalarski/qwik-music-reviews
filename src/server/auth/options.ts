@@ -15,7 +15,9 @@ export const authOptions: AuthOptions = {
   callbacks: {
     session: ({ session, user }) => {
       if (session.user) {
-        session.user.id = user?.id;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const sessionUser = session.user as any;
+        sessionUser.id = user?.id;
       }
       return session;
     },

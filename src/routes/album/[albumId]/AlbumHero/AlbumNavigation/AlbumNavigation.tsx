@@ -35,7 +35,7 @@ export const AlbumNavigation = component$<Props>((props) => {
         <li>
           <Link
             class={link({
-              isActive: paths.album(props.album.id) === location.pathname,
+              isActive: paths.album(props.album.id) === location.url.pathname,
             })}
             href={paths.album(props.album.id)}
           >
@@ -46,7 +46,8 @@ export const AlbumNavigation = component$<Props>((props) => {
           <li>
             <Link
               class={link({
-                isActive: paths.albumEdit(props.album.id) === location.pathname,
+                isActive:
+                  paths.albumEdit(props.album.id) === location.url.pathname,
               })}
               href={paths.albumEdit(props.album.id)}
             >
@@ -58,7 +59,8 @@ export const AlbumNavigation = component$<Props>((props) => {
         <li>
           <Link
             class={link({
-              isActive: paths.albumReview(props.album.id) === location.pathname,
+              isActive:
+                paths.albumReview(props.album.id) === location.url.pathname,
             })}
             href={paths.albumReview(props.album.id)}
           >
