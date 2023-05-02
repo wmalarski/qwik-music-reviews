@@ -6,8 +6,7 @@ import {
   z,
   type DocumentHead,
 } from "@builder.io/qwik-city";
-import { AlbumGrid } from "~/modules/AlbumGrid/AlbumGrid";
-import type { AlbumGridItem } from "~/modules/AlbumGrid/AlbumGridCard/AlbumGridCard";
+import { AlbumGrid, type AlbumGridItem } from "~/modules/AlbumGrid/AlbumGrid";
 import {
   getNullableProtectedRequestContext,
   getProtectedRequestContext,

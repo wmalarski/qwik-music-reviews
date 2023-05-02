@@ -5,8 +5,10 @@ import {
   z,
   type DocumentHead,
 } from "@builder.io/qwik-city";
-import { ReviewList } from "~/modules/ReviewList/ReviewList";
-import type { ReviewListItem } from "~/modules/ReviewList/ReviewListCard/ReviewListCard";
+import {
+  ReviewList,
+  type ReviewListItem,
+} from "~/modules/ReviewList/ReviewList";
 import {
   getNullableProtectedRequestContext,
   getProtectedRequestContext,
